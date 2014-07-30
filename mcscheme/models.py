@@ -1,7 +1,9 @@
 from django.db import models
+from django import forms
+from django.forms.widgets import RadioSelect
 
 class Student(models.Model):
-	email = models.CharField(max_length=50, primary_key=True)
+	email = models.CharField(max_length=50)
 
 	def __unicode__(self):
 		return self.email
@@ -15,11 +17,22 @@ class Question(models.Model):
 class Answer(models.Model):
 	question_id = models.IntegerField()
 	student_id = models.IntegerField()
-	text = models.CharField(max_length=500)
+	answer = models.CharField(max_length=500)
+	answer_tf = models.CharField(max_length=20)
 	score = models.FloatField(default=0.0)
 
 	def __unicode__(self):
 		return str(self.student_id) + "'s answer to q" + str(self.question_id)
+
+class ExamForm(forms.Form):
+	student_id = forms.IntegerField()
+	question_id = forms.IntegerField()
+	answer = forms.CharField(required=True)
+	answer_tf = forms.ChoiceField(
+			widget=RadioSelect(),
+			choices=[['1','True'],['0','False']])
+	fields = ('student_id', 'question_id', 'answer')
+
 
 class Score(models.Model):
 	answer_id = models.IntegerField()

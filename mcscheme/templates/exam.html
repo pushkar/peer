@@ -1,0 +1,28 @@
+
+<p>{{ message }}</p>
+<form action="/mcscheme/exam/" method="post">{% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="fieldWrapper">
+    {{ form.student_id.errors }}
+    <label for="student_id">Student:</label>
+    {{ form.student_id }}
+    </div>
+    <div class="fieldWrapper">
+    {{ form.question_id.errors }}
+    <label for="question_id">Question:</label>
+    {{ form.question_id }}
+    </div>
+    <div class="fieldWrapper">
+    {{ form.answer_tf.errors }}
+    <label for="answer_tf">T/F:</label>
+    {% for radio in form.answer_tf %}
+        {{ radio }}
+    {% endfor %}
+    </div>
+    <div class="fieldWrapper">
+    {{ form.answer.errors }}
+    <label for="answer">Answer:</label>
+    {{ form.answer }}
+    </div>
+    <p><input type="submit" value="Submit" /></p>
+</form>

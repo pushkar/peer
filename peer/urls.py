@@ -7,6 +7,7 @@ urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'peer.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
-	  url(r'^mcscheme/', include('mcscheme.urls', namespace="mcscheme")),
+	url(r'^mcscheme/', include('mcscheme.urls', namespace="mcscheme")),
+	url(r"^account/", include("account.urls")),
     url(r'^admin/', include(admin.site.urls)),
 )

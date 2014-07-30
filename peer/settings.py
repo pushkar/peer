@@ -1,4 +1,4 @@
-"""
+'''
 Django settings for peer project.
 
 For more information on this file, see
@@ -6,7 +6,7 @@ https://docs.djangoproject.com/en/1.6/topics/settings/
 
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.6/ref/settings/
-"""
+'''
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
@@ -36,6 +36,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'account',
     'mcscheme',
 )
 
@@ -46,6 +47,19 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'account.middleware.LocaleMiddleware',
+    'account.middleware.TimezoneMiddleware',
+)
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.debug',
+    'django.core.context_processors.i18n',
+    'django.core.context_processors.media',
+    'django.core.context_processors.static',
+    'django.core.context_processors.tz',
+    'django.contrib.messages.context_processors.messages',
+    'account.context_processors.account',
 )
 
 ROOT_URLCONF = 'peer.urls'
@@ -79,5 +93,10 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
-
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_ROOT = 'static'
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
