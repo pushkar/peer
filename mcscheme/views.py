@@ -8,6 +8,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.core.urlresolvers import reverse
 
 import numpy
+import csv
 
 #@login_required
 def index(request):
@@ -15,49 +16,62 @@ def index(request):
     return HttpResponse("No user is logged in.")
   return HttpResponse(request.user.username)
 
+def home(request):
+    request.session['student_id'] = 1
+    s = Student.objects.get(pk=request.session['student_id'])
+    r = "Student with email, " + s.email + ", is logged in"
+    return HttpResponse(r)
+
 def exam(request):
-    student_id = 1
     message = ""
     if request.method == 'POST':
-        form = ExamForm(request.POST)
+        form = TFForm(request.POST)
         if form.is_valid():
-            a = Answer()
-            a.student_id = form.cleaned_data['student_id']
-            a.question_id = form.cleaned_data['question_id']
-            a.answer = form.cleaned_data['answer']
-            a.answer_tf = form.cleaned_data['answer_tf']
-            a.save()
-            message = "Success, saved answer."
+            tf = TFLog()
+            tf.student_id = request.session['student_id']
+            tf.question_id = request.session['question_id']
+            tf.answer_tf = form.cleaned_data['answer_tf']
+            tf.answer = form.cleaned_data['answer']
+            tf.save()
+            message = "Saved a TFLog at " + str(tf.created)
 
     q_s = Question.objects.all()
     q_list = range(0, q_s.count()-1)
-    a_s = Answer.objects.filter(student_id=student_id)
+    a_s = Answer.objects.filter(student_id=request.session['student_id'])
     for a in a_s:
         if a.question_id in q_list:
             q_list.remove(a.question_id)
 
     print q_list
     q_id = numpy.random.choice(q_list)
-    form = ExamForm(initial={'student_id':student_id, 'question_id':q_id})
+    request.session['question_id'] = q_id
+    form = TFForm()
 
     return render(request, 'exam.html', {
         'message': message,
+        'student': Student.objects.get(pk=request.session['student_id']),
+        'question': request.session['question_id'],
         'form': form,
     })
 
 def db_populate(request):
     response = ""
-    Student(email="abc").save()
-    Student(email="def").save()
-    response += "Students added<br />"
+    open('djangotemp.txt', 'w')
 
-    Question(text="q1").save()
-    Question(text="q2").save()
-    Question(text="q3").save()
-    Question(text="q4").save()
-    Question(text="q5").save()
-    Question(text="q6").save()
-    response += "Questions added<br />"
+    with open('roster.csv', 'rb') as file:
+        reader = csv.reader(file, delimiter=',')
+        for row in reader:
+            if len(row) == 5:
+                Student.objects.get_or_create(userid=row[0], email=row[1],
+                    gtid=row[2], lastname=row[3], firstname=row[4])
+                response += row[0] + " added.<br />"
+
+    with open('questions.csv', 'rb') as file:
+        reader = csv.reader(file, delimiter=',')
+        for row in reader:
+            Question.objects.get_or_create(text=row[0])
+            response += row[0] + "<br />"
+
     return HttpResponse(response)
 
 def db_show(request):

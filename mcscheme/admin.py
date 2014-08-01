@@ -5,4 +5,6 @@ from mcscheme.models import *
 admin.site.register(Student)
 admin.site.register(Question)
 admin.site.register(Answer)
+admin.site.register(TFLog)
+admin.site.register(MCLog)
 admin.site.register(Score)

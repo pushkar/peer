@@ -3,10 +3,14 @@ from django import forms
 from django.forms.widgets import RadioSelect
 
 class Student(models.Model):
+	userid = models.CharField(max_length=50)
 	email = models.CharField(max_length=50)
+	gtid = models.CharField(max_length=12)
+	lastname = models.CharField(max_length=50)
+	firstname = models.CharField(max_length=50)
 
 	def __unicode__(self):
-		return self.email
+		return self.userid
 
 class Question(models.Model):
 	text = models.CharField(max_length=500)
@@ -24,14 +28,31 @@ class Answer(models.Model):
 	def __unicode__(self):
 		return str(self.student_id) + "'s answer to q" + str(self.question_id)
 
-class ExamForm(forms.Form):
+class TFLog(models.Model):
+	created = models.DateTimeField(auto_now_add=True)
 	student_id = forms.IntegerField()
 	question_id = forms.IntegerField()
-	answer = forms.CharField(required=True)
+
+class MCLog(models.Model):
+	created = models.DateTimeField(auto_now_add=True)
+	student_id = forms.IntegerField()
+	answer1_id = forms.IntegerField()
+	answer2_id = forms.IntegerField()
+
+class TFForm(forms.Form):
 	answer_tf = forms.ChoiceField(
 			widget=RadioSelect(),
 			choices=[['1','True'],['0','False']])
-	fields = ('student_id', 'question_id', 'answer')
+	answer = forms.CharField(required=True)
+	fields = ('answer', 'explanation')
+
+class MCForm(forms.Form):
+	choice = forms.ChoiceField(
+			widget=RadioSelect(),
+			choices=[['1','First is True'],
+					['2','Second is True'],
+					['3', 'Both are True'],
+					['4', 'Both are False']])
 
 
 class Score(models.Model):
