@@ -1,8 +1,8 @@
-
+<p><a href="/mcscheme/logout">Logout</a> | <a href="/mcscheme/done">Finish Exam</a></p>
 <p>{{ message }}</p>
-<form action="/mcscheme/exam/" method="post">{% csrf_token %}
-    <p>Student: {{ student }}</p>
-    <p>Question: {{ question }}</p>
+<form action="/mcscheme/exam/tf" method="post">{% csrf_token %}
+    <!--<p>Student: {{ student }}</p>-->
+    <p>{{ question }}</p>
     <div class="fieldWrapper">
     {{ form.answer_tf.errors }}
     <label for="answer_tf">T/F:</label>
@@ -12,7 +12,7 @@
     </div>
     <div class="fieldWrapper">
     {{ form.answer.errors }}
-    <label for="answer">Answer:</label>
+    <label for="answer">Explanation:</label><br />
     {{ form.answer }}
     </div>
     <p><input type="submit" value="Submit" /></p>

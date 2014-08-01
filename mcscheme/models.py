@@ -8,12 +8,13 @@ class Student(models.Model):
 	gtid = models.CharField(max_length=12)
 	lastname = models.CharField(max_length=50)
 	firstname = models.CharField(max_length=50)
+	gtpe_finished = models.IntegerField()
 
 	def __unicode__(self):
 		return self.userid
 
 class Question(models.Model):
-	text = models.CharField(max_length=500)
+	text = models.CharField(max_length=2000)
 
 	def __unicode__(self):
 		return self.text
@@ -21,30 +22,40 @@ class Question(models.Model):
 class Answer(models.Model):
 	question_id = models.IntegerField()
 	student_id = models.IntegerField()
-	answer = models.CharField(max_length=500)
-	answer_tf = models.CharField(max_length=20)
+	answer = models.CharField(max_length=2000)
+	answer_tf = models.CharField(max_length=10)
 	score = models.FloatField(default=0.0)
 
 	def __unicode__(self):
 		return str(self.student_id) + "'s answer to q" + str(self.question_id)
 
-class TFLog(models.Model):
+class Log(models.Model):
 	created = models.DateTimeField(auto_now_add=True)
-	student_id = forms.IntegerField()
-	question_id = forms.IntegerField()
+	student_id = models.IntegerField()
+	question_id = models.IntegerField()
+	type_of_question = models.CharField(max_length=10)
+	log_id = models.IntegerField()
 
-class MCLog(models.Model):
-	created = models.DateTimeField(auto_now_add=True)
-	student_id = forms.IntegerField()
-	answer1_id = forms.IntegerField()
-	answer2_id = forms.IntegerField()
+	def __unicode__(self):
+		return str(self.created)
+
 
 class TFForm(forms.Form):
 	answer_tf = forms.ChoiceField(
 			widget=RadioSelect(),
 			choices=[['1','True'],['0','False']])
-	answer = forms.CharField(required=True)
+	answer = forms.CharField(widget=forms.Textarea)
 	fields = ('answer', 'explanation')
+
+class TFLog(models.Model):
+	created = models.DateTimeField(auto_now_add=True)
+	student_id = models.IntegerField()
+	question_id = models.IntegerField()
+	answer_tf = models.CharField(max_length=10)
+	answer = models.CharField(max_length=2000)
+
+	def __unicode__(self):
+		return str(self.created)
 
 class MCForm(forms.Form):
 	choice = forms.ChoiceField(
@@ -54,6 +65,21 @@ class MCForm(forms.Form):
 					['3', 'Both are True'],
 					['4', 'Both are False']])
 
+class MCLog(models.Model):
+	created = models.DateTimeField(auto_now_add=True)
+	student_id = models.IntegerField()
+	question_id = models.IntegerField()
+	answer1_id = models.IntegerField()
+	answer2_id = models.IntegerField()
+	choice = models.IntegerField()
+
+	def __unicode__(self):
+		return str(self.created)
+
+class LoginForm(forms.Form):
+	userid = forms.CharField()
+	gtid = forms.CharField()
+	fields = ('userid', 'gtid')
 
 class Score(models.Model):
 	answer_id = models.IntegerField()

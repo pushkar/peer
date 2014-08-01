@@ -1,0 +1,15 @@
+<p><a href="/mcscheme/logout">Logout</a> | <a href="/mcscheme/done">Finish Exam</a></p>
+<p>{{ message }}</p>
+<form action="/mcscheme/exam/mc" method="post">{% csrf_token %}
+    <p>{{ question }}</p>
+    <p>Statement 1: {{ answer1_tf }} {{ answer1 }}</p>
+    <p>Statement 2: {{ answer2_tf }} {{ answer2 }}</p>
+    <div class="fieldWrapper">
+    {{ form.choice.errors }}
+    <label for="choice">Choose which of the following is correct about the above statement:</label> <br />
+    {% for radio in form.choice %}
+        {{ radio }}
+    {% endfor %}
+    </div>
+    <p><input type="submit" value="Submit" /></p>
+</form>

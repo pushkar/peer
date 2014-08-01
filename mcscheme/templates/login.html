@@ -1,0 +1,15 @@
+
+<p>{{ message }}</p>
+<form action="/mcscheme/login" method="post">{% csrf_token %}
+    <div class="fieldWrapper">
+    {{ form.userid.errors }}
+    <label for="userid">UserId:</label>
+    {{ form.userid }} (example: pkolhe3)
+    </div>
+    <div class="fieldWrapper">
+    {{ form.gtid.errors }}
+    <label for="gtid">GTID:</label>
+    {{ form.gtid }} (example: 90*******)
+    </div>
+    <p><input type="submit" value="Submit" /></p>
+</form>
