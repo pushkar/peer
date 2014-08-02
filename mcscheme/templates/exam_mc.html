@@ -1,4 +1,9 @@
 <p><a href="/mcscheme/logout">Logout</a> | <a href="/mcscheme/done">Finish Exam</a></p>
+<p>
+    {% for i in total %}
+        <a href="/mcscheme/update/{{ i }}">{{ i }}</a> |
+    {% endfor %}
+</p>
 <p>{{ message }}</p>
 <form action="/mcscheme/exam/mc" method="post">{% csrf_token %}
     <p>{{ question }}</p>

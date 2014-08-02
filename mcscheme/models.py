@@ -39,6 +39,9 @@ class Log(models.Model):
 	def __unicode__(self):
 		return str(self.created)
 
+	class Meta:
+		get_latest_by = "created"
+
 
 class TFForm(forms.Form):
 	answer_tf = forms.ChoiceField(

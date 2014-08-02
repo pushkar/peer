@@ -11,6 +11,8 @@ import numpy
 import csv
 
 def index(request):
+    if not 'message' in request.session:
+        request.session['message'] = ""
     return render(request, 'index.html', {
       'message': request.session['message'],
     })
@@ -67,7 +69,10 @@ def exam_tf(request):
             log.type_of_question = "tf"
             log.student_id = request.session['student_id']
             log.question_id = request.session['question_id']
-            tf = TFLog()
+            try:
+                tf = TFLog.objects.get(student_id=request.session['student_id'], question_id=request.session['question_id'])
+            except TFLog.DoesNotExist:
+                tf = TFLog()
             tf.student_id = request.session['student_id']
             tf.question_id = request.session['question_id']
             tf.answer_tf = form.cleaned_data['answer_tf']
@@ -75,12 +80,14 @@ def exam_tf(request):
             tf.save()
             log.log_id = tf.pk
             log.save()
-            request.session['question_id'] += 1
+            if request.session['question_id'] < 27:
+                request.session['question_id'] += 1
             return HttpResponseRedirect('/mcscheme/exam')
         else:
             request.session['message'] = "Fill all required fields."
     return render(request, 'exam_tf.html', {
         'message': request.session['message'],
+        'total': range(1, 27),
         'student': Student.objects.get(pk=request.session['student_id']),
         'question': Question.objects.get(pk=request.session['question_id']),
         'form': form,
@@ -95,7 +102,10 @@ def exam_mc(request):
             log.type_of_question = "mc"
             log.student_id = request.session['student_id']
             log.question_id = request.session['question_id']
-            mc = MCLog()
+            try:
+                mc = MCLog.objects.get(student_id=request.session['student_id'], question_id=request.session['question_id'])
+            except MCLog.DoesNotExist:
+                mc = MCLog()
             mc.student_id = request.session['student_id']
             mc.question_id = request.session['question_id']
             mc.answer1_id = request.session['answer1']
@@ -104,12 +114,14 @@ def exam_mc(request):
             mc.save()
             log.log_id = mc.pk
             log.save()
-            request.session['question_id'] += 1
+            if request.session['question_id'] < 27:
+                request.session['question_id'] += 1
             return HttpResponseRedirect('/mcscheme/exam')
         else:
             request.session['message'] = "Choose an option before submitting."
     return render(request, 'exam_mc.html', {
         'message': request.session['message'],
+        'total': range(1, 27),
         'question': Question.objects.get(pk=request.session['question_id']),
         'answer1_tf': request.session['answer1_tf'],
         'answer2_tf': request.session['answer2_tf'],
@@ -119,15 +131,54 @@ def exam_mc(request):
     })
 
 def exam(request):
+
     if Student.objects.get(pk=request.session['student_id']).gtpe_finished == 1:
         request.session['message'] = "You have finished and saved your exam. You can't visit it again."
         return HttpResponseRedirect("/mcscheme")
+    #----
+
+    try:
+        log = Log.objects.filter(student_id=request.session['student_id'], question_id=request.session['question_id']).latest()
+
+        if log.type_of_question == "tf":
+            tflog = TFLog.objects.get(pk=log.log_id)
+            data = {'answer_tf': tflog.answer_tf, 'answer': tflog.answer}
+            form = TFForm(initial=data)
+            return render(request, 'exam_tf.html', {
+                'message': request.session['message'],
+                'total': range(1, 27),
+                'student': Student.objects.get(pk=request.session['student_id']),
+                'question': Question.objects.get(pk=request.session['question_id']),
+                'form': form,
+            })
+        if log.type_of_question == "mc":
+            mclog = MCLog.objects.get(pk=log.log_id)
+            request.session['answer1'] = mclog.answer1_id
+            request.session['answer2'] = mclog.answer2_id
+            data = {'choice': mclog.choice}
+            form = MCForm(initial=data)
+            return render(request, 'exam_mc.html', {
+                'message': request.session['message'],
+                'total': range(1, 27),
+                'question': Question.objects.get(pk=request.session['question_id']),
+                'answer1_tf': Answer.objects.get(pk=request.session['answer1']).answer_tf,
+                'answer2_tf': Answer.objects.get(pk=request.session['answer2']).answer_tf,
+                'answer1': Answer.objects.get(pk=request.session['answer1']).answer,
+                'answer2': Answer.objects.get(pk=request.session['answer2']).answer,
+                'form': form
+            })
+
+    except Log.DoesNotExist:
+        pass
+
+    #------
 
     if numpy.random.choice(2, 1)[0] == 0:
         form = TFForm()
 
         return render(request, 'exam_tf.html', {
             'message': request.session['message'],
+            'total': range(1, 27),
             'student': Student.objects.get(pk=request.session['student_id']),
             'question': Question.objects.get(pk=request.session['question_id']),
             'form': form,
@@ -147,6 +198,7 @@ def exam(request):
 
         return render(request, 'exam_mc.html', {
             'message': request.session['message'],
+            'total': range(1, 27),
             'question': Question.objects.get(pk=request.session['question_id']),
             'answer1_tf': request.session['answer1_tf'],
             'answer2_tf': request.session['answer2_tf'],
@@ -156,11 +208,6 @@ def exam(request):
         })
 
 def update(request, q_id="1"):
-    #Assume that the question_id is set somehow
-    #try:
-    #    log = Log.objects.get(student_id=request.session['student_id'], question_id=q_id)
-    #
-    #except Log.DoesNotExist:
     request.session['question_id'] = q_id
     return HttpResponseRedirect('/mcscheme/exam')
 
