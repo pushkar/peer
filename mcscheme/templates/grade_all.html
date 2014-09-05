@@ -1,0 +1,22 @@
+<p>{{ message }}</p>
+<br />
+<table>
+    <tr>
+        <td></td>
+        <td width="150">UserId</td>
+        <td width="100">T/F count</td>
+        <td width="100">MC count</td>
+        <td width="100">Total Answered</td>
+        <td width="100">Score</td>
+    </tr>
+{% for s in scores %}
+    <tr>
+    <td>{{ s.pk }}</td>
+    <td>{{ s.userid }}</td>
+    <td>{{ s.tf_count }}</td>
+    <td>{{ s.mc_count }}</td>
+    <td>{{ s.total_count }}</td>
+    <td>{{ s.score }}</td>
+    </tr>
+{% endfor %}
+</table>
