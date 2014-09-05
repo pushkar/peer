@@ -236,6 +236,142 @@ def save(request):
     request.session['message'] = "Congratulations, you have finished your exam."
     return HttpResponseRedirect("/mcscheme")
 
+def grade_auto(request):
+    mc_log = MCLog.objects.all()
+    for m in mc_log:
+        m.score = 0.0
+        a1 = Answer.objects.get(pk=m.answer1_id)
+        a2 = Answer.objects.get(pk=m.answer2_id)
+        if a1.score == 1.0:
+            if a2.score == 1.0:
+                if m.choice == 3:
+                    m.score = 1.0
+            else:
+                if m.choice == 1:
+                    m.score = 1.0
+        else:
+            if a2.score == 1.0:
+                if m.choice == 2:
+                    m.score = 1.0
+                else:
+                    if m.choice == 4:
+                        m.score = 0
+        m.save()
+    return render(request, 'index.html', {
+      'message': request.session['message'],
+    })
+
+def grade(request, log_type="tf", log_id="1", score=0.0):
+    tf_log = TFLog.objects.get(pk=log_id)
+    tf_log.score = score
+    tf_log.save()
+    return HttpResponseRedirect("/mcscheme/grade/"+log_type+"/"+log_id)
+
+def grade_all(request):
+    request.session['message'] = ""
+    students = Student.objects.all().order_by('lastname')
+    scores = []
+    for s in students:
+        s_dict = {}
+        tf_log = TFLog.objects.filter(student_id=s.pk)
+        mc_log = MCLog.objects.filter(student_id=s.pk)
+        n_score = 0
+        for l in tf_log:
+            if l.score > 0:
+                n_score += l.score
+        for l in mc_log:
+            if l.score > 0:
+                n_score += l.score
+        s_dict['userid'] = s.userid
+        s_dict['tf_count'] = tf_log.count()
+        s_dict['mc_count'] = mc_log.count()
+        s_dict['total_count'] = tf_log.count() + mc_log.count()
+        s_dict['score'] = n_score
+        scores.append(s_dict)
+    return render(request, 'grade_all.html', {
+        'message': request.session['message'],
+        'scores': scores,
+    })
+
+def grade_log(request, log_type="tf", log_id=1):
+    request.session['message'] = ""
+    try:
+        if log_type == "tf":
+            tf_log = TFLog.objects.get(pk=log_id)
+            if tf_log.answer_tf == "1":
+                answer_tf = "True"
+            else:
+                answer_tf = "False"
+            student = Student.objects.get(pk=tf_log.student_id)
+            question = Question.objects.get(pk=tf_log.question_id)
+            back_link = "/mcscheme/grade/"+log_type+"/"+str(int(log_id)-1)
+            next_link = "/mcscheme/grade/"+log_type+"/"+str(int(log_id)+1)
+            return render(request, 'grade_tflog.html', {
+                'message': request.session['message'],
+                'tf_log' : tf_log,
+                'answer_tf': answer_tf,
+                'student': student,
+                'question': question,
+                'back': back_link,
+                'next': next_link,
+            })
+        elif log_type == "mc":
+            mc_log = MCLog.objects.get(pk=log_id)
+            student = Student.objects.get(pk=mc_log.student_id)
+            question = Question.objects.get(pk=mc_log.question_id)
+            answer1 = Answer.objects.get(pk=mc_log.answer1_id)
+            answer2 = Answer.objects.get(pk=mc_log.answer2_id)
+
+            if answer1.answer_tf == "1":
+                answer1_tf = "True"
+            else:
+                answer1_tf = "False"
+
+            if answer2.answer_tf == "1":
+                answer2_tf = "True"
+            else:
+                answer2_tf = "False"
+
+            back_link = "/mcscheme/grade/"+log_type+"/"+str(int(log_id)-1)
+            next_link = "/mcscheme/grade/"+log_type+"/"+str(int(log_id)+1)
+            return render(request, 'grade_mclog.html', {
+                'message': request.session['message'],
+                'mc_log' : mc_log,
+                'student': student,
+                'question': question,
+                'answer1': answer1,
+                'answer2': answer2,
+                'answer1_tf': answer1_tf,
+                'answer2_tf': answer2_tf,
+                'back': back_link,
+                'next': next_link,
+            })
+    except:
+        request.session['message'] = "Something went wrong"
+        return render(request, 'grade_tflog.html', {
+            'message': request.session['message'],
+            'back': "javascript:history.go(-1)",
+        })
+
+
+def grade_student(request, u_id="pushkar"):
+    student = Student.objects.get(userid=u_id)
+    log = Log.objects.filter(student_id=student.id)
+    log_list = []
+    for l in log:
+        log_list.append([l.type_of_question, l.log_id])
+    tflog = Log.objects.all()
+    mclog = Log.objects.all()
+    request.session['message'] = str(log.count())
+    print log_list
+    return render(request, 'grade.html', {
+        'message': request.session['message'],
+        'log': log_list,
+        'tflog': tflog,
+        'mclog': mclog,
+        'student': student,
+    })
+
 def db_populate(request):
     response = ""
     open('djangotemp.txt', 'w')

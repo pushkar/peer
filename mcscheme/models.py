@@ -56,6 +56,7 @@ class TFLog(models.Model):
 	question_id = models.IntegerField()
 	answer_tf = models.CharField(max_length=10)
 	answer = models.CharField(max_length=2000)
+	score = models.FloatField(default=0.0)
 
 	def __unicode__(self):
 		return str(self.created)
@@ -75,9 +76,11 @@ class MCLog(models.Model):
 	answer1_id = models.IntegerField()
 	answer2_id = models.IntegerField()
 	choice = models.IntegerField()
+	score = models.FloatField(default=0.0)
 
 	def __unicode__(self):
 		return str(self.created)
+
 
 class LoginForm(forms.Form):
 	userid = forms.CharField()
