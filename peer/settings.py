@@ -99,10 +99,10 @@ USE_L10N = True
 
 USE_TZ = True
 
-#import dj_database_url
-#import os
-#if os.getcwd() == "/app":
-#    DATABASES = {'default': dj_database_url.config(default='postgres://localhost')}
+import dj_database_url
+import os
+if os.getcwd() == "/app":
+    DATABASES = {'default': dj_database_url.config(default='postgres://localhost')}
 
 
 # Static asset configuration
