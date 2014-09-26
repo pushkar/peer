@@ -10,3 +10,8 @@ urlpatterns = patterns('',
 	url(r'^mcscheme/', include('mcscheme.urls', namespace="mcscheme")),
     url(r'^admin/', include(admin.site.urls)),
 )
+
+from peer import settings
+urlpatterns += patterns('',
+	(r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
+)
