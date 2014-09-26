@@ -7,3 +7,11 @@
 5; True; As the amount of training data increases, the probability that the model overfits the training data increases. This will cause the training error to go down.; 1
 6; False; If the training data is noisy, a classifier trained on it could still overfit.; 1
 7; False; Boosting actually can have a lot of variance because it is a combination of many classifiers.; 0
+7; False; Boosting actually can have a lot of variance because it is a combination of many classifiers.; 0
+8; True; If you use random initializations, you may end up in different solutions each time; 1
+12; False; In case of continuous or even discrete variables with more than two states, the same variable can provide more information; 1
+14; True; Linear combinations of linear functions are linear; 1
+15; False; Every machine learning algorithm makes assumptions about the hypothesis it represents. This is its preference or restriction bias.; 1
+15; True; We can design an algorithm that makes no assumptions.; 0
+16; False; When k increases, the variance also increases because it is finding the best neighbor with k points; 0
+17; False; The information gain mechanism biases towards smaller trees, but it considers one variable at a time.; 1

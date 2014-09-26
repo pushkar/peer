@@ -26,6 +26,7 @@ class Answer(models.Model):
 	answer = models.CharField(max_length=2000)
 	answer_tf = models.CharField(max_length=10)
 	score = models.FloatField(default=0.0)
+	count = models.IntegerField()
 
 	def __unicode__(self):
 		return 'Answer to Q' + str(self.question_id)

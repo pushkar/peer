@@ -83,7 +83,7 @@ def exam_tf(request):
             request.session['message'] = "Fill all required fields."
     return render(request, 'exam_tf.html', {
         'message': request.session['message'],
-        'total': range(1, 7),
+        'total': range(1, 21),
         'student': Student.objects.get(pk=request.session['student_id']),
         'question': Question.objects.get(pk=request.session['question_id']),
         'form': form,
@@ -117,7 +117,7 @@ def exam_mc(request):
             request.session['message'] = "Choose an option before submitting."
     return render(request, 'exam_mc.html', {
         'message': request.session['message'],
-        'total': range(1, 7),
+        'total': range(1, 21),
         'question': Question.objects.get(pk=request.session['question_id']),
         'student': Student.objects.get(pk=request.session['student_id']),
         'answer1_tf': request.session['answer1_tf'],
@@ -145,7 +145,7 @@ def exam(request):
             form = TFForm(initial=data)
             return render(request, 'exam_tf.html', {
                 'message': request.session['message'],
-                'total': range(1, 7),
+                'total': range(1, 21),
                 'student': Student.objects.get(pk=request.session['student_id']),
                 'question': Question.objects.get(pk=request.session['question_id']),
                 'form': form,
@@ -158,7 +158,7 @@ def exam(request):
             form = MCForm(initial=data)
             return render(request, 'exam_mc.html', {
                 'message': request.session['message'],
-                'total': range(1, 7),
+                'total': range(1, 21),
                 'student': Student.objects.get(pk=request.session['student_id']),
                 'question': Question.objects.get(pk=request.session['question_id']),
                 'answer1_tf': Answer.objects.get(pk=request.session['answer1']).answer_tf,
@@ -178,7 +178,7 @@ def exam(request):
 
         return render(request, 'exam_tf.html', {
             'message': request.session['message'],
-            'total': range(1, 7),
+            'total': range(1, 21),
             'student': Student.objects.get(pk=request.session['student_id']),
             'question': Question.objects.get(pk=request.session['question_id']),
             'form': form,
@@ -198,7 +198,7 @@ def exam(request):
 
         return render(request, 'exam_mc.html', {
             'message': request.session['message'],
-            'total': range(1, 7),
+            'total': range(1, 21),
             'student': Student.objects.get(pk=request.session['student_id']),
             'question': Question.objects.get(pk=request.session['question_id']),
             'answer1_tf': request.session['answer1_tf'],
@@ -394,7 +394,7 @@ def db_populate(request):
     with open('answers.csv', 'rb') as file:
         reader = csv.reader(file, delimiter=';')
         for row in reader:
-            Answer.objects.get_or_create(question_id=row[0], student_id=1, answer_tf=row[1], answer=row[2], score=row[3])
+            Answer.objects.get_or_create(question_id=row[0], student_id=1, answer_tf=row[1], answer=row[2], score=row[3], count=5)
             response += row[0] + "<br />"
 
     return HttpResponse(response)

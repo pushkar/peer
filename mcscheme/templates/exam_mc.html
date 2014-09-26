@@ -1,17 +1,26 @@
 {% extends "base-exam.html" %}
 {% block examform %}
-<form action="/mcscheme/exam/mc" method="post">{% csrf_token %}
-
-    <p>{{ question }}</p>
-    <p>Statement 1: {{ answer1_tf }} {{ answer1 }}</p>
-    <p>Statement 2: {{ answer2_tf }} {{ answer2 }}</p>
-    <div class="fieldWrapper">
-    {{ form.choice.errors }}
-    <label for="choice">Choose which of the following is correct about the above statement:</label> <br />
-    {% for radio in form.choice %}
-        {{ radio }}
-    {% endfor %}
+<form class="form-group" action="/mcscheme/exam/mc" method="post">{% csrf_token %}
+    <div class="form-group">
+        <p>{{ question }}</p>
+        <p>Statement 1: {{ answer1_tf }} {{ answer1 }}</p>
+        <p>Statement 2: {{ answer2_tf }} {{ answer2 }}</p>
     </div>
-    <p><input type="submit" value="Submit" /></p>
+    <div class="form-group">
+        <label for="choice">Choose which of the following is correct for these statements:</label>
+    </div>
+    <div class="form-group">
+        <div class="fieldWrapper">
+        {{ form.choice.errors }}
+        {% for radio in form.choice %}
+            <div class="radio">
+            {{ radio }}
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+    <div class="form-group">
+        <p><input class="btn btn-default" type="submit" value="Submit" /></p>
+    </div>
 </form>
 {% endblock %}

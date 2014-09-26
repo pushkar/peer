@@ -1,19 +1,28 @@
 {% extends "base-exam.html" %}
 {% block examform %}
-<form action="/mcscheme/exam/tf" method="post">{% csrf_token %}
+<form class="form-group" action="/mcscheme/exam/tf" method="post">{% csrf_token %}
     <p>{{ question }}</p>
-    <div class="fieldWrapper">
-    {{ form.answer_tf.errors }}
-    <label for="answer_tf">T/F:</label>
-    {% for radio in form.answer_tf %}
-        {{ radio }}
-    {% endfor %}
+    <b>Select True or False and explain your choice clearly.</b>
+    <div class="form-group">
+        <div class="fieldWrapper">
+        <label for="answer_tf"></label>
+        {% for radio in form.answer_tf %}
+            <div class="radio">
+            {{ radio }}
+            </div>
+        {% endfor %}
+        </div>
+        {{ form.answer_tf.errors }}
     </div>
-    <div class="fieldWrapper">
-    {{ form.answer.errors }}
-    <label for="answer">Explanation:</label><br />
-    {{ form.answer }}
+    <div class="form-group">
+        <div class="fieldWrapper">
+        <label for="answer">Explanation:</label><br />
+        {{ form.answer }}
+        {{ form.answer.errors }}
+        </div>
     </div>
-    <p><input type="submit" value="Submit" /></p>
+    <div class="form-group">
+        <p><input class="btn btn-default" type="submit" value="Submit" /></p>
+    </div>
 </form>
 {% endblock %}
