@@ -1,33 +1,7 @@
-Version space is a subset of your hypothesis space
-The target concept is an element of your hypothesis space
-One of the powerful advantages of the boosting algorithm is that it does not overfit
-"Bayesian Networks can represent any propositional statement (i.e., boolean symbols and operators)"
-"As the amount of training data increases, the training error goes down"
-A classifier trained on less training data is less likely to overfit
-Boosting is used to reduce the bias of low-variance classifiers
-We can get multiple local optimum solutions if we solve a linear regression problem by minimizing the sum of squared errors using gradient descent.
-"When the hypothesis space is richer, over ﬁtting is more likely."
-"When the feature space is larger, over ﬁtting is more likely."
-"As the number of training examples goes to infinity, your model trained on that dataset will have the same bias but lower variance."
-In the class we argued that we never reselect the same variable along one path in a decision tree. Someone argued that this approach is inefficient and unnecessary. This argument is correct whether our attributes are discrete or continuous.
-The output of a boosting algorithm that learns using decision stumps can be converted to an equivalent decision tree in a straightforward way.
-"Given a network of perceptrons where each perceptron uses linear activation functions (that is, for each unit, j, the output is some constant cj, times the weighted sum of its inputs with no thresholds), one can construct a single unit perceptron that computes the same function."
-The discounted model of optimality in MDPs is inappropriate for agents with a known finite lifetime.
-"If implemented properly, k-means must converge after a finite number of iterations."
-"If implemented properly, EM must converge after a finite number of iterations."
-The component features obtained from ICA are orthonormal to each other.
-"In reinforcement learning, the agent needs to know the reward function in advance."
-"For a clustering algorithm, scale invariance means that it should produce the same clustering for a distance matrix and any positive multiple of the same distance matrix. Scale invariance can be achieved by a single-link clustering algorithm that terminates when the number of clusters equals half the number of objects."
-"If you have weakly relevant features in your dataset, you can convert them to strongly relevant features using PCA or ICA."
-A reinforcement agent in a finite state-action space which uses value iteration or policy iteration always find an optimal solution.
-"After having estimated a utility function, a reinforcement learning agent should simply adopt the policy of choosing the action that maximizes the expected estimated utility."
-A reinforcement learning agent learns to play Tic-Tac-Toe by playing an opponent. The agent will learn an optimal policy if the opponent plays optimally.
-A Nash equilibrium occurs where a player maximises their payoff given what they anticipate their opponent is doing.
-The best learning algorithms make no assumptions.
-The variance of k-NN decreases as k increases.
-The ID3 algorithm returns the smallest consistent tree.
-More training data decreases the training error.
-Boosting of boosted classifiers leads to even lower bias.
-Adaboost is a special case of gradient boosting.
-SVMs involve a convex minimization problem.
-PCA minimizes your reconstruction error.
+1; Version space is a subset of your hypothesis space.
+2; The target concept is an element of your hypothesis space.
+3; One of the powerful advantages of the boosting algorithm is that it does not overfit.
+4; Bayesian Networks can represent any propositional statement (i.e., boolean symbols and operators).
+5; As the amount of training data increases, the training error goes down
+6; A classifier trained on less training data is less likely to overfit.
+7; Boosting is used to reduce the bias of low-variance classifiers.

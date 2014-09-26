@@ -3,7 +3,6 @@ from django.conf.urls import patterns, url
 from mcscheme import views
 
 urlpatterns = patterns('',
-    url(r'^home$', views.home, name='home'),
     url(r'^login$', views.login, name='login'),
     url(r'^logout$', views.logout, name='logout'),
     url(r'^exam$', views.exam, name='exam'),

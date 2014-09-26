@@ -4,6 +4,7 @@ from django.forms.widgets import RadioSelect
 
 class Student(models.Model):
 	userid = models.CharField(max_length=50)
+	usertype = models.CharField(max_length=50)
 	email = models.CharField(max_length=50)
 	gtid = models.CharField(max_length=12)
 	lastname = models.CharField(max_length=50)
@@ -14,10 +15,10 @@ class Student(models.Model):
 		return self.userid
 
 class Question(models.Model):
-	text = models.CharField(max_length=2000)
+	question = models.CharField(max_length=2000)
 
 	def __unicode__(self):
-		return self.text
+		return self.question
 
 class Answer(models.Model):
 	question_id = models.IntegerField()
@@ -27,7 +28,7 @@ class Answer(models.Model):
 	score = models.FloatField(default=0.0)
 
 	def __unicode__(self):
-		return str(self.student_id) + "'s answer to q" + str(self.question_id)
+		return 'Answer to Q' + str(self.question_id)
 
 class Log(models.Model):
 	created = models.DateTimeField(auto_now_add=True)
@@ -83,8 +84,8 @@ class MCLog(models.Model):
 
 
 class LoginForm(forms.Form):
-	userid = forms.CharField()
-	gtid = forms.CharField()
+	userid = forms.CharField(initial='pkolhe3')
+	gtid = forms.CharField(initial='9022*****')
 	fields = ('userid', 'gtid')
 
 class Score(models.Model):

@@ -13,24 +13,20 @@ import csv
 def index(request):
     if not 'message' in request.session:
         request.session['message'] = ""
-    return render(request, 'index.html', {
-      'message': request.session['message'],
-    })
 
-def home(request):
-    if 'student_id' in request.session:
-        if request.session['student_id'] != -1:
-            request.session['message'] = "You are already logged in. "
-            return HttpResponseRedirect("/mcscheme/exam")
-        else:
-            request.session['student_id'] = -1
-            request.session['message'] = "You are logged out. "
-    else:
+    if not 'student_id' in request.session:
+        request.session['message'] = ""
         request.session['student_id'] = -1
-        request.session['message'] = "Welcome!"
 
-    form = LoginForm()
-    return render(request, 'login.html', {
+    if request.session['student_id'] != -1:
+        s = Student.objects.get(pk=request.session['student_id'])
+        return render(request, 'index.html', {
+        'message': request.session['message'],
+        'student': s,
+    })
+    else:
+        form = LoginForm()
+        return render(request, 'index.html', {
         'message': request.session['message'],
         'form': form,
     })
@@ -46,13 +42,13 @@ def login(request):
                 s = Student.objects.get(userid=userid, gtid=gtid)
                 request.session['student_id'] = s.pk
                 request.session['question_id'] = 1
-                request.session['message'] = "Welcome " + s.firstname + " " + s.lastname + ","
+                request.session['message'] = "You are logged in."
                 return HttpResponseRedirect('/mcscheme/exam')
             except Student.DoesNotExist:
                 request.session['message'] = "User does not exist. Try again."
-                return HttpResponseRedirect('/mcscheme/home')
+                return HttpResponseRedirect('/mcscheme/')
     request.session['message'] = "Form entries are wrong. Please try again."
-    return HttpResponseRedirect('/mcscheme/home')
+    return HttpResponseRedirect('/mcscheme/')
 
 def logout(request):
     if 'student_id' in request.session:
@@ -87,7 +83,7 @@ def exam_tf(request):
             request.session['message'] = "Fill all required fields."
     return render(request, 'exam_tf.html', {
         'message': request.session['message'],
-        'total': range(1, 27),
+        'total': range(1, 7),
         'student': Student.objects.get(pk=request.session['student_id']),
         'question': Question.objects.get(pk=request.session['question_id']),
         'form': form,
@@ -121,8 +117,9 @@ def exam_mc(request):
             request.session['message'] = "Choose an option before submitting."
     return render(request, 'exam_mc.html', {
         'message': request.session['message'],
-        'total': range(1, 27),
+        'total': range(1, 7),
         'question': Question.objects.get(pk=request.session['question_id']),
+        'student': Student.objects.get(pk=request.session['student_id']),
         'answer1_tf': request.session['answer1_tf'],
         'answer2_tf': request.session['answer2_tf'],
         'answer1': Answer.objects.get(pk=request.session['answer1']).answer,
@@ -131,6 +128,8 @@ def exam_mc(request):
     })
 
 def exam(request):
+
+    request.session['message'] = ""
 
     if Student.objects.get(pk=request.session['student_id']).gtpe_finished == 1:
         request.session['message'] = "You have finished and saved your exam. You can't visit it again."
@@ -146,7 +145,7 @@ def exam(request):
             form = TFForm(initial=data)
             return render(request, 'exam_tf.html', {
                 'message': request.session['message'],
-                'total': range(1, 27),
+                'total': range(1, 7),
                 'student': Student.objects.get(pk=request.session['student_id']),
                 'question': Question.objects.get(pk=request.session['question_id']),
                 'form': form,
@@ -159,7 +158,8 @@ def exam(request):
             form = MCForm(initial=data)
             return render(request, 'exam_mc.html', {
                 'message': request.session['message'],
-                'total': range(1, 27),
+                'total': range(1, 7),
+                'student': Student.objects.get(pk=request.session['student_id']),
                 'question': Question.objects.get(pk=request.session['question_id']),
                 'answer1_tf': Answer.objects.get(pk=request.session['answer1']).answer_tf,
                 'answer2_tf': Answer.objects.get(pk=request.session['answer2']).answer_tf,
@@ -178,7 +178,7 @@ def exam(request):
 
         return render(request, 'exam_tf.html', {
             'message': request.session['message'],
-            'total': range(1, 27),
+            'total': range(1, 7),
             'student': Student.objects.get(pk=request.session['student_id']),
             'question': Question.objects.get(pk=request.session['question_id']),
             'form': form,
@@ -198,7 +198,8 @@ def exam(request):
 
         return render(request, 'exam_mc.html', {
             'message': request.session['message'],
-            'total': range(1, 27),
+            'total': range(1, 7),
+            'student': Student.objects.get(pk=request.session['student_id']),
             'question': Question.objects.get(pk=request.session['question_id']),
             'answer1_tf': request.session['answer1_tf'],
             'answer2_tf': request.session['answer2_tf'],
@@ -214,6 +215,7 @@ def update(request, q_id="1"):
 def done(request):
     return render(request, 'done.html', {
       'message': request.session['message'],
+      'student': Student.objects.get(pk=request.session['student_id']),
     })
 
 def save(request):
@@ -374,20 +376,25 @@ def grade_student(request, u_id="pushkar"):
 
 def db_populate(request):
     response = ""
-    open('djangotemp.txt', 'w')
 
     with open('roster.csv', 'rb') as file:
         reader = csv.reader(file, delimiter=',')
         for row in reader:
-            if len(row) == 5:
+            if len(row) == 6:
                 Student.objects.get_or_create(userid=row[0], email=row[1],
-                    gtid=row[2], lastname=row[3], firstname=row[4], gtpe_finished=0)
+                    gtid=row[2], usertype=row[3], lastname=row[4], firstname=row[5], gtpe_finished=0)
                 response += row[0] + " added.<br />"
 
     with open('questions.csv', 'rb') as file:
-        reader = csv.reader(file, delimiter=',')
+        reader = csv.reader(file, delimiter=';')
         for row in reader:
-            Question.objects.get_or_create(text=row[0])
+            Question.objects.get_or_create(question=row[1])
+            response += row[0] + "<br />"
+
+    with open('answers.csv', 'rb') as file:
+        reader = csv.reader(file, delimiter=';')
+        for row in reader:
+            Answer.objects.get_or_create(question_id=row[0], student_id=1, answer_tf=row[1], answer=row[2], score=row[3])
             response += row[0] + "<br />"
 
     return HttpResponse(response)
@@ -403,4 +410,10 @@ def db_show(request):
   q_entries = Question.objects.all()
   for q in q_entries:
     response += str(q.id) + ". " + str(q) + "<br />"
+
+  response += "<hr />"
+  a_entries = Answer.objects.all()
+  for a in a_entries:
+    response += str(a.question_id) + ". " + str(a.answer_tf) + "." + str(a.answer) + " (" + str(a.score) +")<br />"
+
   return HttpResponse(response)

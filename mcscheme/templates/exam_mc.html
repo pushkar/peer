@@ -1,11 +1,7 @@
-<p><a href="/mcscheme/logout">Logout</a> | <a href="/mcscheme/done">Finish Exam</a></p>
-<p>
-    {% for i in total %}
-        <a href="/mcscheme/update/{{ i }}">{{ i }}</a> |
-    {% endfor %}
-</p>
-<p>{{ message }}</p>
+{% extends "base-exam.html" %}
+{% block examform %}
 <form action="/mcscheme/exam/mc" method="post">{% csrf_token %}
+
     <p>{{ question }}</p>
     <p>Statement 1: {{ answer1_tf }} {{ answer1 }}</p>
     <p>Statement 2: {{ answer2_tf }} {{ answer2 }}</p>
@@ -18,3 +14,4 @@
     </div>
     <p><input type="submit" value="Submit" /></p>
 </form>
+{% endblock %}
