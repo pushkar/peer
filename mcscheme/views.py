@@ -238,6 +238,7 @@ def save(request):
     request.session['message'] = "Congratulations, you have finished your exam."
     return HttpResponseRedirect("/mcscheme")
 
+@login_required
 def grade_auto(request):
     mc_log = MCLog.objects.all()
     for m in mc_log:
@@ -263,12 +264,14 @@ def grade_auto(request):
       'message': request.session['message'],
     })
 
+@login_required
 def grade(request, log_type="tf", log_id="1", score=0.0):
     tf_log = TFLog.objects.get(pk=log_id)
     tf_log.score = score
     tf_log.save()
     return HttpResponseRedirect("/mcscheme/grade/"+log_type+"/"+log_id)
 
+@login_required
 def grade_all(request):
     request.session['message'] = ""
     students = Student.objects.all().order_by('lastname')
@@ -295,6 +298,7 @@ def grade_all(request):
         'scores': scores,
     })
 
+@login_required
 def grade_log(request, log_type="tf", log_id=1):
     request.session['message'] = ""
     try:
@@ -355,7 +359,7 @@ def grade_log(request, log_type="tf", log_id=1):
             'back': "javascript:history.go(-1)",
         })
 
-
+@login_required
 def grade_student(request, u_id="pushkar"):
     student = Student.objects.get(userid=u_id)
     log = Log.objects.filter(student_id=student.id)
@@ -374,9 +378,9 @@ def grade_student(request, u_id="pushkar"):
         'student': student,
     })
 
+@login_required
 def db_populate(request):
     response = ""
-
     with open('roster.csv', 'rb') as file:
         reader = csv.reader(file, delimiter=',')
         for row in reader:
@@ -399,6 +403,7 @@ def db_populate(request):
 
     return HttpResponse(response)
 
+@login_required
 def db_show(request):
   response = ""
   s_entries = Student.objects.all()

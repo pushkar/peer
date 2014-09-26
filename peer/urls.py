@@ -10,6 +10,7 @@ urlpatterns = patterns('',
     # url(r'^$', 'peer.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
 	url(r'^mcscheme/', include('mcscheme.urls', namespace="mcscheme")),
+	url(r'^accounts/login/', include(admin.site.urls)),
     url(r'^admin/', include(admin.site.urls)),
 )
 
