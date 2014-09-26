@@ -231,6 +231,7 @@ def save(request):
         a.question_id = l.question_id
         a.answer_tf = l.answer_tf
         a.answer = l.answer
+        a.count = 1
         a.save()
     s = Student.objects.get(pk=request.session['student_id'])
     s.gtpe_finished = 1
