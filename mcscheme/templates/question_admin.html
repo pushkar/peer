@@ -1,0 +1,40 @@
+{% extends "base_admin.html" %}
+{% block title %}GTPE ML Fall 2014 - Admin {% endblock %}
+
+{% block content %}
+<div class="panel panel-primary">
+  <!-- Default panel contents -->
+  <div class="panel-heading">{{ q.id }}. {{ q.question }}</div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th>Score</th>
+                <th>Answers</th>
+            </tr>
+        </thead>
+    {% for tf in tflog %}
+        <tbody>
+            <tr>
+            <td>{{ tf.pk }}</a></td>
+            <td><a href="">0</a></td>
+            <td><a href="">.5</a></td>
+            <td><a href="">1</a></td>
+            <td>{{ tf.score }}</td>
+            <td>
+                <b>{% if tf.answer_tf == 1 %} True{% else %} False{% endif %}</b>. {{ tf.answer }} <br />
+                {% with tf.student_id as id %}
+                {{ id }}
+                <small>{{ s.25.firstname }}</small>
+                {% endwith %}
+            </td>
+            </tr>
+        </tbody>
+    {% endfor %}
+    </table>
+</div>
+
+{% endblock %}

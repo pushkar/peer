@@ -1,0 +1,26 @@
+{% extends "base_admin.html" %}
+{% block title %}GTPE ML Fall 2014 - Admin {% endblock %}
+
+{% block content %}
+<div class="panel panel-primary">
+  <!-- Default panel contents -->
+  <div class="panel-heading">All Questions</div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Question</th>
+            </tr>
+        </thead>
+    {% for q in questions %}
+        <tbody>
+            <tr>
+            <td><a href="/mcscheme/admin/grade/q/{{ q.pk }}">{{ q.pk }}</a></td>
+            <td>{{ q.question }}</td>
+            </tr>
+        </tbody>
+    {% endfor %}
+    </table>
+</div>
+
+{% endblock %}

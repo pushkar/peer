@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block container %}
+<nav class="navbar navbar-default navbar-static-top" role="navigation">
+    <ul class="nav navbar-nav">
+    {% block menu %}{% endblock %}
+    </ul>
+    <ul class="nav navbar-nav navbar-right">
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Me <span class="caret"></span></a>
+        <ul class="dropdown-menu" role="menu">
+        {% block accountmenu %}{% endblock %}
+        </ul>
+    </li>
+    </ul>
+</nav>
+</div>
+
+{% endblock %}
+
+<div class="container">
+    <nav class="navbar navbar-default navbar-static-top" role="navigation">
+        <ul class="nav navbar-nav">
+        {% block menu %}{% endblock %}
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Me <span class="caret"></span></a>
+            <ul class="dropdown-menu" role="menu">
+            {% block accountmenu %}{% endblock %}
+            <li><a href="/mcscheme/logout">Logout </a></li>
+            </ul>
+        </li>
+        </ul>
+    </nav>
+</div>

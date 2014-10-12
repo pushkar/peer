@@ -1,0 +1,34 @@
+{% extends "base_admin.html" %}
+{% block title %}GTPE ML Fall 2014 - Admin {% endblock %}
+
+{% block content %}
+<div class="panel panel-primary">
+  <!-- Default panel contents -->
+  <div class="panel-heading">All Grades</div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>UserId</th>
+                <th>T/F count</th>
+                <th>MC count</th>
+                <th>Total Answered</th>
+                <th>Score</th>
+            </tr>
+        </thead>
+    {% for s in scores %}
+        <tbody>
+            <tr>
+            <td>{{ s.pk }}</td>
+            <td>{{ s.userid }}</td>
+            <td>{{ s.tf_count }}</td>
+            <td>{{ s.mc_count }}</td>
+            <td>{{ s.total_count }}</td>
+            <td>{{ s.score }}</td>
+            </tr>
+        </tbody>
+    {% endfor %}
+    </table>
+</div>
+
+{% endblock %}
