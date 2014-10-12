@@ -7,7 +7,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     # Examples:
-    # url(r'^$', 'peer.views.home', name='home'),
+    url(r'^$', 'mcscheme.views.index', name='index'),
     # url(r'^blog/', include('blog.urls')),
 	url(r'^mcscheme/', include('mcscheme.urls', namespace="mcscheme")),
 	url(r'^accounts/login/', include(admin.site.urls)),

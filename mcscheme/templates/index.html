@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 {% block title %}GTPE ML Fall 2014 - Home {% endblock %}
+{% block menu %}
+{% if student.usertype|stringformat:"s" == "superadmin"  %}
+<li><a href="/mcscheme/admin">Admin</a></li>
+{% endif %}
+{% endblock %}
 {% block content %}
 
 {% if student %}

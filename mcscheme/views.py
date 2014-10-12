@@ -43,7 +43,7 @@ def login(request):
                 request.session['student_id'] = s.pk
                 request.session['question_id'] = 1
                 request.session['message'] = "You are logged in."
-                return HttpResponseRedirect('/mcscheme/exam')
+                return HttpResponseRedirect('/mcscheme/')
             except Student.DoesNotExist:
                 request.session['message'] = "User does not exist. Try again."
                 return HttpResponseRedirect('/mcscheme/')
@@ -272,32 +272,6 @@ def grade(request, log_type="tf", log_id="1", score=0.0):
     tf_log.save()
     return HttpResponseRedirect("/mcscheme/grade/"+log_type+"/"+log_id)
 
-@login_required
-def grade_all(request):
-    request.session['message'] = ""
-    students = Student.objects.all().order_by('lastname')
-    scores = []
-    for s in students:
-        s_dict = {}
-        tf_log = TFLog.objects.filter(student_id=s.pk)
-        mc_log = MCLog.objects.filter(student_id=s.pk)
-        n_score = 0
-        for l in tf_log:
-            if l.score > 0:
-                n_score += l.score
-        for l in mc_log:
-            if l.score > 0:
-                n_score += l.score
-        s_dict['userid'] = s.userid
-        s_dict['tf_count'] = tf_log.count()
-        s_dict['mc_count'] = mc_log.count()
-        s_dict['total_count'] = tf_log.count() + mc_log.count()
-        s_dict['score'] = n_score
-        scores.append(s_dict)
-    return render(request, 'grade_all.html', {
-        'message': request.session['message'],
-        'scores': scores,
-    })
 
 @login_required
 def grade_log(request, log_type="tf", log_id=1):
