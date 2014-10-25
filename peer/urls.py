@@ -10,6 +10,8 @@ urlpatterns = patterns('',
     url(r'^$', 'mcscheme.views.index', name='index'),
     # url(r'^blog/', include('blog.urls')),
 	url(r'^mcscheme/', include('mcscheme.urls', namespace="mcscheme")),
+    url(r'^ul/', include('ul.urls', namespace="ul")),
+    url(r'^api/', include('api.urls', namespace="api")),
 	url(r'^accounts/login/', include(admin.site.urls)),
     url(r'^admin/', include(admin.site.urls)),
 )

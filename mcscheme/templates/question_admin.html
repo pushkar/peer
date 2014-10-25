@@ -4,7 +4,7 @@
 {% block content %}
 <div class="panel panel-primary">
   <!-- Default panel contents -->
-  <div class="panel-heading">{{ q.id }}. {{ q.question }}</div>
+  <div class="panel-heading">{{ tf_response.0.question.pk }}. {{ tf_response.0.question.text }}</div>
     <table class="table">
         <thead>
             <tr>
@@ -16,25 +16,66 @@
                 <th>Answers</th>
             </tr>
         </thead>
-    {% for tf in tflog %}
+    {% for i, r in tf_response.items %}
         <tbody>
             <tr>
-            <td>{{ tf.pk }}</a></td>
-            <td><a href="">0</a></td>
-            <td><a href="">.5</a></td>
-            <td><a href="">1</a></td>
-            <td>{{ tf.score }}</td>
+            <td>{{ r.pk }}</a></td>
+            <td><a href="/mcscheme/update/tflog/id/{{r.pk}}/score/0.0">0</a></td>
+            <td><a href="/mcscheme/update/tflog/id/{{r.pk}}/score/0.5">.5</a></td>
+            <td><a href="/mcscheme/update/tflog/id/{{r.pk}}/score/1.0">1</a></td>
+            <td>{{ r.score }}</td>
             <td>
-                <b>{% if tf.answer_tf == 1 %} True{% else %} False{% endif %}</b>. {{ tf.answer }} <br />
-                {% with tf.student_id as id %}
-                {{ id }}
-                <small>{{ s.25.firstname }}</small>
-                {% endwith %}
+                <b>{{ r.tf }}</b>. {{ r.text }} <br />
+                <small>By {{ r.student.userid }}</small>
             </td>
             </tr>
         </tbody>
     {% endfor %}
     </table>
 </div>
+
+<div class="panel panel-primary">
+  <!-- Default panel contents -->
+  <div class="panel-heading">{{ mc_response.0.question.pk }}. {{ mc_response.0.question.text }}</div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th>Score</th>
+                <th>Answers</th>
+            </tr>
+        </thead>
+    {% for i, r in mc_response.items %}
+        <tbody>
+            <tr>
+            <td>{{ r.pk }}</a></td>
+            <td><a href="/mcscheme/update/mclog/id/{{r.pk}}/score/0.0">0</a></td>
+            <td><a href="/mcscheme/update/mclog/id/{{r.pk}}/score/0.0">1</a></td>
+            <td>{{ r.score }}</td>
+            <td>
+                <ul class="list-group">
+                    <li class="list-group-item {% if r.choice == 1 %}list-group-item-success{% endif %}">
+                        {{ r.answer1.tf }}. {{ r.answer1.text }}
+                    </li>
+                    <li class="list-group-item {% if r.choice == 2 %}list-group-item-success{% endif %}">
+                        {{ r.answer1.tf }}. {{ r.answer2.text }}
+                    </li>
+                    <li class="list-group-item {% if r.choice == 3 %}list-group-item-success{% endif %}">
+                        Both are True
+                    </li>
+                    <li class="list-group-item {% if r.choice == 4 %}list-group-item-success{% endif %}">
+                        Both are False
+                        </li>
+                </ul>
+                <small>By {{ r.student.userid }}</small>
+            </td>
+            </tr>
+        </tbody>
+    {% endfor %}
+    </table>
+</div>
+
 
 {% endblock %}

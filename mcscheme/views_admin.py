@@ -7,8 +7,11 @@ from mcscheme.models import *
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.urlresolvers import reverse
 
+from urllib2 import Request, urlopen, URLError
+
 import numpy
 import csv
+import json
 
 def index(request):
     if not 'message' in request.session:
@@ -73,17 +76,28 @@ def questions_all(request):
 @login_required
 def question(request, q_id="1"):
     request.session['message'] = ""
-    q = Question.objects.get(pk=q_id)
 
-    tflog = TFLog.objects.filter(question_id=q_id)
-    s = Student.objects.all()
-    a = Answer.objects.all()
+    api_uri = "http://localhost:8000/api/tflog/" + q_id
+    api_request = Request(api_uri)
+    response = urlopen(api_request)
+    tf_response = response.read()
+
+    api_uri = "http://localhost:8000/api/mclog/" + q_id
+    api_request = Request(api_uri)
+    response = urlopen(api_request)
+    mc_response = response.read()
 
     return render(request, 'question_admin.html', {
-        'student': Student.objects.get(pk=request.session['student_id']),
         'message': request.session['message'],
-        'q': q,
-        'a': a,
-        's': s,
-        'tflog': tflog,
+        'student': Student.objects.get(pk=request.session['student_id']),
+        'tf_response': json.loads(tf_response),
+        'mc_response': json.loads(mc_response),
     })
+
+@login_required
+def tflog_update(request, id="0", score="0.0"):
+    request.session['message'] = ""
+
+@login_required
+def mclog_update(request, id="0", score="0.0"):
+    request.session['message'] = ""

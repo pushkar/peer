@@ -9,10 +9,13 @@ urlpatterns = patterns('',
     url(r'^done$', views.done, name='done'),
     url(r'^save$', views.save, name='save'),
     url(r'^update/(?P<q_id>[0-9]+)$', views.update, name='update'),
+
     url(r'^admin$', views_admin.index, name='admin_index'),
     url(r'^admin/grade/all$', views_admin.grade_all, name='grade_all'),
     url(r'^admin/grade/q/all$', views_admin.questions_all, name='questions_all'),
     url(r'^admin/grade/q/(?P<q_id>\d+)$', views_admin.question, name='question'),
+    url(r'^admin/update/tflog/id/(?P<id>\d+)/score/(?P<score>\d+.\d+)$', views_admin.tflog_update, name='tflog_update'),
+    url(r'^admin/update/mclog/id/(?P<id>\d+)/score/(?P<score>\d+.\d+)$', views_admin.mclog_update, name='mclog_update'),
 
     url(r'^exam/tf$', views.exam_tf, name='exam_tf'),
     url(r'^exam/mc$', views.exam_mc, name='exam_mc'),
