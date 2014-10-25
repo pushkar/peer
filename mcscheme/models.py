@@ -96,3 +96,18 @@ class Score(models.Model):
 
 	def __unicode__(self):
 		return str(self.scorer_id) + "'s score for a" + str(self.answer_id)
+
+
+class ShortEssayForm(forms.Form):
+	answer = forms.CharField(widget=forms.Textarea)
+	fields = ('answer')
+
+class ShortEssayLog(models.Model):
+	created = models.DateTimeField(auto_now_add=True)
+	student_id = models.IntegerField()
+	question_id = models.IntegerField()
+	answer = models.CharField(max_length=5000)
+	score = models.FloatField(default=0.0)
+
+	def __unicode__(self):
+		return str(self.created)

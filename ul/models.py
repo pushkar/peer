@@ -82,3 +82,20 @@ class MCLog(models.Model):
 
     def __unicode__(self):
         return str(self.created)
+
+class ShortEssayForm(forms.Form):
+    answer = forms.CharField(widget=forms.Textarea)
+    fields = ('answer')
+
+class ShortEssayLog(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    student_id = models.IntegerField()
+    question_id = models.IntegerField()
+    answer = models.CharField(max_length=5000)
+    score = models.FloatField(default=0.0)
+
+    class Meta:
+        get_latest_by = "created"
+
+    def __unicode__(self):
+        return str(self.created)

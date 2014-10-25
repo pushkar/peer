@@ -6,4 +6,7 @@
 6;If you have a feature in your dataset which has a constant value for all rows, you should discard it.
 7;The No Free Lunch Theorem states that no search algorithm performs better than another search algorithm for all problems.
 8;KL Divergence is the measure of the difference between two distributions.
-9;End
+9;Using the principles of Information Theory design a coding system for a language with 3 variables A, B and C. In this language the probability of seeing A is twice that of B and C.
+10;Describe pros/cons for using Simulated Annealing over Randomized Hill Climbing? Are there problems where you rather use randomized hill climbing than simulated annealing?
+11;Which kind of problems is MIMIC best suited for? Compare Genetic Algorithms vs MIMIC.
+12;End

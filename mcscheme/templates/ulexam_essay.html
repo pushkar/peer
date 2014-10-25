@@ -1,0 +1,16 @@
+{% extends "base-ulexam.html" %}
+{% block examform %}
+<form class="form-group" action="/ul/exam/essay" method="post">{% csrf_token %}
+    <p>{{ question }}</p>
+    <div class="form-group">
+        <div class="fieldWrapper">
+        <label for="answer">Answer:</label><br />
+        {{ form.answer }}
+        {{ form.answer.errors }}
+        </div>
+    </div>
+    <div class="form-group">
+        <p><input class="btn btn-default" type="submit" value="Submit" /></p>
+    </div>
+</form>
+{% endblock %}

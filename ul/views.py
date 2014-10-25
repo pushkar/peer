@@ -10,6 +10,8 @@ from django.core.urlresolvers import reverse
 import numpy
 import csv
 
+max_questions = 12
+
 def index(request):
     if not 'message' in request.session:
         request.session['message'] = ""
@@ -51,14 +53,14 @@ def exam_tf(request):
             tf.save()
             log.log_id = tf.pk
             log.save()
-            if request.session['question_id'] < 9:
+            if request.session['question_id'] < max_questions:
                 request.session['question_id'] += 1
             return HttpResponseRedirect('/ul/exam')
         else:
             request.session['message'] = "Fill all required fields."
     return render(request, 'ulexam_tf.html', {
         'message': request.session['message'],
-        'total': range(1, 9),
+        'total': range(1, max_questions),
         'student': Student.objects.get(pk=request.session['student_id']),
         'question': Question.objects.get(pk=request.session['question_id']),
         'form': form,
@@ -85,14 +87,14 @@ def exam_mc(request):
             mc.save()
             log.log_id = mc.pk
             log.save()
-            if request.session['question_id'] < 9:
+            if request.session['question_id'] < max_questions:
                 request.session['question_id'] += 1
             return HttpResponseRedirect('/ul/exam')
         else:
             request.session['message'] = "Choose an option before submitting."
     return render(request, 'ulexam_mc.html', {
         'message': request.session['message'],
-        'total': range(1, 9),
+        'total': range(1, max_questions),
         'question': Question.objects.get(pk=request.session['question_id']),
         'student': Student.objects.get(pk=request.session['student_id']),
         'answer1_tf': request.session['answer1_tf'],
@@ -100,6 +102,31 @@ def exam_mc(request):
         'answer1': Answer.objects.get(pk=request.session['answer1']).answer,
         'answer2': Answer.objects.get(pk=request.session['answer2']).answer,
         'form': form
+    })
+
+def exam_essay(request):
+    if request.method == 'POST':
+        form = ShortEssayForm(request.POST)
+        if form.is_valid():
+            try:
+                e = ShortEssayLog.objects.get(student_id=request.session['student_id'], question_id=request.session['question_id'])
+            except ShortEssayLog.DoesNotExist:
+                e = ShortEssayLog()
+            e.student_id = request.session['student_id']
+            e.question_id = request.session['question_id']
+            e.answer = form.cleaned_data['answer']
+            e.save()
+            if request.session['question_id'] < max_questions:
+                request.session['question_id'] += 1
+            return HttpResponseRedirect('/ul/exam')
+        else:
+            request.session['message'] = "Fill all required fields."
+    return render(request, 'ulexam_essay.html', {
+        'message': request.session['message'],
+        'total': range(1, max_questions),
+        'student': Student.objects.get(pk=request.session['student_id']),
+        'question': Question.objects.get(pk=request.session['question_id']),
+        'form': form,
     })
 
 def exam(request):
@@ -111,6 +138,23 @@ def exam(request):
         return HttpResponseRedirect("/mcscheme")
     #----
 
+    if int(request.session['question_id']) >= 9:
+        try:
+            log = ShortEssayLog.objects.filter(student_id=request.session['student_id'], question_id=request.session['question_id']).latest()
+            data = {'answer': log.answer}
+            form = ShortEssayForm(initial=data)
+
+        except ShortEssayLog.DoesNotExist:
+            form = ShortEssayForm()
+
+        return render(request, 'ulexam_essay.html', {
+            'message': request.session['message'],
+            'total': range(1, max_questions),
+            'student': Student.objects.get(pk=request.session['student_id']),
+            'question': Question.objects.get(pk=request.session['question_id']),
+            'form': form,
+        })
+
     try:
         log = Log.objects.filter(student_id=request.session['student_id'], question_id=request.session['question_id']).latest()
 
@@ -120,7 +164,7 @@ def exam(request):
             form = TFForm(initial=data)
             return render(request, 'ulexam_tf.html', {
                 'message': request.session['message'],
-                'total': range(1, 9),
+                'total': range(1, max_questions),
                 'student': Student.objects.get(pk=request.session['student_id']),
                 'question': Question.objects.get(pk=request.session['question_id']),
                 'form': form,
@@ -133,7 +177,7 @@ def exam(request):
             form = MCForm(initial=data)
             return render(request, 'ulexam_mc.html', {
                 'message': request.session['message'],
-                'total': range(1, 9),
+                'total': range(1, max_questions),
                 'student': Student.objects.get(pk=request.session['student_id']),
                 'question': Question.objects.get(pk=request.session['question_id']),
                 'answer1_tf': Answer.objects.get(pk=request.session['answer1']).answer_tf,
@@ -153,7 +197,7 @@ def exam(request):
 
         return render(request, 'ulexam_tf.html', {
             'message': request.session['message'],
-            'total': range(1, 9),
+            'total': range(1, max_questions),
             'student': Student.objects.get(pk=request.session['student_id']),
             'question': Question.objects.get(pk=request.session['question_id']),
             'form': form,
@@ -173,7 +217,7 @@ def exam(request):
 
         return render(request, 'ulexam_mc.html', {
             'message': request.session['message'],
-            'total': range(1, 9),
+            'total': range(1, max_questions),
             'student': Student.objects.get(pk=request.session['student_id']),
             'question': Question.objects.get(pk=request.session['question_id']),
             'answer1_tf': request.session['answer1_tf'],
