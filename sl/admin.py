@@ -1,5 +1,5 @@
 from django.contrib import admin
-from mcscheme.models import *
+from sl.models import *
 # Register your models here.
 
 admin.site.register(Student)

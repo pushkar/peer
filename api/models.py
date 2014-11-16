@@ -1,4 +1,4 @@
 from django.db import models
-from mcscheme.models import *
+from sl.models import *
 
 # Create your models here.

@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
-from mcscheme.models import *
+from sl.models import *
 
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.urlresolvers import reverse

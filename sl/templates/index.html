@@ -2,7 +2,7 @@
 {% block title %}GTPE ML Fall 2014 - Home {% endblock %}
 {% block menu %}
 {% if student.usertype|stringformat:"s" == "superadmin"  %}
-<li><a href="/mcscheme/admin">Admin</a></li>
+<li><a href="/sl/admin">Admin</a></li>
 {% endif %}
 {% endblock %}
 {% block content %}
@@ -16,7 +16,7 @@
 {% elif form %}
 
 
-<form class="form-horizontal" action="/mcscheme/login" method="post">{% csrf_token %}
+<form class="form-horizontal" action="/sl/login" method="post">{% csrf_token %}
   <div class="form-group">
     <label for="userid" class="col-sm-2 control-label">GTUser</label>
     <div class="col-sm-10">

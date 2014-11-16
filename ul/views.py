@@ -135,7 +135,7 @@ def exam(request):
 
     if Student.objects.get(pk=request.session['student_id']).gtpe_finished == 1:
         request.session['message'] = "You have finished and saved your exam. You can't visit it again."
-        return HttpResponseRedirect("/mcscheme")
+        return HttpResponseRedirect("/sl")
     #----
 
     if int(request.session['question_id']) >= 9:
@@ -256,7 +256,7 @@ def save(request):
     s.gtpe_finished = 1
     s.save()
     request.session['message'] = "Congratulations, you have finished your exam."
-    return HttpResponseRedirect("/mcscheme")
+    return HttpResponseRedirect("/sl")
 
 
 @login_required

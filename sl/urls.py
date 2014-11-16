@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 
-from mcscheme import views, views_admin
+from sl import views, views_admin
 
 urlpatterns = patterns('',
     url(r'^login$', views.login, name='login'),

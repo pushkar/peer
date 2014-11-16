@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block title %}GTPE ML Fall 2014 - Exam {% endblock %}
 {% block menu %}
-<li><a href="/mcscheme/done">Finish Exam</a></li>
+<li><a href="/sl/done">Finish Exam</a></li>
 {% if student.usertype|stringformat:"s" == "superadmin"  %}
-<li><a href="/mcscheme/admin">Admin</a></li>
+<li><a href="/sl/admin">Admin</a></li>
 {% endif %}
 {% endblock %}
 
@@ -16,7 +16,7 @@
 {% block content %}
 <ul class="pagination">
     {% for i in total %}
-        <li><a href="/mcscheme/update/{{ i }}">{{ i }}</a></li>
+        <li><a href="/sl/update/{{ i }}">{{ i }}</a></li>
     {% endfor %}
 </ul>
 {% block examform %}{% endblock %}

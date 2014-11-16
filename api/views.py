@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 
-from mcscheme.models import *
+from sl.models import *
 
 def index(request):
     response = {}

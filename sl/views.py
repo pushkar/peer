@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
-from mcscheme.models import *
+from sl.models import *
 
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.urlresolvers import reverse
@@ -43,19 +43,19 @@ def login(request):
                 request.session['student_id'] = s.pk
                 request.session['question_id'] = 1
                 request.session['message'] = "You are logged in."
-                return HttpResponseRedirect('/mcscheme/')
+                return HttpResponseRedirect('/sl/')
             except Student.DoesNotExist:
                 request.session['message'] = "User does not exist. Try again."
-                return HttpResponseRedirect('/mcscheme/')
+                return HttpResponseRedirect('/sl/')
     request.session['message'] = "Form entries are wrong. Please try again."
-    return HttpResponseRedirect('/mcscheme/')
+    return HttpResponseRedirect('/sl/')
 
 def logout(request):
     if 'student_id' in request.session:
         request.session['student_id'] = -1
     request.session.flush()
     request.session['message'] = "You were successfully logged out."
-    return HttpResponseRedirect('/mcscheme')
+    return HttpResponseRedirect('/sl')
 
 def exam_tf(request):
     if request.method == 'POST':
@@ -78,7 +78,7 @@ def exam_tf(request):
             log.save()
             if request.session['question_id'] < 27:
                 request.session['question_id'] += 1
-            return HttpResponseRedirect('/mcscheme/exam')
+            return HttpResponseRedirect('/sl/exam')
         else:
             request.session['message'] = "Fill all required fields."
     return render(request, 'exam_tf.html', {
@@ -112,7 +112,7 @@ def exam_mc(request):
             log.save()
             if request.session['question_id'] < 27:
                 request.session['question_id'] += 1
-            return HttpResponseRedirect('/mcscheme/exam')
+            return HttpResponseRedirect('/sl/exam')
         else:
             request.session['message'] = "Choose an option before submitting."
     return render(request, 'exam_mc.html', {
@@ -133,7 +133,7 @@ def exam(request):
 
     if Student.objects.get(pk=request.session['student_id']).gtpe_finished == 1:
         request.session['message'] = "You have finished and saved your exam. You can't visit it again."
-        return HttpResponseRedirect("/mcscheme")
+        return HttpResponseRedirect("/sl")
     #----
 
     try:
@@ -187,7 +187,7 @@ def exam(request):
     else:
         a_s = Answer.objects.filter(question_id=request.session['question_id'])
         if len(a_s) < 2:
-            return HttpResponseRedirect('/mcscheme/exam')
+            return HttpResponseRedirect('/sl/exam')
         a_s2 = numpy.random.choice(a_s, 2, False)
         request.session['answer1'] = a_s2[0].pk
         request.session['answer2'] = a_s2[1].pk
@@ -210,7 +210,7 @@ def exam(request):
 
 def update(request, q_id="1"):
     request.session['question_id'] = q_id
-    return HttpResponseRedirect('/mcscheme/exam')
+    return HttpResponseRedirect('/sl/exam')
 
 def done(request):
     return render(request, 'done.html', {
@@ -237,7 +237,7 @@ def save(request):
     s.gtpe_finished = 1
     s.save()
     request.session['message'] = "Congratulations, you have finished your exam."
-    return HttpResponseRedirect("/mcscheme")
+    return HttpResponseRedirect("/sl")
 
 @login_required
 def grade_auto(request):
@@ -270,7 +270,7 @@ def grade(request, log_type="tf", log_id="1", score=0.0):
     tf_log = TFLog.objects.get(pk=log_id)
     tf_log.score = score
     tf_log.save()
-    return HttpResponseRedirect("/mcscheme/grade/"+log_type+"/"+log_id)
+    return HttpResponseRedirect("/sl/grade/"+log_type+"/"+log_id)
 
 
 @login_required
@@ -285,8 +285,8 @@ def grade_log(request, log_type="tf", log_id=1):
                 answer_tf = "False"
             student = Student.objects.get(pk=tf_log.student_id)
             question = Question.objects.get(pk=tf_log.question_id)
-            back_link = "/mcscheme/grade/"+log_type+"/"+str(int(log_id)-1)
-            next_link = "/mcscheme/grade/"+log_type+"/"+str(int(log_id)+1)
+            back_link = "/sl/grade/"+log_type+"/"+str(int(log_id)-1)
+            next_link = "/sl/grade/"+log_type+"/"+str(int(log_id)+1)
             return render(request, 'grade_tflog.html', {
                 'message': request.session['message'],
                 'tf_log' : tf_log,
@@ -313,8 +313,8 @@ def grade_log(request, log_type="tf", log_id=1):
             else:
                 answer2_tf = "False"
 
-            back_link = "/mcscheme/grade/"+log_type+"/"+str(int(log_id)-1)
-            next_link = "/mcscheme/grade/"+log_type+"/"+str(int(log_id)+1)
+            back_link = "/sl/grade/"+log_type+"/"+str(int(log_id)-1)
+            next_link = "/sl/grade/"+log_type+"/"+str(int(log_id)+1)
             return render(request, 'grade_mclog.html', {
                 'message': request.session['message'],
                 'mc_log' : mc_log,
