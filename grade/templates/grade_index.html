@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}GTPE ML Fall 2014 - Admin {% endblock %}
+{% block menu %}
+{% if student.usertype|stringformat:"s" == "superadmin"  %}
+<li><a href="/grade">Grade</a></li>
+{% endif %}
+{% endblock %}
+{% block content %}
+
+<p>Welcome to the Admin Interface!</p>
+<ul>
+<li>Go to  <a href="sl">Supervised Learning Exam</a></li>
+<li>Go to  <a href="ul">Unsupervised Learning Exam</a></li>
+<li>Go to  <a href="rl">Reinforcement Learning Exam</a></li>
+<li>Go to  <a href="recommender">Video Recommendation Assignment</a>.</li>
+</ul>
+
+{% endblock %}

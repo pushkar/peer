@@ -33,7 +33,6 @@ def index(request):
         'form': form,
     })
 
-
 def exam_tf(request):
     if request.method == 'POST':
         form = TFForm(request.POST)
@@ -257,7 +256,6 @@ def save(request):
     s.save()
     request.session['message'] = "Congratulations, you have finished your exam."
     return HttpResponseRedirect("/sl")
-
 
 @login_required
 def db_populate(request):

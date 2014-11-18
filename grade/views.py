@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
+from student.models import *
 from sl.models import *
 
 from django.contrib.auth.forms import AuthenticationForm
@@ -13,9 +14,11 @@ import numpy
 import csv
 import json
 
+api_src = "http://localhost:8000/api/"
+
 def index(request):
     if not 'message' in request.session:
-        request.session['message'] = ""
+        request.session['message'] = "Boo"
 
     if not 'student_id' in request.session:
         request.session['message'] = ""
@@ -23,16 +26,95 @@ def index(request):
 
     if request.session['student_id'] != -1:
         s = Student.objects.get(pk=request.session['student_id'])
-        return render(request, 'index_admin.html', {
+        return render(request, 'grade_index.html', {
         'message': request.session['message'],
         'student': s,
     })
     else:
         form = LoginForm()
-        return render(request, 'index_admin.html', {
+        return render(request, 'grade_index.html', {
         'message': request.session['message'],
         'form': form,
     })
+
+@login_required
+def grade_exam(request, exam):
+    request.session['message'] = ""
+
+    title = ""
+    if exam == "sl":
+        title = "Supervised Learning Exam"
+    elif exam == "ul":
+        title = "Unsupervised Learning Exam"
+    elif exam == "rl":
+        title = "Reinforcement Learning Exam"
+
+    api_uri = api_src + str(exam) + "/q/all"
+    api_request = Request(api_uri)
+    response = urlopen(api_request)
+    q_response = response.read()
+
+    return render(request, 'grade_exam.html', {
+        'title': title,
+        'exam': exam,
+        'message': request.session['message'],
+        'student': Student.objects.get(pk=request.session['student_id']),
+        'questions': json.loads(q_response),
+    })
+
+@login_required
+def grade_question(request, exam, q_id="1"):
+    request.session['message'] = ""
+
+    title = ""
+    if exam == "sl":
+        title = "Supervised Learning Exam"
+    elif exam == "ul":
+        title = "Unsupervised Learning Exam"
+    elif exam == "rl":
+        title = "Reinforcement Learning Exam"
+
+    api_uri = api_src + str(exam) + "/q/" + q_id
+    api_request = Request(api_uri)
+    response = urlopen(api_request)
+    q_response = json.loads(response.read())
+
+    if q_response['type'].strip() == "tf":
+        api_uri = api_src + str(exam) + "/tflog/" + q_id
+
+        api_request = Request(api_uri)
+        response = urlopen(api_request)
+        tf_response = response.read()
+
+        api_uri = api_src + str(exam) + "/mclog/" + q_id
+
+        api_request = Request(api_uri)
+        response = urlopen(api_request)
+        mc_response = response.read()
+
+        return render(request, 'grade_tfquestion.html', {
+            'title': title,
+            'exam': exam,
+            'message': request.session['message'],
+            'student': Student.objects.get(pk=request.session['student_id']),
+            'tf_response': json.loads(tf_response),
+            'mc_response': json.loads(mc_response),
+        })
+
+    elif q_response['type'].strip() == "short":
+
+        api_uri = api_src + str(exam) + "/selog/" + q_id
+
+        api_request = Request(api_uri)
+        response = urlopen(api_request)
+        s_response = response.read()
+        return render(request, 'grade_shortquestion.html', {
+            'title': title,
+            'exam': exam,
+            'message': request.session['message'],
+            'student': Student.objects.get(pk=request.session['student_id']),
+            's_response': json.loads(s_response),
+        })
 
 @login_required
 def grade_all(request):

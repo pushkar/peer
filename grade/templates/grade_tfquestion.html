@@ -1,10 +1,15 @@
-{% extends "base_admin.html" %}
+{% extends "base.html" %}
 {% block title %}GTPE ML Fall 2014 - Admin {% endblock %}
+{% block menu %}
+{% if student.usertype|stringformat:"s" == "superadmin"  %}
+<li><a href="/grade">Grade</a></li>
+{% endif %}
+{% endblock %}
 
 {% block content %}
 <div class="panel panel-primary">
   <!-- Default panel contents -->
-  <div class="panel-heading">{{ tf_response.0.question.pk }}. {{ tf_response.0.question.text }}</div>
+  <div class="panel-heading">{{title}} <br/>{{ tf_response.0.question.pk }}. {{ tf_response.0.question.text }}</div>
     <table class="table">
         <thead>
             <tr>
@@ -36,7 +41,7 @@
 
 <div class="panel panel-primary">
   <!-- Default panel contents -->
-  <div class="panel-heading">{{ mc_response.0.question.pk }}. {{ mc_response.0.question.text }}</div>
+  <div class="panel-heading">{{ title }} <br />{{ mc_response.0.question.pk }}. {{ mc_response.0.question.text }}</div>
     <table class="table">
         <thead>
             <tr>

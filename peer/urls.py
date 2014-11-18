@@ -7,11 +7,14 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     # Examples:
-    url(r'^$', 'sl.views.index', name='index'),
-    # url(r'^blog/', include('blog.urls')),
+    url(r'^$', 'student.views.index', name='index'),
+    url(r'^student/', include('student.urls', namespace="student")),
 	url(r'^sl/', include('sl.urls', namespace="sl")),
     url(r'^ul/', include('ul.urls', namespace="ul")),
+    url(r'^rl/', include('rl.urls', namespace="rl")),
+    url(r'^recommender/', include('recommender.urls', namespace="recommender")),
     url(r'^api/', include('api.urls', namespace="api")),
+    url(r'^grade/', include('grade.urls', namespace="grade")),
 	url(r'^accounts/login/', include(admin.site.urls)),
     url(r'^admin/', include(admin.site.urls)),
 )

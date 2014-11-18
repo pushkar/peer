@@ -2,7 +2,7 @@
 {% block title %}GTPE ML Fall 2014 - Home {% endblock %}
 {% block menu %}
 {% if student.usertype|stringformat:"s" == "superadmin"  %}
-<li><a href="/sl/admin">Admin</a></li>
+<li><a href="/grade">Grade</a></li>
 {% endif %}
 {% endblock %}
 {% block content %}
@@ -10,13 +10,15 @@
 {% if student %}
 <p>Welcome {{ student.firstname }} {{ student.lastname }}!</p>
 <ul>
-<li>Go to  <a href="#">Supervised Learning Exam</a> (Exam Ended)</li>
-<li>Go to  <a href="#">Unsupervised Learning Exam</a> (Exam Ended)</li>
+<li>Go to  <a href="/sl">Supervised Learning Exam</a> (Exam Ended)</li>
+<li>Go to  <a href="/ul">Unsupervised Learning Exam</a> (Exam Ended)</li>
+<li>Go to  <a href="/rl">Reinforcement Learning Exam</a> (Exam Ended)</li>
+<li>Go to  <a href="/recommender">Video Recommendation Assignment</a>.</li>
 </ul>
 {% elif form %}
 
 
-<form class="form-horizontal" action="/sl/login" method="post">{% csrf_token %}
+<form class="form-horizontal" action="/student/login" method="post">{% csrf_token %}
   <div class="form-group">
     <label for="userid" class="col-sm-2 control-label">GTUser</label>
     <div class="col-sm-10">

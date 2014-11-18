@@ -1,24 +1,28 @@
 from django.db import models
 from django import forms
+from django.contrib import admin
 from django.forms.widgets import RadioSelect
 
-class Student(models.Model):
+class StudentInfo(models.Model):
 	userid = models.CharField(max_length=50)
-	usertype = models.CharField(max_length=50)
-	email = models.CharField(max_length=50)
-	gtid = models.CharField(max_length=12)
-	lastname = models.CharField(max_length=50)
-	firstname = models.CharField(max_length=50)
 	gtpe_finished = models.IntegerField()
+	score = models.IntegerField()
 
-	def __unicode__(self):
-		return self.userid
+class StudentInfoAdmin(admin.ModelAdmin):
+	list_display = ('id', 'userid', 'score')
+	list_filter = ('gtpe_finished',)
 
 class Question(models.Model):
+	type = models.CharField(max_length=20)
 	question = models.CharField(max_length=2000)
 
 	def __unicode__(self):
 		return self.question
+
+class QuestionAdmin(admin.ModelAdmin):
+	list_display = ('id', 'type', 'question')
+	search_fields = ('question',)
+	ordering = ('id',)
 
 class Answer(models.Model):
 	question_id = models.IntegerField()
@@ -30,6 +34,10 @@ class Answer(models.Model):
 
 	def __unicode__(self):
 		return 'Answer to Q' + str(self.question_id)
+
+class AnswerAdmin(admin.ModelAdmin):
+	list_display = ('id', 'question_id', 'answer_tf', 'answer')
+	list_filter = ('question_id', 'student_id')
 
 class Log(models.Model):
 	created = models.DateTimeField(auto_now_add=True)
@@ -43,6 +51,11 @@ class Log(models.Model):
 
 	class Meta:
 		get_latest_by = "created"
+
+class LogAdmin(admin.ModelAdmin):
+	list_display = ('id', 'created', 'type_of_question', 'log_id')
+	ordering = ('-created',)
+	list_filter = ('type_of_question', 'created', 'student_id', 'question_id')
 
 
 class TFForm(forms.Form):
@@ -62,6 +75,11 @@ class TFLog(models.Model):
 
 	def __unicode__(self):
 		return str(self.created)
+
+class TFLogAdmin(admin.ModelAdmin):
+	list_display = ('id', 'created', 'question_id', 'answer_tf', 'answer', 'score')
+	ordering = ('-created',)
+	list_filter = ('question_id', 'created',)
 
 class MCForm(forms.Form):
 	choice = forms.ChoiceField(
@@ -83,31 +101,7 @@ class MCLog(models.Model):
 	def __unicode__(self):
 		return str(self.created)
 
-
-class LoginForm(forms.Form):
-	userid = forms.CharField(initial='pkolhe3')
-	gtid = forms.CharField(initial='9022*****')
-	fields = ('userid', 'gtid')
-
-class Score(models.Model):
-	answer_id = models.IntegerField()
-	scorer_id = models.IntegerField()
-	score = models.IntegerField()
-
-	def __unicode__(self):
-		return str(self.scorer_id) + "'s score for a" + str(self.answer_id)
-
-
-class ShortEssayForm(forms.Form):
-	answer = forms.CharField(widget=forms.Textarea)
-	fields = ('answer')
-
-class ShortEssayLog(models.Model):
-	created = models.DateTimeField(auto_now_add=True)
-	student_id = models.IntegerField()
-	question_id = models.IntegerField()
-	answer = models.CharField(max_length=5000)
-	score = models.FloatField(default=0.0)
-
-	def __unicode__(self):
-		return str(self.created)
+class MCLogAdmin(admin.ModelAdmin):
+	list_display = ('id', 'created', 'question_id', 'answer1_id', 'answer2_id', 'choice', 'score')
+	ordering = ('-created',)
+	list_filter = ('question_id', 'created',)

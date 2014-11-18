@@ -1,10 +1,15 @@
-{% extends "base_admin.html" %}
+{% extends "base.html" %}
 {% block title %}GTPE ML Fall 2014 - Admin {% endblock %}
+{% block menu %}
+{% if student.usertype|stringformat:"s" == "superadmin"  %}
+<li><a href="/grade">Grade</a></li>
+{% endif %}
+{% endblock %}
 
 {% block content %}
 <div class="panel panel-primary">
   <!-- Default panel contents -->
-  <div class="panel-heading">All Questions</div>
+  <div class="panel-heading">{{ title}}</div>
     <table class="table">
         <thead>
             <tr>
@@ -12,11 +17,11 @@
                 <th>Question</th>
             </tr>
         </thead>
-    {% for q in questions %}
+    {% for i, q in questions.items %}
         <tbody>
             <tr>
-            <td><a href="/sl/admin/grade/q/{{ q.pk }}">{{ q.pk }}</a></td>
-            <td>{{ q.question }}</td>
+            <td><a href="{{exam}}/q/{{ q.pk }}">{{ q.pk }}</a></td>
+            <td>{{ q.text }}</td>
             </tr>
         </tbody>
     {% endfor %}
