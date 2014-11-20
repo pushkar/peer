@@ -9,13 +9,13 @@
 <div class = "row">
     <div class="col-sm-3 col-md-2 sidebar">
       <ul class="nav nav-sidebar">
-        <li><a href="leaderboard">Leaderboard</a></li>
-        <li><a href="overview">Overview</a></li>
-        <li><a href="dataset">Dataset</a></li>
+        <li><a href="{% url 'recommender:leaderboard' %}">Leaderboard</a></li>
+        <li><a href="{% url 'recommender:overview' %}">Overview</a></li>
+        <li><a href="{% url 'recommender:dataset' %}">Dataset</a></li>
         <li><a href="http://pushkar.github.io/recommendation_engine/">Code</a></li>
-        <li><a href="prediction">Submit solution</a></li>
-        <li><a href="report">Submit report</a></li>
-        <li><a href="review">Review</a></li>
+        <li><a href="{% url 'recommender:submit_prediction' %}">Submit solution</a></li>
+        <li><a href="{% url 'recommender:submit_report' %}">Submit report</a></li>
+        <li><a href="{% url 'recommender:submit_review' %}">Review</a></li>
       </ul>
     </div>
 

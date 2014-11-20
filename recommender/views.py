@@ -73,6 +73,8 @@ def submit_report(request):
 
     report_message = "None"
     si = StudentInfo.objects.get(pk=request.session['student_id'])
+    review = Review.objects.filter(review_userid=request.session['student_id'])
+
     if len(si.report) > 0:
         report_message = si.report
 
@@ -87,53 +89,82 @@ def submit_report(request):
     else:
         form = ReportForm()
 
-    try:
-        reviews = Review.objects.filter(review_userid=request.session['student_id'])
-    except:
-        reviews = Review.objects.none()
-
     return render(request, 'recommender_submitreport.html', {
         'message': request.session['message'],
         'report_message': report_message,
         'si': si,
         'form': form,
-        'reviews': reviews,
+        'review': review,
         })
 
 def submit_review(request):
     request.session['message'] = ""
 
-    if request.method == 'POST':
-        if not 'review_pk' in request.session:
-            request.session['message'] = "Something went wrong while submitting your review."
-            pass
-        form = ReviewForm(request.POST)
-        if form.is_valid():
-            review = Review.objects.get(pk=request.session['review_pk'])
-            review.text = form.cleaned_data['review_text']
-            review.save()
-            request.session['message'] = "Your review was saved. Thank you!"
-        else:
-            request.session['message'] = "Something went wrong while saving your review."
-
     try:
-        review = Review.objects.filter(userid=request.session['student_id'])[0]
-        # only a single review request per student
-        review_si = StudentInfo.objects.get(pk=review.review_userid)
-        data = {'review_text': review.text}
-        form = ReviewForm(initial=data)
-        request.session['review_pk'] = review.pk
+        review = Review.objects.filter(userid=request.session['student_id'])
     except:
         review = Review.objects.none()
-        review_si = StudentInfo.objects.none()
-        form = ReviewForm()
 
     return render(request, 'recommender_review.html', {
         'message': request.session['message'],
         'review': review,
-        'review_si': review_si,
-        'form': form,
         })
+
+def submit_reviewtext(request, review_pk):
+    request.session['message'] = ""
+
+    review_text_submission = False
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review_text = form.cleaned_data['review_text']
+            review_text_submission = True
+
+
+    review = Review.objects.get(pk=review_pk)
+    review_si = StudentInfo.objects.get(pk=review.review_userid)
+    reviewtext = ReviewText.objects.filter(review_pk=review_pk)
+
+    if int(review.userid) == int(request.session['student_id']):
+        text_type = "Review"
+    else:
+        text_type = "Rebuttal"
+
+    try:
+        rt_last = reviewtext.order_by('-created')[0]
+        if int(rt_last.userid) == int(request.session['student_id']):
+            if review_text_submission == True:
+                rt_last.review_text = review_text
+                rt_last.save()
+                request.session['message'] += text_type + " updated."
+            data = {'review_text': rt_last.review_text}
+            form = ReviewForm(initial=data)
+        else:
+            if review_text_submission == True:
+                r = ReviewText()
+                r.userid = request.session['student_id']
+                r.review_pk = review_pk
+                r.review_text = review_text
+                r.save()
+                request.session['message'] += text_type + " added."
+                data = {'review_text': review_text}
+                form = ReviewForm(initial=data)
+                reviewtext = ReviewText.objects.filter(review_pk=review_pk)
+            else:
+                form = ReviewForm()
+    except:
+        rt_last = ReviewText.objects.none()
+        form = ReviewForm()
+
+
+    return render(request, 'recommender_reviewtext.html', {
+        'message': request.session['message'],
+        'review': review,
+        'review_si': review_si,
+        'reviewtext': reviewtext,
+        'form': form,
+        'text_type': text_type,
+    })
 
 def populate(request):
     return HttpResponse("Skipped")

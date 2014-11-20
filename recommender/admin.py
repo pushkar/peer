@@ -4,3 +4,4 @@ from recommender.models import *
 
 admin.site.register(StudentInfo, StudentInfoAdmin)
 admin.site.register(Review, ReviewAdmin)
+admin.site.register(ReviewText, ReviewTextAdmin)

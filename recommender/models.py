@@ -18,13 +18,22 @@ class StudentInfoAdmin(admin.ModelAdmin):
 class Review(models.Model):
     userid = models.CharField(max_length=50)
     review_userid = models.CharField(max_length=50)
-    text = models.CharField(max_length=5000, null=True)
+    review_score = models.CharField(max_length=10)
 
 class ReviewAdmin(admin.ModelAdmin):
-    list_display = ('id', 'userid', 'review_userid', 'text',)
-    search_fields = ('text',)
+    list_display = ('id', 'userid', 'review_userid', 'review_score',)
     list_filter = ('userid', 'review_userid')
 
+class ReviewText(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    userid = models.CharField(max_length=50)
+    review_pk = models.IntegerField(max_length=10)
+    review_text =  models.CharField(max_length=10000, null=True)
+
+class ReviewTextAdmin(admin.ModelAdmin):
+    list_display = ('id', 'created', 'userid', 'review_pk', 'review_text')
+    search_fields = ('review_text',)
+    list_filter = ('review_pk',)
 
 class PredictionForm(forms.Form):
     test_data = forms.CharField(widget=forms.Textarea)
