@@ -2,5 +2,5 @@ from django.contrib import admin
 from recommender.models import *
 # Register your models here.
 
-admin.site.register(Student)
-admin.site.register(Review)
+admin.site.register(StudentInfo, StudentInfoAdmin)
+admin.site.register(Review, ReviewAdmin)

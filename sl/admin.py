@@ -2,6 +2,7 @@ from django.contrib import admin
 from sl.models import *
 # Register your models here.
 
+admin.site.register(ExamInfo)
 admin.site.register(StudentInfo, StudentInfoAdmin)
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Answer, AnswerAdmin)

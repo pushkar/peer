@@ -1,0 +1,24 @@
+{% extends "recommender_base.html" %}
+
+{% block recommender_content %}
+<h4>Leaderboard</h4>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th></th>
+            <th>UserId</th>
+            <th>Score</th>
+        </tr>
+    </thead>
+{% for s in s_info %}
+    <tbody>
+        <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ s.userid }}</td>
+        <td>{{ s.score }}</td>
+        </tr>
+    </tbody>
+{% endfor %}
+</table>
+{% endblock %}

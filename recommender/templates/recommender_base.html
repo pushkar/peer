@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}GTPE ML Fall 2014 - Recommender System {% endblock %}
+{% block menu %}
+{% if student.usertype|stringformat:"s" == "superadmin"  %}
+<li><a href="/grade">Grade</a></li>
+{% endif %}
+{% endblock %}
+{% block content %}
+<div class = "row">
+    <div class="col-sm-3 col-md-2 sidebar">
+      <ul class="nav nav-sidebar">
+        <li><a href="leaderboard">Leaderboard</a></li>
+        <li><a href="overview">Overview</a></li>
+        <li><a href="dataset">Dataset</a></li>
+        <li><a href="http://pushkar.github.io/recommendation_engine/">Code</a></li>
+        <li><a href="prediction">Submit solution</a></li>
+        <li><a href="report">Submit report</a></li>
+        <li><a href="review">Review</a></li>
+      </ul>
+    </div>
+
+    <div class="col-sm-9 main">
+        {% block recommender_content %}
+        {% endblock %}
+    </div>
+</div>
+{% endblock %}

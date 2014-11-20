@@ -30,6 +30,8 @@ DEBUG = True
 
 TEMPLATE_DEBUG = True
 
+MATHJAX_ENABLED = True
+
 ALLOWED_HOSTS = []
 
 
@@ -42,6 +44,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_mathjax',
     'student',
     'sl',
     'ul',

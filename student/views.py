@@ -1,10 +1,15 @@
 from django.shortcuts import render
+from django.utils import timezone
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 
 from student.models import *
+import sl.models as sl
+import ul.models as ul
+import rl.models as rl
 
 import csv
+import datetime
 
 # Create your views here.
 
@@ -18,9 +23,44 @@ def index(request):
 
     if request.session['student_id'] != -1:
         s = Student.objects.get(pk=request.session['student_id'])
+        sl_info = sl.ExamInfo.objects.get(pk=1)
+        ul_info = ul.ExamInfo.objects.get(pk=1)
+        rl_info = rl.ExamInfo.objects.get(pk=1)
+
+        sl_link = ""
+        ul_link = ""
+        rl_link = ""
+
+        now = datetime.datetime.now()
+
+        if sl_info.starttime.replace(tzinfo=None) > now:
+            sl_link = sl_info.name + " will start in " + str(sl_info.starttime.replace(tzinfo=None) - now) + " hours"
+        elif sl_info.stoptime.replace(tzinfo=None) < now:
+            sl_link = sl_info.name + " (Exam Ended) "
+        else:
+            sl_link = "<a href='/sl'>" + sl_info.name + "</a>"
+
+        if ul_info.starttime.replace(tzinfo=None) > now:
+            ul_link = ul_info.name + " will start in " + str(sl_info.starttime.replace(tzinfo=None) - now) + " hours"
+        elif ul_info.stoptime.replace(tzinfo=None) < now:
+            ul_link = ul_info.name + " (Exam Ended) "
+        else:
+            ul_link = "<a href='/ul'>" + ul_info.name + "</a>"
+
+        if rl_info.starttime.replace(tzinfo=None) > now:
+            rl_link = rl_info.name + " will start in " + str(rl_info.starttime.replace(tzinfo=None) - now) + " hours"
+        elif rl_info.stoptime.replace(tzinfo=None) < now:
+            rl_link = rl_info.name + " (Exam Ended) "
+        else:
+            rl_link = "<a href='/rl'>" + rl_info.name + "</a>"
+
+
         return render(request, 'index.html', {
         'message': request.session['message'],
         'student': s,
+        'sl_link': sl_link,
+        'ul_link': ul_link,
+        'rl_link': rl_link,
     })
     else:
         form = LoginForm()

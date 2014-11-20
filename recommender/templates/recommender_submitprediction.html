@@ -1,0 +1,22 @@
+{% extends "recommender_base.html" %}
+
+{% block recommender_content %}
+
+<br />
+<p>Current Score: {{ si.score }}</p>
+<p>Submit prediction in this format....</p>
+
+<br />
+<form class="form-group" action="prediction" method="post">{% csrf_token %}
+    <div class="form-group">
+        <div class="fieldWrapper">
+        <label for="test_data">Prediction:</label><br />
+        {{ form.test_data }}
+        {{ form.test_data.errors }}
+        </div>
+    </div>
+    <div class="form-group">
+        <p><input class="btn btn-default" type="submit" value="Submit" /></p>
+    </div>
+</form>
+{% endblock %}

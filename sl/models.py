@@ -3,6 +3,14 @@ from django import forms
 from django.contrib import admin
 from django.forms.widgets import RadioSelect
 
+class ExamInfo(models.Model):
+	name = models.CharField(max_length=50)
+	starttime = models.DateTimeField()
+	stoptime = models.DateTimeField()
+
+	def __unicode__(self):
+		return self.name
+
 class StudentInfo(models.Model):
 	userid = models.CharField(max_length=50)
 	gtpe_finished = models.IntegerField()
