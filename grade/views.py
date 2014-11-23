@@ -80,21 +80,22 @@ def grade_question(request, exam, q_id="1"):
     q_response = json.loads(response.read())
 
     if q_response['type'].strip() == "tf":
-        api_uri = api_src + str(exam) + "/tflog/" + q_id
+        api_uri = api_src + str(exam) + "/tflog/q/" + q_id
 
         api_request = Request(api_uri)
         response = urlopen(api_request)
         tf_response = response.read()
 
-        api_uri = api_src + str(exam) + "/mclog/" + q_id
+        api_uri = api_src + str(exam) + "/mclog/q/" + q_id
 
         api_request = Request(api_uri)
         response = urlopen(api_request)
         mc_response = response.read()
 
+        request.session['refurl'] = "some url"
         return render(request, 'grade_tfquestion.html', {
             'title': title,
-            'exam': exam,
+            'exam': api_src + str(exam),
             'message': request.session['message'],
             'student': Student.objects.get(pk=request.session['student_id']),
             'tf_response': json.loads(tf_response),
@@ -103,14 +104,16 @@ def grade_question(request, exam, q_id="1"):
 
     elif q_response['type'].strip() == "short":
 
-        api_uri = api_src + str(exam) + "/selog/" + q_id
+        api_uri = api_src + str(exam) + "/selog/q/" + q_id
 
         api_request = Request(api_uri)
         response = urlopen(api_request)
         s_response = response.read()
+
+        request.session['refurl'] = "some url"
         return render(request, 'grade_shortquestion.html', {
             'title': title,
-            'exam': exam,
+            'exam': api_src + str(exam),
             'message': request.session['message'],
             'student': Student.objects.get(pk=request.session['student_id']),
             's_response': json.loads(s_response),

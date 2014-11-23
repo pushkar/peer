@@ -1,6 +1,6 @@
-{% extends "base-ulexam.html" %}
+{% extends "base-exam.html" %}
 {% block examform %}
-<form class="form-group" action="/ul/exam/essay" method="post">{% csrf_token %}
+<form class="form-group" action="/{{ exam }}/exam/essay" method="post">{% csrf_token %}
     <p>{{ question }}</p>
     <div class="form-group">
         <div class="fieldWrapper">

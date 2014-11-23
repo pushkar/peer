@@ -2,6 +2,8 @@ import json
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
 
 import sl.models as sl
 import ul.models as ul
@@ -155,6 +157,31 @@ def selog_exam(request, q_id, exam):
 
     return HttpResponse(json.dumps(response, indent=4), content_type="application/json")
 
+# Updates
+@csrf_exempt
+@require_POST
+def update_log(request, exam, log, id, score):
+    if exam == "sl":
+        _exam = sl
+    elif exam == "ul":
+        _exam = ul
+    elif exam == "rl":
+        _exam = rl
+
+    if log == "tflog":
+        _log = _exam.TFLog
+    elif log == 'mclog':
+        _log = _exam.MCLog
+
+    l = _log.objects.get(pk=id)
+    l.score = score
+    l.save()
+
+    response = {}
+    response['pk'] = id
+    response['score'] = score
+    
+    return HttpResponse(json.dumps(response, indent=4), content_type="application/json")
 
 # Generic Exam Dependent Views
 

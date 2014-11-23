@@ -71,9 +71,9 @@ $$
 <li>Test the ratings you get with the test set. Remember that for each user, you will first have to find out which cluster they belong to and then find their ratings.</li>
 <li>You will submit your ratings to the competition website (link will come out later). A score will be calculated using root mean squared error.
 $$
-    \sum_{i=1}^{n} \sqrt{(\hat{x}^2 - x^2)}
+    \sqrt{\sum_{i=1}^{n} (\hat{x}^2 - x^2)}
 $$
-Here \( \hat{x} \) are the actual ratings and \( x \) is what your recommendation engine gave out.</li>
+Here \( \hat{x} \) are the actual ratings and \( x \) is what your recommendation engine gave out. We divide this score by 5 to normalize it between 0 and 1. So, 0 is a good score and 1 is the worst score you can get.</li>
 <li>Did using the clustering algorithms improve accuracy of your prediction? Explain briefly. For example, if you are using k-means for clustering, graph a plot of performance vs k. If you used EM algorithm, show how the performance changed when you varied parameters of your Gaussian mixture model.</li>
 <li>You will submit this report <a href="report">here</a>.</li>
 </ol>

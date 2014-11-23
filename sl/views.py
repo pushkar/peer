@@ -12,25 +12,7 @@ import numpy
 import csv
 
 def index(request):
-    if not 'message' in request.session:
-        request.session['message'] = ""
-
-    if not 'student_id' in request.session:
-        request.session['message'] = ""
-        request.session['student_id'] = -1
-
-    if request.session['student_id'] != -1:
-        s = Student.objects.get(pk=request.session['student_id'])
-        return render(request, 'index.html', {
-        'message': request.session['message'],
-        'student': s,
-    })
-    else:
-        form = LoginForm()
-        return render(request, 'index.html', {
-        'message': request.session['message'],
-        'form': form,
-    })
+    return HttpResponseRedirect('/sl/exam')
 
 def login(request):
     if request.method == 'POST':
@@ -132,9 +114,9 @@ def exam(request):
 
     request.session['message'] = ""
 
-    if Student.objects.get(pk=request.session['student_id']).gtpe_finished == 1:
+    if StudentInfo.objects.get(pk=request.session['student_id']).gtpe_finished == 1:
         request.session['message'] = "You have finished and saved your exam. You can't visit it again."
-        return HttpResponseRedirect("/sl")
+        return HttpResponseRedirect("/student")
     #----
 
     try:
@@ -234,11 +216,11 @@ def save(request):
         a.answer = l.answer
         a.count = 1
         a.save()
-    s = Student.objects.get(pk=request.session['student_id'])
-    s.gtpe_finished = 1
-    s.save()
+    si = StudentInfo.objects.get(pk=request.session['student_id'])
+    si.gtpe_finished = 1
+    si.save()
     request.session['message'] = "Congratulations, you have finished your exam."
-    return HttpResponseRedirect("/sl")
+    return HttpResponseRedirect("/student")
 
 @login_required
 def grade_auto(request):

@@ -1,10 +1,7 @@
 {% extends "base.html" %}
-{% block title %}GTPE ML Fall 2014 - Exam {% endblock %}
+{% block title %}GTPE ML Fall 2014 - UL Exam {% endblock %}
 {% block menu %}
-<li><a href="/sl/done">Finish Exam</a></li>
-{% if student.usertype|stringformat:"s" == "superadmin"  %}
-<li><a href="/sl/admin">Admin</a></li>
-{% endif %}
+<li><a href="/{{ exam }}/done">Finish Exam</a></li>
 {% endblock %}
 
 {% block accountmenu %}
@@ -16,7 +13,7 @@
 {% block content %}
 <ul class="pagination">
     {% for i in total %}
-        <li><a href="/sl/update/{{ i }}">{{ i }}</a></li>
+        <li><a href="/{{ exam }}/update/{{ i }}">{{ i }}</a></li>
     {% endfor %}
 </ul>
 {% block examform %}{% endblock %}
