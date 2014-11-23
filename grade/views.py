@@ -14,7 +14,7 @@ import numpy
 import csv
 import json
 
-api_src = "http://localhost:8000/api/"
+api_src = "http://gtpe.robotvisions.org/api/"
 
 def index(request):
     if not 'message' in request.session:
