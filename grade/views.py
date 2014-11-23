@@ -75,6 +75,7 @@ def grade_question(request, exam, q_id="1"):
         title = "Reinforcement Learning Exam"
 
     api_uri = api_src + str(exam) + "/q/" + q_id
+    print api_uri
     api_request = Request(api_uri)
     response = urlopen(api_request)
     q_response = json.loads(response.read())
