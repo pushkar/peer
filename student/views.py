@@ -7,6 +7,7 @@ from student.models import *
 import sl.models as sl
 import ul.models as ul
 import rl.models as rl
+import recommender.models as re
 
 import csv
 import datetime
@@ -106,5 +107,10 @@ def populate(request):
                 Student.objects.get_or_create(userid=row[0], email=row[1],
                     gtid=row[2], usertype=row[3], lastname=row[4], firstname=row[5])
                 response += row[0] + " added.<br />"
+
+                sl.StudentInfo.objects.get_or_create(userid=row[0], gtpe_finished=0, score=0)
+                ul.StudentInfo.objects.get_or_create(userid=row[0], gtpe_finished=0, score=0)
+                rl.StudentInfo.objects.get_or_create(userid=row[0], gtpe_finished=0, score=0)
+                re.StudentInfo.objects.get_or_create(userid=row[0], report="", score=0)
 
     return HttpResponse(response)
