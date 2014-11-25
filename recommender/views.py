@@ -159,10 +159,12 @@ def submit_reviewtext(request, review_pk):
             review_text = form.cleaned_data['review_text']
             review_text_submission = True
 
-
-    review = Review.objects.get(pk=review_pk)
-    review_si = StudentInfo.objects.get(pk=review.review_userid)
-    reviewtext = ReviewText.objects.filter(review_pk=review_pk)
+    try:
+        review = Review.objects.get(pk=review_pk)
+        review_si = StudentInfo.objects.get(pk=review.review_userid)
+        reviewtext = ReviewText.objects.filter(review_pk=review_pk)
+    except:
+        return HttpResponseRedirect('/recommender/review')
 
     form_score = None
     if int(review.userid) == int(request.session['student_id']):
@@ -174,6 +176,7 @@ def submit_reviewtext(request, review_pk):
 
     try:
         rt_last = reviewtext.order_by('-created')[0]
+
         if int(rt_last.userid) == int(request.session['student_id']):
             if review_text_submission == True:
                 rt_last.review_text = review_text
@@ -181,23 +184,29 @@ def submit_reviewtext(request, review_pk):
                 request.session['message'] += text_type + " updated."
             data = {'review_text': rt_last.review_text}
             form = ReviewForm(initial=data)
-        else:
+        elif int(rt_last.review_userid) == int(request.session['student_id']):
             if review_text_submission == True:
-                r = ReviewText()
-                r.userid = request.session['student_id']
-                r.review_pk = review_pk
-                r.review_text = review_text
-                r.save()
-                request.session['message'] += text_type + " added."
-                data = {'review_text': review_text}
-                form = ReviewForm(initial=data)
-                reviewtext = ReviewText.objects.filter(review_pk=review_pk)
-            else:
-                form = ReviewForm()
+                rt_last.review_text = review_text
+                rt_last.save()
+                request.session['message'] += text_type + " updated."
+            data = {'review_text': rt_last.review_text}
+            form = ReviewForm(initial=data)
+        else:
+            form = ReviewForm()
     except:
         rt_last = ReviewText.objects.none()
-        form = ReviewForm()
-
+        if review_text_submission == True:
+            r = ReviewText()
+            r.userid = request.session['student_id']
+            r.review_pk = review_pk
+            r.review_text = review_text
+            r.save()
+            request.session['message'] += text_type + " added."
+            data = {'review_text': review_text}
+            form = ReviewForm(initial=data)
+            reviewtext = ReviewText.objects.filter(review_pk=review_pk)
+        else:
+            form = ReviewForm()
 
     return render(request, 'recommender_reviewtext.html', {
         'message': request.session['message'],

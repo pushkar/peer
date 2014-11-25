@@ -4,6 +4,9 @@
 
 <br />
 <p>Review for the following report: <a href="{{ review_si.report }}">{{ review_si.report }}</a></p>
+{% if text_type == "Rebuttal" %}
+<p>Score given by reviewer: {{ review.review_score }}</a> (This score does not affect your final grade)</p>
+{% endif %}
 {% if text_type == "Review" %}
 <form class="form-group" action="{% url 'recommender:submit_reviewscore' review_pk=review.pk %}" method="post">{% csrf_token %}
     <div class="form-group">
