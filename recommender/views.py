@@ -42,7 +42,7 @@ def dataset(request):
 def leaderboard(request):
     request.session['message'] = ""
     s = Student.objects.get(pk=request.session['student_id'])
-    si = StudentInfo.objects.filter(score__gt=0).order_by('-score')
+    si = StudentInfo.objects.filter(score__gt=0).order_by('score')
     return render(request, 'recommender_leaderboard.html', {
         'message': request.session['message'],
         'student': s,
