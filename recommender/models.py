@@ -6,7 +6,7 @@ from django.forms.widgets import RadioSelect
 class StudentInfo(models.Model):
     userid = models.CharField(max_length=50)
     score = models.CharField(max_length=10)
-    report = models.CharField(max_length=50, null=True)
+    report = models.CharField(max_length=200, null=True)
 
     def __unicode__(self):
         return self.userid

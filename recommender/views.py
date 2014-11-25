@@ -104,8 +104,9 @@ def submit_report(request):
     si = StudentInfo.objects.get(pk=request.session['student_id'])
     review = Review.objects.filter(review_userid=request.session['student_id'])
 
-    if len(si.report) > 0:
-        report_message = si.report
+    if si.report:
+        if len(si.report) > 0:
+            report_message = si.report
 
     if request.method == 'POST':
         form = ReportForm(request.POST)
