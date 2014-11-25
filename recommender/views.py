@@ -139,6 +139,15 @@ def submit_review(request):
         'review': review,
         })
 
+def submit_reviewscore(request, review_pk):
+    if request.method == 'POST':
+        form_score = ScoreForm(request.POST)
+        if form_score.is_valid():
+            review = Review.objects.get(pk=review_pk)
+            review.review_score = form_score.cleaned_data['review_score']
+            review.save()
+    return submit_reviewtext(request, review_pk)
+
 def submit_reviewtext(request, review_pk):
     request.session['message'] = ""
 
@@ -154,8 +163,11 @@ def submit_reviewtext(request, review_pk):
     review_si = StudentInfo.objects.get(pk=review.review_userid)
     reviewtext = ReviewText.objects.filter(review_pk=review_pk)
 
+    form_score = None
     if int(review.userid) == int(request.session['student_id']):
         text_type = "Review"
+        data = {'review_score': review.review_score}
+        form_score = ScoreForm(initial=data)
     else:
         text_type = "Rebuttal"
 
@@ -192,6 +204,7 @@ def submit_reviewtext(request, review_pk):
         'review_si': review_si,
         'reviewtext': reviewtext,
         'form': form,
+        'form_score': form_score,
         'text_type': text_type,
     })
 

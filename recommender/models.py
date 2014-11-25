@@ -43,6 +43,10 @@ class ReviewForm(forms.Form):
     review_text = forms.CharField(widget=forms.Textarea)
     field = ('review_text')
 
+class ScoreForm(forms.Form):
+    review_score = forms.ChoiceField(choices=[(x, x) for x in range(1, 6)])
+    field = ('review_score')
+
 class ReportForm(forms.Form):
     report_link = forms.CharField(max_length=100)
     fields = ('report_link')

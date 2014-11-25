@@ -12,9 +12,27 @@ from django.core.urlresolvers import reverse
 
 import numpy
 import csv
+import datetime
+
+def check_examtime(request):
+    rl_info = ExamInfo.objects.get(pk=1)
+    now = datetime.datetime.now()
+
+    if rl_info.starttime.replace(tzinfo=None) > now:
+        request.session['message'] += "Exam has not yet started."
+        return 0
+    elif rl_info.stoptime.replace(tzinfo=None) < now:
+        request.session['message'] += "Exam has ended."
+        return 0
+
+    request.session['message'] = "Welcome to the " + rl_info.name
+    return 1
 
 def index(request):
-    return HttpResponseRedirect(exam_page)
+    request.session['message'] = ""
+    if not check_examtime(request):
+        return HttpResponseRedirect('/student')
+    return HttpResponseRedirect('/student')
 
 def exam_tf(request):
     if request.method == 'POST':
@@ -117,6 +135,8 @@ def exam_essay(request):
 def exam(request):
 
     request.session['message'] = ""
+    if not check_examtime(request):
+        return HttpResponseRedirect('/student')
 
     if StudentInfo.objects.get(pk=request.session['student_id']).gtpe_finished == 1:
         request.session['message'] = "You have finished and saved your exam. You can't visit it again."

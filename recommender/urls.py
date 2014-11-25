@@ -11,5 +11,6 @@ urlpatterns = patterns('',
     url(r'^report$', views.submit_report, name='submit_report'),
     url(r'^review$', views.submit_review, name='submit_review'),
     url(r'^review/(?P<review_pk>[0-9]+)$', views.submit_reviewtext, name='submit_reviewtext'),
+    url(r'^reviewscore/(?P<review_pk>[0-9]+)$', views.submit_reviewscore, name='submit_reviewscore'),
     url(r'^populate$', views.populate, name='populate'),
 )
