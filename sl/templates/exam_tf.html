@@ -1,7 +1,9 @@
 {% extends "base-exam.html" %}
 {% block examform %}
 <form class="form-group" action="/{{ exam }}/exam/tf" method="post">{% csrf_token %}
+    {% autoescape off %}
     <p>{{ question }}</p>
+    {% endautoescape %}
     <b>Select True or False and explain your choice clearly.</b>
     <div class="form-group">
         <div class="fieldWrapper">

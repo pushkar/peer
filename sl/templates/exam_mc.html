@@ -2,7 +2,9 @@
 {% block examform %}
 <form class="form-group" action="/{{ exam }}/exam/mc" method="post">{% csrf_token %}
     <div class="form-group">
+        {% autoescape off %}
         <p>{{ question }}</p>
+        {% endautoescape %}
         <p>Statement 1: {{ answer1_tf }} {{ answer1 }}</p>
         <p>Statement 2: {{ answer2_tf }} {{ answer2 }}</p>
     </div>

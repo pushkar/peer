@@ -1,7 +1,9 @@
 {% extends "base-exam.html" %}
 {% block examform %}
 <form class="form-group" action="/{{ exam }}/exam/essay" method="post">{% csrf_token %}
+    {% autoescape off %}
     <p>{{ question }}</p>
+    {% endautoescape %}
     <div class="form-group">
         <div class="fieldWrapper">
         <label for="answer">Answer:</label><br />

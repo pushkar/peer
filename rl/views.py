@@ -25,16 +25,16 @@ def check_examtime(request):
         request.session['message'] += "Exam has ended."
         return 0
 
-    request.session['message'] = "Welcome to the " + rl_info.name
     return 1
 
 def index(request):
     request.session['message'] = ""
     if not check_examtime(request):
         return HttpResponseRedirect('/student')
-    return HttpResponseRedirect('/student')
+    return HttpResponseRedirect(exam_page)
 
 def exam_tf(request):
+    request.session['message'] = ""
     if request.method == 'POST':
         form = TFForm(request.POST)
         if form.is_valid():
@@ -69,6 +69,7 @@ def exam_tf(request):
 
 
 def exam_mc(request):
+    request.session['message'] = ""
     if request.method == 'POST':
         form = MCForm(request.POST)
         if form.is_valid():
@@ -107,6 +108,7 @@ def exam_mc(request):
     })
 
 def exam_essay(request):
+    request.session['message'] = ""
     if request.method == 'POST':
         form = ShortEssayForm(request.POST)
         if form.is_valid():
@@ -143,7 +145,7 @@ def exam(request):
         return HttpResponseRedirect("/student")
     #----
 
-    if int(request.session['question_id']) >= 9:
+    if int(request.session['question_id']) >= 6:
         try:
             log = ShortEssayLog.objects.filter(student_id=request.session['student_id'], question_id=request.session['question_id']).latest()
             data = {'answer': log.answer}
@@ -200,7 +202,8 @@ def exam(request):
 
     #------
 
-    if numpy.random.choice(2, 1)[0] == 0:
+    #if numpy.random.choice(2, 1)[0] == 0:
+    if True:
         form = TFForm()
 
         return render(request, 'exam_tf.html', {
