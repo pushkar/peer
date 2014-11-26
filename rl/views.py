@@ -27,10 +27,46 @@ def check_examtime(request):
 
     return 1
 
+def check_exampass(request):
+    si = StudentInfo.objects.get(pk=request.session['student_id'])
+
+    if int(si.gtpe_started) == 0:
+        return -1
+
+    if int(si.gtpe_finished) == 1:
+        request.session['message'] = "You have finished and saved your exam. You can't visit it again."
+        return 0
+
+    return 1
+
+def exampass(request):
+    print "here in exampass"
+    if request.method == 'POST':
+        form = PassForm(request.POST)
+        if form.is_valid():
+            if form.cleaned_data['password'] == "ockham":
+                si = StudentInfo.objects.get(pk=request.session['student_id'])
+                si.gtpe_started = 1
+                si.save()
+                return HttpResponseRedirect(exam_page)
+
+    request.session['message'] = "Ask your Proctor to fill in the exam password for you."
+    form = PassForm()
+    return render(request, 'exampass.html', {
+        'message': request.session['message'],
+        'exam': "rl",
+        'si': StudentInfo.objects.get(pk=request.session['student_id']),
+        'form': form,
+    })
+
 def index(request):
     request.session['message'] = ""
-    if not check_examtime(request):
+    check = check_exampass(request)
+    if check == -1:
+        return HttpResponseRedirect('exampass')
+    elif check == 0:
         return HttpResponseRedirect('/student')
+
     return HttpResponseRedirect(exam_page)
 
 def exam_tf(request):
@@ -137,12 +173,11 @@ def exam_essay(request):
 def exam(request):
 
     request.session['message'] = ""
-    if not check_examtime(request):
+    check = check_exampass(request)
+    if check == -1:
+        return HttpResponseRedirect('exampass')
+    elif check == 0:
         return HttpResponseRedirect('/student')
-
-    if StudentInfo.objects.get(pk=request.session['student_id']).gtpe_finished == 1:
-        request.session['message'] = "You have finished and saved your exam. You can't visit it again."
-        return HttpResponseRedirect("/student")
     #----
 
     if int(request.session['question_id']) >= 6:

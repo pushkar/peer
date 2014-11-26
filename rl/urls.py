@@ -3,6 +3,7 @@ from django.conf.urls import patterns, url
 from rl import views
 
 urlpatterns = patterns('',
+    url(r'^exampass$', views.exampass, name='exampass'),
     url(r'^exam$', views.exam, name='exam'),
     url(r'^done$', views.done, name='done'),
     url(r'^save$', views.save, name='save'),

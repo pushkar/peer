@@ -11,13 +11,18 @@ class ExamInfo(models.Model):
     def __unicode__(self):
         return self.name
 
+class PassForm(forms.Form):
+    password = forms.CharField(widget=forms.PasswordInput())
+    field = ('password')
+
 class StudentInfo(models.Model):
     userid = models.CharField(max_length=50)
+    gtpe_started = models.IntegerField()
     gtpe_finished = models.IntegerField()
     score = models.IntegerField()
 
 class StudentInfoAdmin(admin.ModelAdmin):
-    list_display = ('id', 'userid', 'score')
+    list_display = ('id', 'userid', 'score', 'gtpe_started', 'gtpe_finished')
     list_filter = ('gtpe_finished',)
 
 class Question(models.Model):
