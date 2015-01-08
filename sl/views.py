@@ -222,10 +222,7 @@ def save(request):
     request.session['message'] = "Congratulations, you have finished your exam."
     return HttpResponseRedirect("/student")
 
-#Shows the exam to the student
-def exam_check(request):
     
-
 # Sync tflog scores with answers
 @login_required
 def db_sync(request):
