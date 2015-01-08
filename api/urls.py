@@ -10,6 +10,10 @@ urlpatterns = patterns('',
     url(r'^(?P<exam>\w+)/q/all$', views.question_all, name='question_all'),
     url(r'^(?P<exam>\w+)/q/(?P<q_id>\w+)$', views.question, name='question'),
 
+    url(r'^student/(?P<exam>\w+)/tflog/s/(?P<s_id>\d+)$', views.tflog_s, name='tflog_s'),
+    url(r'^student/(?P<exam>\w+)/mclog/s/(?P<s_id>\d+)$', views.mclog_s, name='mclog_s'),
+    url(r'^student/(?P<exam>\w+)/selog/s/(?P<s_id>\d+)$', views.selog_s, name='selog_s'),
+
     url(r'^(?P<exam>\w+)/(?P<log>\w+)/id/(?P<id>\d+)/score/(?P<score>\d+.\d+)$', views.update_log, name='update_log'),
 
     url(r'^student/all$', views.student_all, name='student_all'),

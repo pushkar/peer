@@ -13,5 +13,8 @@ urlpatterns = patterns('',
     url(r'^exam/essay$', views.exam_essay, name='exam_essay'),
     url(r'^db/populate$', views.db_populate, name='db_populate'),
     url(r'^db/show$', views.db_show, name='db_show'),
+    url(r'^sync$', views.db_sync, name='db_sync'),
+    url(r'^grade$', views.db_grade, name='db_grade'),
+
     url(r'^$', views.index, name='index'),
 )

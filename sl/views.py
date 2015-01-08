@@ -222,9 +222,36 @@ def save(request):
     request.session['message'] = "Congratulations, you have finished your exam."
     return HttpResponseRedirect("/student")
 
+#Shows the exam to the student
+def exam_check(request):
+    
+
+# Sync tflog scores with answers
 @login_required
-def grade_auto(request):
+def db_sync(request):
+    tf_log = TFLog.objects.all()
+    print tf_log.count()
+    count = 1
+    string = ""
+
+    for t in tf_log:
+        try:
+            a = Answer.objects.get(student_id=str(t.student_id), question_id=str(t.question_id))
+            a.score = t.score
+            a.save()
+            count = count + 1
+        except:
+            pass
+            string += "pass <br />"
+
+    string_e = "Synced " + str(count) + " Answers <br /><br />" + string
+    return HttpResponse(string_e)
+
+# Check score in Answer's and then give out grades for MCLogs
+@login_required
+def db_grade(request):
     mc_log = MCLog.objects.all()
+    count = 1
     for m in mc_log:
         m.score = 0.0
         a1 = Answer.objects.get(pk=m.answer1_id)
@@ -244,10 +271,23 @@ def grade_auto(request):
                     if m.choice == 4:
                         m.score = 0
         m.save()
-    return render(request, 'index.html', {
-      'message': request.session['message'],
-    })
+        count = count + 1
+    string_e = "Graded " + str(count) + " MCLog's <br /><br />"
 
+    students = StudentInfo.objects.all()
+    for s in students:
+        score = 0
+        tf_log = TFLog.objects.filter(student_id=s.pk)
+        for t in tf_log:
+            score += t.score
+        mc_log = MCLog.objects.filter(student_id=s.pk)
+        for m in mc_log:
+            score += m.score
+        s.score = score
+        string_e += "Score for " + s.userid + " is " + str(s.score) + "<br />"
+        s.save()
+
+    return HttpResponse(string_e)
 
 @login_required
 def grade(request, log_type="tf", log_id="1", score=0.0):

@@ -56,7 +56,7 @@ def question_exam(request, exam, q_id):
 
 def question_all_exam(request, exam):
     response = {}
-    questions = exam.Question.objects.all()
+    questions = exam.Question.objects.all().order_by('pk')
     for q in questions:
         response[q.pk] = question_obj_to_dict(q)
     return HttpResponse(json.dumps(response, indent=4), content_type="application/json")
@@ -99,14 +99,14 @@ def student(request, var="pk", val=""):
 
 def tflog_exam(request, q_id, exam):
     response = {}
-    tflog = exam.TFLog.objects.filter(question_id=q_id)
+    tflog = exam.TFLog.objects.filter(question_id=q_id).order_by('pk')
 
     i = 0
     for t in tflog:
         t_dict = {}
         t_dict['pk'] = t.pk
         t_dict['created'] = t.created.strftime('%m/%d/%Y')
-        if t.answer_tf == 1:
+        if t.answer_tf == "1":
             t_dict['tf'] = "True"
         else:
             t_dict['tf'] = "False"
@@ -121,7 +121,7 @@ def tflog_exam(request, q_id, exam):
 
 def mclog_exam(request, q_id, exam):
     response = {}
-    mclog = exam.MCLog.objects.filter(question_id=q_id)
+    mclog = exam.MCLog.objects.filter(question_id=q_id).order_by('pk')
 
     i=0
     for m in mclog:
@@ -157,6 +157,66 @@ def selog_exam(request, q_id, exam):
 
     return HttpResponse(json.dumps(response, indent=4), content_type="application/json")
 
+def tflog_student(request, s_id, exam):
+    response = {}
+    tflog = exam.TFLog.objects.filter(student_id=s_id)
+
+    i = 0
+    for t in tflog:
+        t_dict = {}
+        t_dict['pk'] = t.pk
+        t_dict['created'] = t.created.strftime('%m/%d/%Y')
+        if t.answer_tf == "1":
+            t_dict['tf'] = "True"
+        else:
+            t_dict['tf'] = "False"
+        t_dict['text'] = t.answer
+        t_dict['score'] = t.score
+        t_dict['student'] = student_obj_to_dict(Student.objects.get(pk=t.student_id))
+        t_dict['question'] = question_obj_to_dict(exam.Question.objects.get(pk=t.question_id))
+        response[i] = t_dict
+        i = i + 1
+
+    return HttpResponse(json.dumps(response, indent=4), content_type="application/json")
+
+def mclog_student(request, s_id, exam):
+    response = {}
+    mclog = exam.MCLog.objects.filter(student_id=s_id)
+
+    i=0
+    for m in mclog:
+        m_dict = {}
+        m_dict['pk'] = m.pk
+        m_dict['created'] = m.created.strftime('%m/%d/%Y')
+        m_dict['choice'] = m.choice
+        m_dict['score'] = m.score
+        m_dict['question'] = question_obj_to_dict(exam.Question.objects.get(pk=m.question_id))
+        m_dict['student'] = student_obj_to_dict(Student.objects.get(pk=m.student_id))
+        m_dict['answer1'] = answer_obj_to_dict(exam.Answer.objects.get(pk=m.answer1_id))
+        m_dict['answer2'] = answer_obj_to_dict(exam.Answer.objects.get(pk=m.answer2_id))
+        response[i] = m_dict
+        i = i + 1
+
+    return HttpResponse(json.dumps(response, indent=4), content_type="application/json")
+
+def selog_student(request, s_id, exam):
+    response = {}
+    elog = exam.ShortEssayLog.objects.filter(student_id=s_id)
+
+    i=0
+    for m in elog:
+        m_dict = {}
+        m_dict['pk'] = m.pk
+        m_dict['created'] = m.created.strftime('%m/%d/%Y')
+        m_dict['score'] = m.score
+        m_dict['question'] = question_obj_to_dict(exam.Question.objects.get(pk=m.question_id))
+        m_dict['student'] = student_obj_to_dict(Student.objects.get(pk=m.student_id))
+        m_dict['answer'] = m.answer
+        response[i] = m_dict
+        i = i + 1
+
+    return HttpResponse(json.dumps(response, indent=4), content_type="application/json")
+
 # Updates
 @csrf_exempt
 @require_POST
@@ -170,7 +230,7 @@ def update_log(request, exam, log, id, score):
 
     if log == "tflog":
         _log = _exam.TFLog
-    elif log == 'mclog':
+    elif log == "mclog":
         _log = _exam.MCLog
 
     l = _log.objects.get(pk=id)
@@ -180,7 +240,7 @@ def update_log(request, exam, log, id, score):
     response = {}
     response['pk'] = id
     response['score'] = score
-    
+
     return HttpResponse(json.dumps(response, indent=4), content_type="application/json")
 
 # Generic Exam Dependent Views
@@ -228,8 +288,32 @@ def mclog(request, exam, q_id="1"):
 
 def selog(request, exam, q_id="1"):
     if exam == "ul":
-        return selog_exam(request, q_id, ul)
+        return selog_student(request, q_id, ul)
     elif exam == "sl":
-        return selog_exam(request, q_id, sl)
+        return selog_student(request, q_id, sl)
     elif exam == "rl":
-        return selog_exam(request, q_id, rl)
+        return selog_student(request, q_id, rl)
+
+def tflog_s(request, exam, s_id="1"):
+    if exam == "ul":
+        return tflog_student(request, s_id, ul)
+    elif exam == "sl":
+        return tflog_student(request, s_id, sl)
+    elif exam == "rl":
+        return tflog_student(request, s_id, rl)
+
+def mclog_s(request, exam, s_id="1"):
+    if exam == "ul":
+        return mclog_student(request, s_id, ul)
+    elif exam == "sl":
+        return mclog_student(request, s_id, sl)
+    elif exam == "rl":
+        return mclog_student(request, s_id, rl)
+
+def selog_s(request, exam, s_id="1"):
+    if exam == "ul":
+        return selog_student(request, s_id, ul)
+    elif exam == "sl":
+        return selog_student(request, s_id, sl)
+    elif exam == "rl":
+        return selog_student(request, s_id, rl)

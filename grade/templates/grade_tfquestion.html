@@ -56,8 +56,8 @@
         <tbody>
             <tr>
             <td>{{ r.pk }}</a></td>
-            <td><a href="{{ exam }}/mclog/id/{{r.pk}}/score/0.0">0</a></td>
-            <td><a href="{{ exam }}/mclog/id/{{r.pk}}/score/0.0">1</a></td>
+            <td><a href="{{ exam }}/mclog/id/{{r.pk}}/score/0.0" class="ajax" data-method="post">0</a></td>
+            <td><a href="{{ exam }}/mclog/id/{{r.pk}}/score/1.0" class="ajax" data-method="post">1</a></td>
             <td>{{ r.score }}</td>
             <td>
                 <ul class="list-group">
