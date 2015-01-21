@@ -15,8 +15,6 @@ def index(request):
     if not 'message' in request.session:
         request.session['message'] = ""
 
-    request.session['message'] = ""
-    
     if not 'student_id' in request.session:
         request.session['student_id'] = -1
 
@@ -35,7 +33,6 @@ def index(request):
     })
 
 def login(request):
-    request.session['message'] = ""
 
     if request.method == 'POST':
         form = LoginForm(request.POST)

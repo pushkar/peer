@@ -16,13 +16,20 @@ def check_session(request):
     if not 'message' in request.session:
         request.session['message'] = ""
 
+    request.session['message'] = ""
+
     if not 'student_id' in request.session:
         request.session['message'] = ""
         request.session['student_id'] = -1
-        return HttpResponseRedirect('/student/')
+
+    if request.session['student_id'] == -1:
+        return False
+    return True
+
 
 def index(request):
-    check_session(request)
+    if not check_session(request):
+        return HttpResponseRedirect('/student/')
 
     s = Student.objects.get(pk=request.session['student_id'])
     a = Assignment.objects.all()
@@ -34,7 +41,8 @@ def index(request):
         })
 
 def assignment_page(request, a_name, p_name):
-    check_session(request)
+    if not check_session(request):
+        return HttpResponseRedirect('/student/')
 
     s = Student.objects.get(pk=request.session['student_id'])
     a = Assignment.objects.filter(assignment_name=a_name)
@@ -53,7 +61,8 @@ def assignment_view(request, a_name):
     return HttpResponseRedirect('/assignment/'+a_name+"/page")
 
 def submit_report(request, a_name):
-    check_session(request)
+    if not check_session(request):
+        return HttpResponseRedirect('/student/')
 
     s = Student.objects.get(pk=request.session['student_id'])
     a = Assignment.objects.filter(assignment_name=a_name)
@@ -97,7 +106,8 @@ def submit_report(request, a_name):
         })
 
 def submit_review(request, a_name):
-    request.session['message'] = ""
+    if not check_session(request):
+        return HttpResponseRedirect('/student/')
 
     try:
         review = Review.objects.filter(userid=request.session['student_id'])
@@ -126,7 +136,8 @@ def submit_reviewscore(request, a_name, review_pk):
     return submit_reviewtext(request, review_pk)
 
 def submit_reviewtext(request, a_name, review_pk):
-    request.session['message'] = ""
+    if not check_session(request):
+        return HttpResponseRedirect('/student/')
 
     review_text_submission = False
     if request.method == 'POST':

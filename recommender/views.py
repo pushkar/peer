@@ -14,19 +14,30 @@ import re
 import numpy as np
 import csv
 
-def index(request):
+def check_session(request):
     if not 'message' in request.session:
         request.session['message'] = ""
+
+    request.session['message'] = ""
 
     if not 'student_id' in request.session:
         request.session['message'] = ""
         request.session['student_id'] = -1
+
+    if request.session['student_id'] == -1:
+        return False
+    return True
+
+def index(request):
+    if not check_session(request):
         return HttpResponseRedirect('/student/')
 
     return HttpResponseRedirect('leaderboard')
 
 def leaderboard(request):
-    request.session['message'] = ""
+    if not check_session(request):
+        return HttpResponseRedirect('/student/')
+
     s = Student.objects.get(pk=request.session['student_id'])
     si = StudentInfo.objects.filter(score__gt=0).order_by('score')
     a = Assignment.objects.filter(assignment_name="unsupervised")
@@ -41,7 +52,9 @@ def leaderboard(request):
     })
 
 def submit_prediction(request):
-    request.session['message'] = ""
+    if not check_session(request):
+        return HttpResponseRedirect('/student/')
+
     s = Student.objects.get(pk=request.session['student_id'])
     si = StudentInfo.objects.get(pk=request.session['student_id'])
     a = Assignment.objects.filter(assignment_name="unsupervised")
@@ -93,6 +106,7 @@ def submit_prediction(request):
         'assignmentpages': ap,
         })
 
+@login_required
 def populate(request):
     students = Student.objects.all()
     for s in students:
