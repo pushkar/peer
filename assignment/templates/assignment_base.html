@@ -2,15 +2,13 @@
 {% block title %}GTPE ML Spring 2015 - Assignments {% endblock %}
 {% block menu %}
 {% if student.usertype|stringformat:"s" == "superadmin"  %}
-<li><a href="/grade">Grade</a></li>
+<li><a href="/admin">Admin</a></li>
 {% endif %}
 {% endblock %}
 {% block content %}
 <div class = "row">
     <div class="col-sm-3 col-md-2 sidebar">
         <ul class="nav nav-sidebar">
-            <li><a href="/assignment">Assignments</a></li>
-
             {% block assignment_menu %}
             {% endblock %}
         </ul>

@@ -18,6 +18,7 @@ class AssignmentPage(models.Model):
     assignment_name = models.CharField(max_length=50)
     page_name = models.CharField(max_length=200)
     page_title = models.CharField(max_length=200)
+    page_link = models.CharField(max_length=200, null=True, blank=True)
     page_content = models.TextField(max_length=5000)
 
 class Submission(models.Model):

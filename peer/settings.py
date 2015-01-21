@@ -80,7 +80,7 @@ WSGI_APPLICATION = 'peer.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": "peer",
+        "NAME": "peerspring2015",
         "USER": "",
         "PASSWORD": "",
         "HOST": "localhost",
