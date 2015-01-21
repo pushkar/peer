@@ -1,12 +1,4 @@
-{% extends "assignment_base.html" %}
-
-{% block assignment_menu %}
-    {% for ap in assignmentpages %}
-        <li><a href="/assignment/{{ ap.assignment_name }}/{{ ap.page_name }}">{{ ap.page_title }}</a></li>
-    {% endfor %}
-    <li><a href="/assignment/{{ assignmentpages.0.assignment_name }}/report">Submit Report</a></li>
-    <li><a href="/assignment/{{ assignmentpages.0.assignment_name }}/review">Review</a></li>
-{% endblock %}
+{% extends "assignment_pagebase.html" %}
 
 {% block assignment_content %}
 {% load mathjax %}

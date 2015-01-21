@@ -15,8 +15,9 @@ def index(request):
     if not 'message' in request.session:
         request.session['message'] = ""
 
+    request.session['message'] = ""
+    
     if not 'student_id' in request.session:
-        request.session['message'] = ""
         request.session['student_id'] = -1
 
     if request.session['student_id'] != -1:
@@ -34,6 +35,8 @@ def index(request):
     })
 
 def login(request):
+    request.session['message'] = ""
+
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -48,7 +51,7 @@ def login(request):
                 return HttpResponseRedirect('/student/')
             except Student.DoesNotExist:
                 request.session['message'] = "User does not exist. Try again."
-                return HttpResponseRedirect('/sl/')
+                return HttpResponseRedirect('/student/')
     request.session['message'] = "Form entries are wrong. Please try again."
     return HttpResponseRedirect('/student/')
 
