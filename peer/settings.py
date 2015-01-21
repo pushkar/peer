@@ -46,12 +46,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django_mathjax',
     'student',
-    'sl',
-    'ul',
-    'rl',
     'recommender',
-    'api',
-    'grade',
+    'assignment',
 )
 
 MIDDLEWARE_CLASSES = (

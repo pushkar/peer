@@ -1,8 +1,0 @@
-{% extends "base-exam.html" %}
-{% block examform %}
-<p>After you have saved your exam, you won't be able to update any question. Are you sure you want to continue?</p>
-<ul>
-    <li><a href="/{{ exam }}/save">Yes, I am done.</a></li>
-    <li><a href="javascript:history.go(-1)"> No, go back. </a></li>
-</ul>
-{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "assignment_base.html" %}
+
+{% block  assignment_content %}
+
+
+<br />
+<p>Review for the following report: <a href="{{ review_si.report }}">{{ review_si.report }}</a></p>
+{% if text_type == "Rebuttal" %}
+<p>Score given by reviewer: {{ review.review_score }}</a> (This score does not affect your final grade)</p>
+{% endif %}
+{% if text_type == "Review" %}
+<form class="form-group" action="{% url 'recommender:submit_reviewscore' review_pk=review.pk %}" method="post">{% csrf_token %}
+    <div class="form-group">
+        <div class="fieldWrapper">
+            <label for="review_score">Score:</label><br />
+            {{ form_score.review_score }}
+            {{ form_score.review_score.errors }}
+        </div>
+    </div>
+    <div class="form-group">
+        <p><input class="btn btn-default" type="submit" value="Save" /></p>
+    </div>
+</form>
+{% endif %}
+
+{% for r in reviewtext %}
+<br />
+<p>{{ r.review_text }}</p>
+<hr />
+{% empty %}
+<p>No reviews or rebutals yet.</p>
+{% endfor %}
+
+
+<form class="form-group" action="{% url 'recommender:submit_reviewtext' review_pk=review.pk %}" method="post">{% csrf_token %}
+    <div class="form-group">
+        <div class="fieldWrapper">
+        <label for="review_text">{{ text_type }}:</label><br />
+        {{ form.review_text }}
+        {{ form.review_text.errors }}
+        </div>
+    </div>
+    <div class="form-group">
+        <p><input class="btn btn-default" type="submit" value="Submit" /></p>
+    </div>
+</form>
+
+{% endblock %}

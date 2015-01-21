@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}GTPE ML Spring 2015 - Assignments {% endblock %}
+{% block menu %}
+{% if student.usertype|stringformat:"s" == "superadmin"  %}
+<li><a href="/grade">Grade</a></li>
+{% endif %}
+{% endblock %}
+{% block content %}
+<div class = "row">
+    <div class="col-sm-3 col-md-2 sidebar">
+        <ul class="nav nav-sidebar">
+            <li><a href="/assignment">Assignments</a></li>
+
+            {% block assignment_menu %}
+            {% endblock %}
+        </ul>
+    </div>
+
+    <div class="col-sm-9 main">
+        {% block assignment_content %}
+        {% endblock %}
+    </div>
+</div>
+{% endblock %}

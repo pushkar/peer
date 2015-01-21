@@ -1,0 +1,13 @@
+{% extends "assignment_base.html" %}
+
+{% block assignment_content %}
+{% load mathjax %}
+{% mathjax_scripts %}
+
+<h4>Assignments</h4>
+<ul>
+    {% for a in assignments %}
+    <li><a href="/assignment/{{ a.assignment_name }}">{{ a.name }}</a> (Due on {{ a.due_date }})</li>
+    {% endfor %}
+</ul>
+{% endblock %}
