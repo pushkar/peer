@@ -6,6 +6,12 @@
 {% endif %}
 {% endblock %}
 
+{% block breadcrumb %}
+<li><a href="{% url 'student:index' %}">Home</a></li>
+<li class="active">Group</li>
+{% endblock %}
+
+
 {% block content %}
 
 <p>Welcome {{ student.firstname }} {{ student.lastname }}!</p>

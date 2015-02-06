@@ -1,16 +1,60 @@
-{% extends "assignment_pagebase.html" %} {% block assignment_content %}
+{% extends "assignment_pagebase.html" %}
 
-<h2>{{ assignment.0.name }}</h2>
+{% block breadcrumb %}
+<li><a href="{% url 'assignment:index' %}">Assignments</a></li>
+<li><a href="{% url 'assignment:home' a_name %}">{{ assignment }}</a></li>
+<li class="active">Review {{ review.pk }}</li>
+{% endblock %}
 
-<br />
-<p>Fill the following reviews. Write atleast a 300 word review.</p>
+{% block assignment_content %}
+{% load mathjax %}
+{% mathjax_scripts %}
+
+<h2>{{ assignment }}</h2>
+
+<h4>Review {{ review.pk }}</h4>
+<h4>{{ review.0.submission }}</h4>
 <ul>
-    {% for r in review %}
-    <li><a href="review/{{ r.pk }}">Review {{ r.pk }}</a>
-    </li>
+    {% for f in files %}
+    <li><a href="{{ f.file }}">{{ f.file }}</a></li>
     {% empty %}
-    <li>No reviews assigned to you yet.</li>
+    <li>No files.</li>
     {% endfor %}
 </ul>
+
+<br />
+<h4>Discussion:</h4>
+{% for c in convo %}
+    <p><small>
+        {{ c.student.firstname }}
+        {% if c.student.usertype == "ta" %}
+        (TA)
+        {% elif c.student.usertype == "superta" %}
+        (The Lord)
+        {% endif %}
+        at {{ c.created }}
+    </small><br />
+    {{ c.text | safe | urlize | linebreaks }}</p>
+<hr />
+{% empty %}
+<p>No discussion yet.</p>
+{% endfor %}
+
+<br />
+<p>Enter Review: <br />
+<small>(You can use Latex. Examples: Inline <code>\( x^2 \)</code> is \( x^2 \) or new line equations with <code>$$ \E = mc^2 $$</code>.</small></p>
+<form class="form-group" action="{% url 'assignment:submit_reviewconvo' a_name review.pk %}" method="post">{% csrf_token %}
+    <div class="form-group">
+        <div class="fieldWrapper">
+            <label for="text">{{ text }}</label>
+            <br /> {{ form.text }} {{ form.text.errors }}
+        </div>
+    </div>
+    <div class="form-group">
+        <p>
+            <input class="btn btn-default" type="submit" value="Submit" />
+        </p>
+    </div>
+</form>
 
 {% endblock %}

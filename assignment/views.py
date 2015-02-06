@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
-from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 from assignment.models import *
 from student.models import *
 
@@ -14,128 +14,127 @@ import numpy as np
 import csv
 
 def check_session(request):
-    if not 'message' in request.session:
-        request.session['message'] = ""
-
-    request.session['message'] = ""
-
     if not 'user' in request.session:
-        request.session['message'] = ""
         request.session['user'] = ""
 
     if not request.session['user']:
         return False
     return True
 
-
+# Displays all Assignments
 def index(request):
     if not check_session(request):
-        return HttpResponseRedirect(reverse('student.views.index'))
+        return HttpResponseRedirect(reverse('student:index'))
 
     s = Student.objects.get(username=request.session['user'])
     a = Assignment.objects.all()
 
     return render(request, 'assignment_index.html', {
-            'message': request.session['message'],
             'student': s,
             'assignments': a,
         })
-
-def assignment_page(request, a_name, p_name):
+# Displays a page from the database
+def page(request, a_name, p_name):
     if not check_session(request):
-        return HttpResponseRedirect(reverse('student.views.index'))
+        return HttpResponseRedirect(reverse('student:index'))
 
     s = Student.objects.get(username=request.session['user'])
-    ap = AssignmentPage.objects.filter(assignment__assignment_name=a_name)
-    ap_this = ap.filter(page_name=p_name)
+    a = Assignment.objects.get(short_name=a_name)
+    ap = AssignmentPage.objects.filter(assignment=a)
+    ap_this = ap.filter(name=p_name)
 
     return render(request, 'assignment_pageview.html', {
-            'message': request.session['message'],
             'student': s,
-            'assignmentpages': ap,
+            'assignment': a,
+            'ap': ap,
             'ap_this': ap_this,
+            'a_name': a_name,
         })
 
 # Default view for assignments
 # Enlists tasks
-def assignment_view(request, a_name):
+def home(request, a_name):
     if not check_session(request):
-        return HttpResponseRedirect(reverse('student.views.index'))
+        return HttpResponseRedirect(reverse('student:index'))
 
     s = Student.objects.get(username=request.session['user'])
-    ap = AssignmentPage.objects.filter(assignment__assignment_name=a_name)
+    a = Assignment.objects.get(short_name=a_name)
+    ap = AssignmentPage.objects.filter(assignment=a)
 
     try:
-        review = Review.objects.filter(review_userid=s.pk)
+        submission = Submission.objects.filter(assignment=a, student=s)
     except:
-        review = Review.objects.none()
-    return render(request, 'assignment_taskview.html', {
-            'message': request.session['message'],
+        submission = Submission.objects.none()
+
+    # TODO Doesn't check which assignment
+    try:
+        review_assigned = Review.objects.filter(assigned=s)
+    except:
+        review_assigned = Review.objects.none()
+
+    try:
+        review_submission = Review.objects.filter(submission=submission)
+    except:
+        review_submission = Review.objects.none()
+
+    try:
+        permissions = Permission.objects.filter(student=s)
+    except:
+        permissions = Permission.objects.none()
+
+    return render(request, 'assignment_homeview.html', {
             'student': s,
-            'assignmentpages': ap,
-            'review': review,
+            'submission': submission,
+            'review_assigned': review_assigned,
+            'review_submission': review_submission,
+            'permissions': permissions,
+            'assignment': a,
+            'ap': ap,
+            'a_name': a_name,
         })
 
-def submit_report(request, a_name):
+def review(request, a_name, id="1"):
     if not check_session(request):
-        return HttpResponseRedirect(reverse('student.views.index'))
+        return HttpResponseRedirect(reverse('student:index'))
 
     s = Student.objects.get(username=request.session['user'])
-    ap = AssignmentPage.objects.filter(assignment__assignment_name=a_name)
+    a = Assignment.objects.get(short_name=a_name)
 
-    report_message = "None."
+    review = Review.objects.get(pk=id)
 
-    try:
-        sub = Submission.objects.get(student__userid=s.userid, assignment__assignment_name=a_name)
-    except:
-        sub = Submission()
-        sub.user_pk = request.session['student_id']
-        sub.assignment_name = a_name
-        sub.score = "0.0"
+    allowed = False
+    if s.pk == review.submission.student.pk or s.pk == review.assigned.pk:
+        allowed = True
 
-    if request.method == 'POST':
-        form = ReportForm(request.POST)
-        if form.is_valid():
-            sub.report = form.cleaned_data['report_link']
-            sub.save()
-            request.session['message'] = "Report at " + sub.report + " accepted."
-        else:
-            request.session['message'] = "Something went wrong during submission."
-    else:
-        form = ReportForm()
+    if not allowed:
+        try:
+            permissions = Permission.objects.get(review=review, student__pk=s.pk)
+            allowed = True
+        except:
+            allowed = False
 
-    if sub.report:
-        if len(sub.report) > 0:
-            report_message = sub.report
+    if not allowed:
+        messages.info(request, 'You are not allowed to participate in this review.')
+        return HttpResponseRedirect(reverse('assignment:home', args=[a_name]))
 
-    return render(request, 'assignment_submitreport.html', {
-        'message': request.session['message'],
-        'form': form,
-        'student': s,
-        'assignmentpages': ap,
-        'report_message': report_message,
-        })
+    files = SubmissionFile.objects.filter(submission=review.submission)
+    convo = ReviewConvo.objects.filter(review=review)
 
-def submit_review(request, a_name):
-    if not check_session(request):
-        return HttpResponseRedirect(reverse('student.views.index'))
-
-    try:
-        review = Review.objects.filter(userid=request.session['student_id'])
-    except:
-        review = Review.objects.none()
-
-    s = Student.objects.get(pk=request.session['student_id'])
-    a = Assignment.objects.filter(assignment_name=a_name)
-    ap = AssignmentPage.objects.filter(assignment_name=a_name)
+    form = ReviewConvoForm()
 
     return render(request, 'assignment_review.html', {
-        'message': request.session['message'],
-        'student': s,
-        'review': review,
-        'assignment': a,
-        'assignmentpages': ap,
+            'student': s,
+            'review': review,
+            'files': files,
+            'convo': convo,
+            'assignment': a,
+            'a_name': a_name,
+            'form': form,
         })
+
+def submission(request, a_name):
+    return HttpResponse("Submit Report")
+
 
 def submit_reviewscore(request, a_name, review_pk):
     if request.method == 'POST':
@@ -146,101 +145,22 @@ def submit_reviewscore(request, a_name, review_pk):
             review.save()
     return submit_reviewtext(request, review_pk)
 
-def submit_reviewtext(request, a_name, review_pk):
-    if not check_session(request):
-        return HttpResponseRedirect(reverse('student.views.index'))
+def submit_reviewconvo(request, a_name, id):
+    s = Student.objects.get(username=request.session['user'])
 
-    s = Student.objects.get(pk=request.session['student_id'])
-    a = Assignment.objects.filter(assignment_name=a_name)
-    ap = AssignmentPage.objects.filter(assignment_name=a_name)
-
-    review_text_submission = False
     if request.method == 'POST':
-        form = ReviewForm(request.POST)
+        form = ReviewConvoForm(request.POST)
         if form.is_valid():
-            review_text = form.cleaned_data['review_text']
-            review_text_submission = True
-
-    try:
-        sub = Submission.objects.get(user_pk=s.id, assignment_name=a_name)
-    except:
-        sub = Submission.ojects.none()
-
-    try:
-        review = Review.objects.get(pk=review_pk)
-        review_si = StudentInfo.objects.get(pk=review.review_userid)
-        reviewtext = ReviewText.objects.filter(review_pk=review_pk)
-    except:
-        return HttpResponseRedirect('/assignment/review')
-
-    form_score = None
-    if int(review.review_userid) == int(request.session['student_id']):
-        text_type = "Review"
-        data = {'review_score': review.review_score}
-        form_score = ScoreForm(initial=data)
-    else:
-        text_type = "Rebuttal"
-
-    try:
-        rt_last = reviewtext.order_by('-created')[0]
-
-        if int(rt_last.userid) == int(request.session['student_id']):
-            if review_text_submission == True:
-                rt_last.review_text = review_text
-                rt_last.save()
-                request.session['message'] += text_type + " updated."
-            data = {'review_text': rt_last.review_text}
-            form = ReviewForm(initial=data)
-        elif int(rt_last.review_userid) == int(request.session['student_id']):
-            if review_text_submission == True:
-                rt_last.review_text = review_text
-                rt_last.save()
-                request.session['message'] += text_type + " updated."
-            data = {'review_text': rt_last.review_text}
-            form = ReviewForm(initial=data)
+            review = Review.objects.get(pk=id)
+            convo = ReviewConvo()
+            convo.review = review
+            convo.student = s
+            convo.text = form.cleaned_data['text']
+            print convo.text
+            convo.score = "0.0"
+            convo.save()
+            messages.success(request, "Review comment entered successfullly.")
         else:
-            form = ReviewForm()
-    except:
-        rt_last = ReviewText.objects.none()
-        if review_text_submission == True:
-            r = ReviewText()
-            r.userid = request.session['student_id']
-            r.review_pk = review_pk
-            r.review_text = review_text
-            r.save()
-            request.session['message'] += text_type + " added."
-            data = {'review_text': review_text}
-            form = ReviewForm(initial=data)
-            reviewtext = ReviewText.objects.filter(review_pk=review_pk)
-        else:
-            form = ReviewForm()
+            messages.warning(request, "Review comment was not saved. Contact system admin.")
 
-    return render(request, 'assignment_reviewtext.html', {
-        'message': request.session['message'],
-        'review': review,
-        'review_si': review_si,
-        'reviewtext': reviewtext,
-        'form': form,
-        'form_score': form_score,
-        'text_type': text_type,
-        'student': s,
-        'assignment': a,
-        'assignmentpages': ap,
-        'submission': sub,
-    })
-
-@login_required
-def adminview(request, a_name):
-    if not check_session(request):
-        return HttpResponseRedirect(reverse('student.views.index'))
-
-    s = Student.objects.get(pk=request.session['student_id'])
-    a = Assignment.objects.filter(assignment_name=a_name)
-    ap = AssignmentPage.objects.filter(assignment_name=a_name)
-
-    return render(request, 'assignment_admin.html', {
-            'message': request.session['message'],
-            'student': s,
-            'assignment': a,
-            'assignmentpages': ap,
-        })
+    return HttpResponseRedirect(reverse('assignment:review', args=[a_name, str(id)]) )

@@ -1,4 +1,5 @@
-{% extends "assignment_pagebase.html" %} {% block assignment_content %}
+{% extends "assignment_pagebase.html" %}
+{% block assignment_content %}
 <h2>{{ assignment.0.name }}</h2>
 <br />
 <p>Submit a link to your report. We advise you to write up your report in Google Docs and share the link here.</p>
@@ -29,4 +30,4 @@
         <li>No reviews yet.</li>
         {% endfor %}
     </ul>
-    {% endblock %}
+{% endblock %}

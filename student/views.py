@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 from student.models import *
 import recommender.models as re
@@ -13,9 +14,6 @@ import datetime
 # Create your views here.
 
 def index(request):
-    if not 'message' in request.session:
-        request.session['message'] = ""
-
     if not 'user' in request.session:
         request.session['user'] = ""
 
@@ -23,13 +21,11 @@ def index(request):
         s = Student.objects.get(username=request.session['user'])
 
         return render(request, 'index.html', {
-        'message': request.session['message'],
         'student': s,
     })
     else:
         form = LoginForm()
         return render(request, 'index.html', {
-        'message': request.session['message'],
         'form': form,
     })
 
@@ -43,19 +39,19 @@ def login(request):
             try:
                 s = Student.objects.get(username=username, gtid=gtid)
                 request.session['user'] = s.username
-                request.session['message'] = "You are logged in."
+                messages.success(request, 'You are logged in.')
                 return HttpResponseRedirect(reverse('student.views.index'))
             except Student.DoesNotExist:
-                request.session['message'] = "User does not exist. Try again."
+                messages.warning(request, "User does not exist. Try again.")
                 return HttpResponseRedirect(reverse('student.views.index'))
-    request.session['message'] = "Form entries are wrong. Please try again."
+    messages.warning(request, "Form entries are wrong. Please try again.")
     return HttpResponseRedirect(reverse('student.views.index'))
 
 def logout(request):
     if 'user' in request.session:
         request.session['user'] = ""
     request.session.flush()
-    request.session['message'] = "You were successfully logged out."
+    messages.success(request, "You were successfully logged out")
     return HttpResponseRedirect(reverse('student.views.index'))
 
 
@@ -83,12 +79,10 @@ def populate(request):
 
 @login_required
 def group(request, group_id="1"):
-    request.session['message'] = ""
     s = Student.objects.get(username=request.session['user'])
     s_g = Student.objects.filter(group_id=group_id)
 
     return render(request, 'group.html', {
-        'message': request.session['message'],
         'student': s,
         'student_group': s_g,
     })

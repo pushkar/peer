@@ -1,5 +1,21 @@
-{% extends "assignment_pagebase.html" %} {% block assignment_content %} {% load mathjax %} {% mathjax_scripts %} {% autoescape off %}
-<h2>{{ assignment.0.name }}</h2>
-<h4>{{ ap_this.0.page_title }}</h4>
+{% extends "assignment_pagebase.html" %}
 
-{{ ap_this.0.page_content }} {% endautoescape %} {% endblock %}
+{% block breadcrumb %}
+<li><a href="{% url 'assignment:index' %}">Assignments</a></li>
+<li><a href="{% url 'assignment:home' a_name %}">{{ assignment }}</a></li>
+<li class="active">{{ ap_this.0.title }}</li>
+{% endblock %}
+
+{% block assignment_content %}
+
+{% load mathjax %}
+{% mathjax_scripts %}
+
+{% autoescape off %}
+
+<h2>{{ assignment }}</h2>
+<h4>{{ ap_this.0.title }}</h4>
+
+{{ ap_this.0.content }}
+{% endautoescape %}
+{% endblock %}

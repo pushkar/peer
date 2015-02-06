@@ -1,0 +1,50 @@
+{% extends "assignment_pagebase.html" %}
+
+{% block breadcrumb %}
+<li><a href="{% url 'assignment:index' %}">Assignments</a></li>
+<li class="active">{{ assignment }}</li>
+{% endblock %}
+
+
+{% block assignment_content %}
+
+<h2>{{ assignment }}</h2>
+<h4>Tasks</h4>
+<ul>
+    {% for r in review_assigned %}
+    <li>
+        <a href="{% url 'assignment:review' a_name r.pk %}">Review {{ r.pk }}</a>
+    </li>
+    {% empty %}
+    <li>No reviews assigned to you yet.</li>
+    {% endfor %}
+</ul>
+
+<h4>Submission</h4>
+<ul>
+    {% for s in submission %}
+    <li>
+        {{ s }}
+        <ul>
+            {% for r in review_submission %}
+            <li><a href="{% url 'assignment:review' a_name r.pk %}">Review {{ r.pk }}</a></li>
+            {% empty %}
+            <li>No Reviews.</li>
+            {% endfor %}
+        </ul>
+    </li>
+    {% empty %}
+    <li>No submissions.</li>
+    {% endfor %}
+</ul>
+
+<h4>Other</h4>
+<ul>
+    {% for p in permissions %}
+    <li><a href="{% url 'assignment:review' a_name p.review.pk %}">Review {{ p.review.pk }} for {{ p.review.submission.student }}</a></li>
+    {% empty %}
+    <li>None.</li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

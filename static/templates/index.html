@@ -6,26 +6,29 @@
 {% endif %}
 {% endblock %}
 
+{% block breadcrumb %}
+<li class="active">Home</li>
+{% endblock %}
+
 {% block content %}
 
 {% if student %}
 {% autoescape off %}
 <p>Welcome {{ student.firstname }} {{ student.lastname }}!</p>
 <ul>
-    <li><a href="/assignment">Go to Assignments</a>.</li>
+    <li><a href="{% url 'assignment:index' %}">Go to Assignments</a>.</li>
 </ul>
 {% endautoescape %}
 
 {% if student.usertype == "superta" %}
 <p>You are a Super TA. Respect!</p>
 <ul>
-    <li><a href="group/{{ student.group_id }}">See your Group</a>
+    <li><a href="{% url 'student:group' student.group_id %}">See your Group</a></li>
 </ul>
 {% elif student.usertype == "ta" %}
 <p>You are a TA!</p>
 <ul>
-    <li><a href="group/{{ student.group_id }}">See your Group</a>
-    </li>
+    <li><a href="{% url 'student:group' group_id %}">{{ student.group_id }}"See your Group</a></li>
 </ul>
 {% endif %}
 

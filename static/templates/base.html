@@ -10,6 +10,15 @@
     <!-- Bootstrap -->
     <!--<link href="{% static "dist/css/bootstrap.min.css" %}" rel="stylesheet">-->
     <link href="https://s3.amazonaws.com/static-style/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+    .alert {
+        padding: 8px 25px 8px 14px;
+    }
+    .breadcrumb {
+        background: #FFFFFF;
+        font-size: 10pt;
+    }
+    </style>
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -42,9 +51,18 @@
         </nav>
     </div>
     <div class="container">
-        {% if message|stringformat:"s" != "" %}
-        <div class="alert alert-info" role="alert">{{ message }}</div>
-        {% endif %} {% block content %}{% endblock %}
+        {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+
+        <ol class="breadcrumb">
+          {% block breadcrumb %}{% endblock %}
+        </ol>
+
+
+        {% block content %}{% endblock %}
         <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <!-- Include all compiled plugins (below), or include individual files as needed -->
