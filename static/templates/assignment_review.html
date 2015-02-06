@@ -16,7 +16,7 @@
 <h4>{{ review.0.submission }}</h4>
 <ul>
     {% for f in files %}
-    <li><a href="{{ f.file }}">{{ f.file }}</a></li>
+    <li><a href="{{ f.link }}">{{ f.name }}</a></li>
     {% empty %}
     <li>No files.</li>
     {% endfor %}

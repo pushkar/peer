@@ -6,6 +6,7 @@ from student.models import *
 
 import csv
 import random
+import urllib2
 
 class Assignment(models.Model):
     short_name = models.CharField(max_length=50)
@@ -31,7 +32,8 @@ class Submission(models.Model):
 
 class SubmissionFile(models.Model):
     submission = models.ForeignKey(Submission)
-    file = models.CharField(max_length=1000)
+    link = models.CharField(max_length=1000)
+    name = models.CharField(max_length=100)
 
     def __unicode__(self):
         return unicode(self.submission)
@@ -72,18 +74,23 @@ class AssignmentAdmin(admin.ModelAdmin):
         submissions_count = 0
 
         for a in queryset:
-            with open('submissions.csv', 'rb') as file:
-                reader = csv.reader(file, delimiter=',')
+            try:
+                g = Global.objects.get(key="submissions")
+                submission_str = urllib2.urlopen(g.value).read()
+                reader = csv.reader(submission_str.split('\n'), delimiter=',')
                 for row in reader:
                     files_total = files_total + 1
                     s = Student.objects.get(username=row[0])
                     if s:
                         submission = Submission.objects.get_or_create(student=s, assignment=a)
-                        file = SubmissionFile.objects.get_or_create(submission=submission[0], file=row[1])
+                        file = SubmissionFile.objects.get_or_create(submission=submission[0], name=row[1], link=row[2])
                         if submission[1]:
                             submissions_count += 1
                         if file[1]:
                             files_count += 1
+            except:
+                self.message_user(request, "Could not find submission file.")
+
 
         self.message_user(request, "%s student submissions were added. %s of %s files were added." % (str(submissions_count), str(files_count), str(files_total)) )
 
@@ -93,7 +100,7 @@ class AssignmentPageAdmin(admin.ModelAdmin):
     list_display = ('assignment', 'name', 'title')
 
 class SubmissionFileAdmin(admin.ModelAdmin):
-    list_display = ('submission', 'file',)
+    list_display = ('submission', 'name', 'link')
     search_fields = ('submission__student__lastname', 'submission__student__firstname', 'submission__student__username')
 
 
@@ -108,7 +115,7 @@ class SubmissionAdmin(admin.ModelAdmin):
 
         for submission in queryset:
             student_groupid = submission.student.group_id
-            group = Student.objects.filter(submission__student__group_id=student_groupid, usertype='student_7641')
+            group = Student.objects.filter(submission__student__group_id=student_groupid, usertype='student')
             if len(group) == 0:
                 self.message_user(request, "Group size %s is too small." % str(len(group)))
             else:

@@ -3,6 +3,17 @@ from django import forms
 from django.contrib import admin
 from django.forms.widgets import RadioSelect
 
+class Global(models.Model):
+    key = models.CharField(max_length=50)
+    value = models.CharField(max_length=1000)
+
+    def __unicode__(self):
+        return unicode(self.key)
+
+class GlobalAdmin(admin.ModelAdmin):
+    list_display = ('id', 'key', 'value')
+    search_fields = ('key', )
+
 class Student(models.Model):
     username = models.CharField(max_length=50)
     usertype = models.CharField(max_length=50)
