@@ -1,22 +1,23 @@
 {% extends "base.html" %}
+
 {% block title %}GTPE ML Spring 2015 - Assignments {% endblock %}
+
 {% block menu %}
-{% if student.usertype|stringformat:"s" == "superadmin"  %}
+{% if student.usertype|stringformat:"s" == "superta" %}
 <li><a href="/admin">Admin</a></li>
 {% endif %}
 {% endblock %}
+
 {% block content %}
-<div class = "row">
+<div class="row">
     <div class="col-sm-3 col-md-2 sidebar">
         <ul class="nav nav-sidebar">
-            {% block assignment_menu %}
-            {% endblock %}
+            {% block assignment_menu %} {% endblock %}
         </ul>
     </div>
 
     <div class="col-sm-9 main">
-        {% block assignment_content %}
-        {% endblock %}
+        {% block assignment_content %} {% endblock %}
     </div>
 </div>
 {% endblock %}

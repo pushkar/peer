@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block menu %}
+{% if student.usertype|stringformat:"s" == "superta" %}
+<li><a href="/admin">Admin</a></li>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<p>Welcome {{ student.firstname }} {{ student.lastname }}!</p>
+<p>This group is:</p>
+<ul>
+{% for s in student_group %}
+    <li>{{ s.firstname }} {{ s.lastname }}
+    {% if s.usertype == "ta" %}
+    (TA)
+    {% endif %}
+    </li>
+{% endfor %}
+</ul>
+
+{% endblock %}

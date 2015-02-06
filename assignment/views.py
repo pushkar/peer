@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
 from django.contrib.auth import authenticate, login, logout
 from assignment.models import *
 from student.models import *
@@ -18,20 +19,20 @@ def check_session(request):
 
     request.session['message'] = ""
 
-    if not 'student_id' in request.session:
+    if not 'user' in request.session:
         request.session['message'] = ""
-        request.session['student_id'] = -1
+        request.session['user'] = ""
 
-    if request.session['student_id'] == -1:
+    if not request.session['user']:
         return False
     return True
 
 
 def index(request):
     if not check_session(request):
-        return HttpResponseRedirect('/student/')
+        return HttpResponseRedirect(reverse('student.views.index'))
 
-    s = Student.objects.get(pk=request.session['student_id'])
+    s = Student.objects.get(username=request.session['user'])
     a = Assignment.objects.all()
 
     return render(request, 'assignment_index.html', {
@@ -42,36 +43,50 @@ def index(request):
 
 def assignment_page(request, a_name, p_name):
     if not check_session(request):
-        return HttpResponseRedirect('/student/')
+        return HttpResponseRedirect(reverse('student.views.index'))
 
-    s = Student.objects.get(pk=request.session['student_id'])
-    a = Assignment.objects.filter(assignment_name=a_name)
-    ap = AssignmentPage.objects.filter(assignment_name=a_name)
-    ap_this = AssignmentPage.objects.filter(assignment_name=a_name).filter(page_name=p_name)
+    s = Student.objects.get(username=request.session['user'])
+    ap = AssignmentPage.objects.filter(assignment__assignment_name=a_name)
+    ap_this = ap.filter(page_name=p_name)
 
     return render(request, 'assignment_pageview.html', {
             'message': request.session['message'],
             'student': s,
-            'assignment': a,
             'assignmentpages': ap,
             'ap_this': ap_this,
         })
 
+# Default view for assignments
+# Enlists tasks
 def assignment_view(request, a_name):
-    return HttpResponseRedirect('/assignment/'+a_name+"/page")
+    if not check_session(request):
+        return HttpResponseRedirect(reverse('student.views.index'))
+
+    s = Student.objects.get(username=request.session['user'])
+    ap = AssignmentPage.objects.filter(assignment__assignment_name=a_name)
+
+    try:
+        review = Review.objects.filter(review_userid=s.pk)
+    except:
+        review = Review.objects.none()
+    return render(request, 'assignment_taskview.html', {
+            'message': request.session['message'],
+            'student': s,
+            'assignmentpages': ap,
+            'review': review,
+        })
 
 def submit_report(request, a_name):
     if not check_session(request):
-        return HttpResponseRedirect('/student/')
+        return HttpResponseRedirect(reverse('student.views.index'))
 
-    s = Student.objects.get(pk=request.session['student_id'])
-    a = Assignment.objects.filter(assignment_name=a_name)
-    ap = AssignmentPage.objects.filter(assignment_name=a_name)
+    s = Student.objects.get(username=request.session['user'])
+    ap = AssignmentPage.objects.filter(assignment__assignment_name=a_name)
 
     report_message = "None."
 
     try:
-        sub = Submission.objects.get(user_pk=request.session['student_id'], assignment_name=a_name)
+        sub = Submission.objects.get(student__userid=s.userid, assignment__assignment_name=a_name)
     except:
         sub = Submission()
         sub.user_pk = request.session['student_id']
@@ -93,21 +108,17 @@ def submit_report(request, a_name):
         if len(sub.report) > 0:
             report_message = sub.report
 
-    review = Review.objects.filter(review_userid=request.session['student_id'])
-
     return render(request, 'assignment_submitreport.html', {
         'message': request.session['message'],
         'form': form,
-        'review': review,
         'student': s,
-        'assignment': a,
         'assignmentpages': ap,
         'report_message': report_message,
         })
 
 def submit_review(request, a_name):
     if not check_session(request):
-        return HttpResponseRedirect('/student/')
+        return HttpResponseRedirect(reverse('student.views.index'))
 
     try:
         review = Review.objects.filter(userid=request.session['student_id'])
@@ -137,7 +148,11 @@ def submit_reviewscore(request, a_name, review_pk):
 
 def submit_reviewtext(request, a_name, review_pk):
     if not check_session(request):
-        return HttpResponseRedirect('/student/')
+        return HttpResponseRedirect(reverse('student.views.index'))
+
+    s = Student.objects.get(pk=request.session['student_id'])
+    a = Assignment.objects.filter(assignment_name=a_name)
+    ap = AssignmentPage.objects.filter(assignment_name=a_name)
 
     review_text_submission = False
     if request.method == 'POST':
@@ -147,6 +162,11 @@ def submit_reviewtext(request, a_name, review_pk):
             review_text_submission = True
 
     try:
+        sub = Submission.objects.get(user_pk=s.id, assignment_name=a_name)
+    except:
+        sub = Submission.ojects.none()
+
+    try:
         review = Review.objects.get(pk=review_pk)
         review_si = StudentInfo.objects.get(pk=review.review_userid)
         reviewtext = ReviewText.objects.filter(review_pk=review_pk)
@@ -154,7 +174,7 @@ def submit_reviewtext(request, a_name, review_pk):
         return HttpResponseRedirect('/assignment/review')
 
     form_score = None
-    if int(review.userid) == int(request.session['student_id']):
+    if int(review.review_userid) == int(request.session['student_id']):
         text_type = "Review"
         data = {'review_score': review.review_score}
         form_score = ScoreForm(initial=data)
@@ -203,4 +223,24 @@ def submit_reviewtext(request, a_name, review_pk):
         'form': form,
         'form_score': form_score,
         'text_type': text_type,
+        'student': s,
+        'assignment': a,
+        'assignmentpages': ap,
+        'submission': sub,
     })
+
+@login_required
+def adminview(request, a_name):
+    if not check_session(request):
+        return HttpResponseRedirect(reverse('student.views.index'))
+
+    s = Student.objects.get(pk=request.session['student_id'])
+    a = Assignment.objects.filter(assignment_name=a_name)
+    ap = AssignmentPage.objects.filter(assignment_name=a_name)
+
+    return render(request, 'assignment_admin.html', {
+            'message': request.session['message'],
+            'student': s,
+            'assignment': a,
+            'assignmentpages': ap,
+        })

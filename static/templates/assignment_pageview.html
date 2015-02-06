@@ -1,0 +1,5 @@
+{% extends "assignment_pagebase.html" %} {% block assignment_content %} {% load mathjax %} {% mathjax_scripts %} {% autoescape off %}
+<h2>{{ assignment.0.name }}</h2>
+<h4>{{ ap_this.0.page_title }}</h4>
+
+{{ ap_this.0.page_content }} {% endautoescape %} {% endblock %}

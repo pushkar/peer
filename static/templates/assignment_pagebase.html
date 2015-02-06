@@ -1,0 +1,15 @@
+{% extends "assignment_base.html" %}
+
+{% block assignment_menu %}
+{% for ap in assignmentpages %}
+    {% if ap.page_link|length > 0 %}
+        <li><a href="{{ ap.page_link }}">{{ ap.page_title }}</a></li>
+    {% else %}
+        <li><a href="/assignment/{{ ap.assignment.assignment_name }}/{{ ap.page_name }}">{{ ap.page_title }}</a></li>
+    {% endif %}
+{% endfor %}
+
+<li><a href="/assignment/{{ assignmentpages.0.assignment.assignment_name }}/report">Submit Report</a></li>
+<li><a href="/assignment/{{ assignmentpages.0.assignment.assignment_name }}/review">Review</a></li>
+
+{% endblock %}
