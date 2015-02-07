@@ -55,3 +55,7 @@ class LoginForm(forms.Form):
     username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'pkolhe3'}))
     gtid = forms.CharField(widget=forms.TextInput(attrs={'placeholder': '987654321'}))
     fields = ('username', 'gtid')
+
+class ForgotPasswordForm(forms.Form):
+    username = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder': 'pkolhe3'}))
+    fields = ('username')
