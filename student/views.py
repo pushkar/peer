@@ -150,7 +150,6 @@ def populate(request):
 
     return HttpResponseRedirect(reverse('admin:index'))
 
-@login_required
 def group(request, group_id="1"):
     s = Student.objects.get(username=request.session['user'])
     s_g = Student.objects.filter(group_id=group_id)
