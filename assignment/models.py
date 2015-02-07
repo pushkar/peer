@@ -114,33 +114,37 @@ class SubmissionAdmin(admin.ModelAdmin):
         reviewer_count = 0
 
         for submission in queryset:
-            student_groupid = submission.student.group_id
-            group = Student.objects.filter(submission__student__group_id=student_groupid, usertype='student')
-            if len(group) == 0:
-                self.message_user(request, "Group size %s is too small." % str(len(group)))
-            else:
-                reviewers_assigned = len(Review.objects.filter(submission=submission))
-                tries = 0
-                while reviewers_assigned <= 3:
-                    # Break if you don't find anyone
-                    tries += 1
-                    if tries > len(group)-1:
-                        self.message_user(request, "Cound not find anyone for %s." % (str(submission.student)), level=messages.WARNING )
-                        break
+            try:
+                opt = OptIn.objects.get(student=submission.student)
+                self.message_user(request, "%s hasn't opted in yet." % (str(submission.student)), level=messages.WARNING)
+            except:
+                student_groupid = submission.student.group_id
+                group = Student.objects.filter(submission__student__group_id=student_groupid, usertype='student')
+                if len(group) == 0:
+                    self.message_user(request, "Group size %s is too small." % str(len(group)))
+                else:
+                    reviewers_assigned = len(Review.objects.filter(submission=submission))
+                    tries = 0
+                    while reviewers_assigned <= 3:
+                        # Break if you don't find anyone
+                        tries += 1
+                        if tries > len(group)-1:
+                            self.message_user(request, "Cound not find anyone for %s." % (str(submission.student)), level=messages.WARNING )
+                            break
 
-                    # Keep randomly finding someone
-                    reviewer = random.choice(group)
-                    # If the reviewer is same as the submitter
-                    if reviewer.username == submission.student.username:
-                        continue
+                        # Keep randomly finding someone
+                        reviewer = random.choice(group)
+                        # If the reviewer is same as the submitter
+                        if reviewer.username == submission.student.username:
+                            continue
 
-                    # If the reviewer already has 3 submissions
-                    reviews = Review.objects.filter(assigned=reviewer)
-                    if len(reviews) < 3:
-                        review = Review.objects.get_or_create(submission=submission, assigned=reviewer, score="0.0")
-                        reviewers_assigned += 1
-                        if review[1]:
-                            reviewer_count += 1
+                        # If the reviewer already has 3 submissions
+                        reviews = Review.objects.filter(assigned=reviewer)
+                        if len(reviews) < 3:
+                            review = Review.objects.get_or_create(submission=submission, assigned=reviewer, score="0.0")
+                            reviewers_assigned += 1
+                            if review[1]:
+                                reviewer_count += 1
 
         self.message_user(request, "Assigned %s reviewers to %s submissions." % (str(reviewer_count), str(submission_count)) )
 

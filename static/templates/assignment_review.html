@@ -23,31 +23,44 @@
 </ul>
 
 <br />
+<h4>Score:</h4>
+<p>The reviewer has assigned a score of <b>{{ review.score }}</b>. <br /><small>(Scores are between 1 (bad) - 5 (good). It does not reflect your final score. That will be decided by your TA independent of these reviews.)</small></p>
+{% if student.pk == review.assigned.pk %}
+<p>Change score to: <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "1" %}">1 (bad)</a>,
+                    <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "2" %}">2</a>,
+                    <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "3" %}">3</a>,
+                    <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "4" %}">4</a> or
+                    <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "5" %}">5 (good)</a>.</p>
+{% endif %}
+<br />
 <h4>Discussion:</h4>
+<ul class="list-group">
 {% for c in convo %}
-    <p><small>
+<li class="list-group-item">
+    <span class="badge">
         {{ c.student.firstname }}
         {% if c.student.usertype == "ta" %}
         (TA)
         {% elif c.student.usertype == "superta" %}
         (The Lord)
         {% endif %}
-        at {{ c.created }}
-    </small><br />
+
+    </span>
     {{ c.text | safe | urlize | linebreaks }}</p>
-<hr />
+</li>
 {% empty %}
 <p>No discussion yet.</p>
 {% endfor %}
+</ul>
 
 <br />
-<p>Enter Review: <br />
-<small>(You can use Latex. Examples: Inline <code>\( x^2 \)</code> is \( x^2 \) or new line equations with <code>$$ \E = mc^2 $$</code>.</small></p>
+<p></p>
 <form class="form-group" action="{% url 'assignment:submit_reviewconvo' a_name review.pk %}" method="post">{% csrf_token %}
     <div class="form-group">
         <div class="fieldWrapper">
-            <label for="text">{{ text }}</label>
-            <br /> {{ form.text }} {{ form.text.errors }}
+            <label for="text">Enter Review:</label>
+            {{ form.text }} {{ form.text.errors }}
+            <small><br />(You can use Latex. Examples: Inline <code>\( x^2 \)</code> is \( x^2 \) or new line equations with <code>$$ \E = mc^2 $$</code>.</small>
         </div>
     </div>
     <div class="form-group">

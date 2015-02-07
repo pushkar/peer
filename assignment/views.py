@@ -136,14 +136,16 @@ def submission(request, a_name):
     return HttpResponse("Submit Report")
 
 
-def submit_reviewscore(request, a_name, review_pk):
-    if request.method == 'POST':
-        form_score = ScoreForm(request.POST)
-        if form_score.is_valid():
-            review = Review.objects.get(pk=review_pk)
-            review.review_score = form_score.cleaned_data['review_score']
-            review.save()
-    return submit_reviewtext(request, review_pk)
+def submit_reviewscore(request, a_name, review_id, value):
+    try:
+        review = Review.objects.get(pk=review_id)
+        review.score = value
+        review.save()
+        messages.success(request, "Changed score to %s" % str(value))
+    except:
+        messages.warning(request, "Couldn't find the review. Something went wrong!")
+
+    return HttpResponseRedirect(reverse('assignment:review', args=[a_name, review_id]))
 
 def submit_reviewconvo(request, a_name, id):
     s = Student.objects.get(username=request.session['user'])

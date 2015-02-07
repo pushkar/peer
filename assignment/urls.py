@@ -10,5 +10,5 @@ urlpatterns = patterns('',
     url(r'^(?P<a_name>\w+)/review/(?P<id>[0-9]+)$', views.review, name='review'),
 
     url(r'^(?P<a_name>\w+)/reviewconvo/(?P<id>[0-9]+)$', views.submit_reviewconvo, name='submit_reviewconvo'),
-    url(r'^(?P<a_name>\w+)/reviewscore/(?P<review_pk>[0-9]+)$', views.submit_reviewscore, name='submit_reviewscore'),
+    url(r'^(?P<a_name>\w+)/reviewscore/(?P<review_id>[0-9]+)/(?P<value>[0-9]+)$', views.submit_reviewscore, name='submit_reviewscore'),
 )

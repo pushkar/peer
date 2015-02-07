@@ -14,12 +14,16 @@ import datetime
 import urllib2
 
 # Create your views here.
-
-def index(request):
+def check_session(request):
     if not 'user' in request.session:
         request.session['user'] = ""
 
-    if request.session['user']:
+    if not request.session['user']:
+        return False
+    return True
+
+def index(request):
+    if check_session(request):
         s = Student.objects.get(username=request.session['user'])
 
         return render(request, 'index.html', {
@@ -56,6 +60,19 @@ def logout(request):
     messages.success(request, "You were successfully logged out")
     return HttpResponseRedirect(reverse('student:index'))
 
+def optin(request):
+    if check_session(request):
+        s = Student.objects.get(username=request.session['user'])
+
+    try:
+        opt = OptIn.objects.get(student=s)
+        opt.value = True
+        opt.save()
+        messages.success(request, "Thank you for opting in. You will soon have reviewers assigned to your submission.")
+    except:
+        messages.warning(request, "You should have reviews and reviewers assigned to you. Look in Assignments > Tasks. If not, wait for a few hours and check again.")
+
+    return HttpResponseRedirect(reverse('student.views.index'))
 
 @login_required
 def populate(request):

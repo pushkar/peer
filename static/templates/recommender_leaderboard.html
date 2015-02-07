@@ -1,20 +1,29 @@
-{% extends "assignment_pagebase.html" %} {% block assignment_content %}
+{% extends "assignment_pagebase.html" %}
+
+{% block breadcrumb %}
+<li><a href="{% url 'assignment:index' %}">Assignments</a></li>
+<li><a href="{% url 'assignment:home' a_name %}">{{ assignment.name }}</a></li>
+<li class="active">Leaderboard</li>
+{% endblock %}
+
+
+{% block assignment_content %}
 <h4>Leaderboard</h4>
 
 <table class="table">
     <thead>
         <tr>
             <th></th>
-            <th>UserId</th>
+            <th></th>
             <th>Score</th>
         </tr>
     </thead>
-    {% for s in s_info %}
+    {% for s in score %}
     <tbody>
         <tr>
             <td>{{ forloop.counter }}</td>
-            <td>{{ s.userid }}</td>
-            <td>{{ s.score }}</td>
+            <td>{{ s }}</td>
+            <td>{{ s.value }}</td>
         </tr>
     </tbody>
     {% endfor %}

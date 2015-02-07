@@ -2,17 +2,18 @@ from django.db import models
 from django import forms
 from django.contrib import admin
 from django.forms.widgets import RadioSelect
+from student.models import *
 
-class StudentInfo(models.Model):
-    userid = models.CharField(max_length=50)
-    score = models.FloatField()
+class Score(models.Model):
+    student = models.ForeignKey(Student)
+    value = models.FloatField()
 
     def __unicode__(self):
-        return self.userid
+        return unicode(self.student)
 
-class StudentInfoAdmin(admin.ModelAdmin):
-    list_display = ('id', 'userid', 'score')
-    search_fields = ('userid',)
+class ScoreAdmin(admin.ModelAdmin):
+    list_display = ('id', 'student', 'value')
+    search_fields = ('student__username', 'student__firstname', 'student__lastname')
 
 
 class PredictionForm(forms.Form):

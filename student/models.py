@@ -31,8 +31,27 @@ class StudentAdmin(admin.ModelAdmin):
     search_fields = ('username', 'gtid', 'firstname', 'lastname')
     list_filter = ('group_id', )
 
+    actions = ['optin_program']
+
+    def optin_program(self, request, queryset):
+        opt_count = 0
+        for s in queryset:
+            opt = OptIn.objects.get_or_create(student=s, value=False)
+            if opt[1]:
+                opt_count += 1
+
+        self.message_user(request, "%d of %d students were put in the Opt In program." % (opt_count, len(queryset)) )
+
+    optin_program.short_description = "Put in the Opt In program"
+
+class OptIn(models.Model):
+    student = models.ForeignKey(Student)
+    value = models.BooleanField(default=False)
+
+class OptInAdmin(admin.ModelAdmin):
+    list_display = ('student', 'value')
 
 class LoginForm(forms.Form):
-    username = forms.CharField(initial='pkolhe3')
-    gtid = forms.CharField(initial='9022*****')
+    username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'pkolhe3'}))
+    gtid = forms.CharField(widget=forms.TextInput(attrs={'placeholder': '987654321'}))
     fields = ('username', 'gtid')

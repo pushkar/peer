@@ -16,6 +16,7 @@
 {% autoescape off %}
 <p>Welcome {{ student.firstname }} {{ student.lastname }}!</p>
 <ul>
+    <li><a href="{% url 'student:optin' %}">Opt In the Peer Review program.</a></li>
     <li><a href="{% url 'assignment:index' %}">Go to Assignments</a>.</li>
 </ul>
 {% endautoescape %}
