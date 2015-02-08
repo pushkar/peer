@@ -50,6 +50,8 @@ class OptIn(models.Model):
 
 class OptInAdmin(admin.ModelAdmin):
     list_display = ('student', 'value')
+    search_fields = ('student__username', 'student__firstname', 'student__lastname')
+    list_filter = ('value',)
 
 class LoginForm(forms.Form):
     username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'pkolhe3'}))

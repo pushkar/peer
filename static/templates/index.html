@@ -29,7 +29,7 @@
 {% elif student.usertype == "ta" %}
 <p>You are a TA!</p>
 <ul>
-    <li><a href="{% url 'student:group' group_id %}">{{ student.group_id }}"See your Group</a></li>
+    <li><a href="{% url 'student:group' student.group_id %}">See your Group</a></li>
 </ul>
 {% endif %}
 

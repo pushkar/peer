@@ -45,7 +45,6 @@ def send_email(email, gtid):
 def index(request):
     if check_session(request):
         s = Student.objects.get(username=request.session['user'])
-
         return render(request, 'index.html', {
             'student': s,
         })
@@ -66,10 +65,12 @@ def login(request):
 
             try:
                 s = Student.objects.get(username=username, gtid=gtid)
+                print "Found"
                 request.session['user'] = s.username
                 messages.success(request, 'You are logged in.')
                 return HttpResponseRedirect(reverse('student:index'))
             except Student.DoesNotExist:
+                print "Not Found"
                 messages.warning(request, "User does not exist. Try again.")
                 return HttpResponseRedirect(reverse('student:index'))
 
