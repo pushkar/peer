@@ -119,6 +119,8 @@ def review(request, a_name, id="1"):
 
     s = Student.objects.get(username=request.session['user'])
     a = Assignment.objects.get(short_name=a_name)
+    ap = AssignmentPage.objects.filter(assignment=a)
+
 
     review = Review.objects.get(pk=id)
 
@@ -150,6 +152,7 @@ def review(request, a_name, id="1"):
             'files': files,
             'convo': convo,
             'assignment': a,
+            'ap': ap,
             'a_name': a_name,
             'form': form,
         })

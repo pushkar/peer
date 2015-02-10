@@ -13,7 +13,7 @@ est = timezone('US/Eastern')
 def log_login(s, new=False):
     log = StudentLog.objects.get_or_create(student=s, details="login")
     if log[1] == False and new:
-        log[0].created = datetime.datetime.now()
+        log[0].created = datetime.now()
         log[0].save()
     return log[0].created
 

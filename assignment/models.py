@@ -106,7 +106,7 @@ class SubmissionFileAdmin(admin.ModelAdmin):
 
 
 class SubmissionAdmin(admin.ModelAdmin):
-    list_display = ('student', 'assignment')
+    list_display = ('pk', 'student', 'assignment')
     search_fields = ('student__lastname', 'student__firstname', 'student__username', 'student__group_id')
     actions = ['assign_reviewers',  'assign_ta_review']
 
@@ -187,7 +187,7 @@ class SubmissionAdmin(admin.ModelAdmin):
 
 
 class ReviewAdmin(admin.ModelAdmin):
-    list_display = ('submission', 'assigned', 'score')
+    list_display = ('pk', 'submission', 'assigned', 'score')
     search_fields = ('submission__student__lastname', 'submission__student__firstname', 'submission__student__username', 'submission__student__group_id')
     list_filter = ('assigned__username',)
     actions = ['permit_ta', 'permit_superta']
@@ -238,7 +238,7 @@ class ReviewAdmin(admin.ModelAdmin):
 
 
 class PermissionAdmin(admin.ModelAdmin):
-    list_display = ('review',)
+    list_display = ('pk', 'review',)
     list_filter = ('review__submission__student__username',)
     filter_horizontal = ('student',)
 
