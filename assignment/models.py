@@ -75,20 +75,19 @@ class AssignmentAdmin(admin.ModelAdmin):
         files_total = 0
         submissions_count = 0
 
-        for a in queryset:
+        for assignment in queryset:
             try:
                 g = Global.objects.get(key="submissions")
+                self.message_user(request, "Reading from %s." % g.value)
                 submission_str = urllib2.urlopen(g.value).read()
                 reader = csv.reader(submission_str.split('\n'), delimiter=',')
                 for row in reader:
                     files_total = files_total + 1
-                    s = Student.objects.get(username=row[0])
-                    if s:
-                        submission = Submission.objects.get_or_create(student=s, assignment=a)
-                        file = SubmissionFile.objects.get_or_create(submission=submission[0], name=row[1], link=row[2])
-                        if submission[1]:
+                    student = Student.objects.get(username=row[0])
+                    if student:
+                        if Submission.objects.get_or_create(student=s, assignment=assignment)[1]:
                             submissions_count += 1
-                        if file[1]:
+                        if SubmissionFile.objects.get_or_create(submission=submission[0], name=row[1], link=row[2])[1]:
                             files_count += 1
             except:
                 self.message_user(request, "Could not find submission file.")
@@ -109,48 +108,83 @@ class SubmissionFileAdmin(admin.ModelAdmin):
 class SubmissionAdmin(admin.ModelAdmin):
     list_display = ('student', 'assignment')
     search_fields = ('student__lastname', 'student__firstname', 'student__username', 'student__group_id')
-    actions = ['assign_reviewers']
+    actions = ['assign_reviewers',  'assign_ta_review']
 
     def assign_reviewers(self, request, queryset):
         submission_count = len(queryset)
         reviewer_count = 0
 
+        optin_reviewers = OptIn.objects.filter(value=True, student__usertype='student').select_related('student')
+
+        ## All reviewers who have opted in
+        reviewers_all = set()
+        for optins in optin_reviewers:
+            reviewers_all.add(optins.student)
+
         for submission in queryset:
-            try:
-                opt = OptIn.objects.get(student=submission.student)
-                self.message_user(request, "%s hasn't opted in yet." % (str(submission.student)), level=messages.WARNING)
-            except:
-                student_groupid = submission.student.group_id
-                group = Student.objects.filter(submission__student__group_id=student_groupid, usertype='student')
-                if len(group) == 0:
-                    self.message_user(request, "Group size %s is too small." % str(len(group)))
-                else:
-                    reviewers_assigned = len(Review.objects.filter(submission=submission))
-                    tries = 0
-                    while reviewers_assigned <= 3:
-                        # Break if you don't find anyone
-                        tries += 1
-                        if tries > len(group)-1:
-                            self.message_user(request, "Cound not find anyone for %s." % (str(submission.student)), level=messages.WARNING )
-                            break
+            ## Check if they have opted in
+            if submission.student not in reviewers_all:
+                self.message_user(request, "%s has not opted in." % str(submission.student), level=messages.WARNING)
+                continue
 
-                        # Keep randomly finding someone
-                        reviewer = random.choice(group)
-                        # If the reviewer is same as the submitter
-                        if reviewer.username == submission.student.username:
-                            continue
+            ## Skip if 3 reviewers have been assigned
+            if Review.objects.filter(submission=submission).count() >= 3:
+                self.message_user(request, "%s has already been assigned." % str(submission), level=messages.WARNING)
+                continue
 
-                        # If the reviewer already has 3 submissions
-                        reviews = Review.objects.filter(assigned=reviewer)
-                        if len(reviews) < 3:
-                            review = Review.objects.get_or_create(submission=submission, assigned=reviewer, score="0.0")
-                            reviewers_assigned += 1
-                            if review[1]:
-                                reviewer_count += 1
+            ## All reviewers who have opted in and are a part of this group
+            reviewers = set()
+            for r in reviewers_all:
+                if submission.student.group_id == r.group_id:
+                    reviewers.add(r)
+
+            ## Remove the current submission student from reviewers set
+            ## If cannot remove, then they probably did not opt in
+            if submission.student in reviewers:
+                reviewers.remove(submission.student)
+
+            ## Remove all reviewers who have been assigned 3 reviews
+            reviewers_assigned = set()
+            for r in reviewers:
+                if Review.objects.filter(assigned=r).count() >= 3:
+                    reviewers_assigned.add(r)
+
+            reviewers -= reviewers_assigned
+            reviewers_all -= reviewers_assigned # Also remove from the _all set
+
+            ## Find 3 random reviewers
+            reviewers_3 = set()
+            if len(reviewers) == 0:
+                self.message_user(request, "Not enough reviewers to match %s in this group." % str(submission.student), level=messages.WARNING)
+            elif len(reviewers) < 3:
+                reviewers_3 = random.sample(reviewers, len(reviewers))
+            else:
+                reviewers_3 = random.sample(reviewers, 3)
+
+            for r in reviewers_3:
+                if Review.objects.get_or_create(submission=submission, assigned=r, score="0")[1]:
+                    reviewer_count += 1
+
 
         self.message_user(request, "Assigned %s reviewers to %s submissions." % (str(reviewer_count), str(submission_count)) )
 
     assign_reviewers.short_description = "Assign 3 Reviewers"
+
+    def assign_ta_review(self, request, queryset):
+        submission_count = len(queryset)
+        reviewer_count = 0
+
+        for submission in queryset:
+            tas = Student.objects.filter(group_id=submission.student.group_id, usertype="ta")
+            for ta in tas:
+                if Review.objects.get_or_create(submission=submission, assigned=ta, score="0")[1]:
+                    reviewer_count += 1
+
+        self.message_user(request, "Assigned %s reviewers to %s submissions." % (str(reviewer_count), str(submission_count)) )
+
+
+    assign_ta_review.short_description = "Assign TA to review submissions in their group."
+
 
 class ReviewAdmin(admin.ModelAdmin):
     list_display = ('submission', 'assigned', 'score')
@@ -161,6 +195,7 @@ class ReviewAdmin(admin.ModelAdmin):
     def permit_ta(self, request, queryset):
         permit_instructions = 0
         reviews_count = 0
+
         for review in queryset:
             reviews_count += 1
 
@@ -168,9 +203,12 @@ class ReviewAdmin(admin.ModelAdmin):
             ta = Student.objects.filter(group_id=student_groupid, usertype="ta")
             if len(ta) == 0:
                 self.message_user(request, "Could not find TA for %s in group %d." % (review.submission.student, student_groupid), level=messages.WARNING)
-            #else:
-            #    self.message_user(request, "Found TA %s." % ta)
 
+            ## If this review is assigned to the TA, skip
+            if review.assigned == ta:
+                continue
+
+            ## Add permits. Don't add duplicate permits.
             permit = Permission.objects.get_or_create(review=review)
             new_permits = set((ta)) - set(permit[0].student.all())
             for n in new_permits:
@@ -197,6 +235,7 @@ class ReviewAdmin(admin.ModelAdmin):
         self.message_user(request, "Needed to add %s permits for %s reviews." % (str(permit_instructions), str(reviews_count)) )
 
     permit_superta.short_description = "Permit all Super TAs to participate"
+
 
 class PermissionAdmin(admin.ModelAdmin):
     list_display = ('review',)

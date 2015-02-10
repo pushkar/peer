@@ -36,8 +36,7 @@ class StudentAdmin(admin.ModelAdmin):
     def optin_program(self, request, queryset):
         opt_count = 0
         for s in queryset:
-            opt = OptIn.objects.get_or_create(student=s, value=False)
-            if opt[1]:
+            if OptIn.objects.get_or_create(student=s, value=False)[1]:
                 opt_count += 1
 
         self.message_user(request, "%d of %d students were put in the Opt In program." % (opt_count, len(queryset)) )
@@ -48,10 +47,29 @@ class OptIn(models.Model):
     student = models.ForeignKey(Student)
     value = models.BooleanField(default=False)
 
+    def __unicode__(self):
+        return unicode(self.student)
+
 class OptInAdmin(admin.ModelAdmin):
     list_display = ('student', 'value')
     search_fields = ('student__username', 'student__firstname', 'student__lastname')
     list_filter = ('value', 'student__group_id')
+
+    actions = ['optin', 'optout']
+
+    def optin(self, request, queryset):
+        for s in queryset:
+            s.value = True
+            s.save()
+
+    optin.short_description = "Change to Opt-In"
+
+    def optout(self, request, queryset):
+        for s in queryset:
+            s.value = False
+            s.save()
+
+    optout.short_description = "Change to Opt-Out"
 
 class StudentLog(models.Model):
     created = models.DateTimeField(auto_now_add=True)

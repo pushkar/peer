@@ -40,15 +40,14 @@ def log_isread(s, review):
     review_details = "review_" + str(review.pk)
     try:
         log = StudentLog.objects.get(student=s, details=review_details)
-        convo = ReviewConvo.objects.filter(review=review, created__gt=log.created)
-        return len(convo)
+        return ReviewConvo.objects.filter(review=review, created__gt=log.created).count()
     except ReviewConvo.DoesNotExist:
         return -1
     except StudentLog.DoesNotExist:
         try:
-            convo = ReviewConvo.objects.filter(review=review)
-            if len(convo) == 0:
+            convo_count = ReviewConvo.objects.filter(review=review).count()
+            if convo_count == 0:
                 return -1
-            return len(convo)
+            return convo_count
         except:
             return -1
