@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import admin, messages
 
 from student.models import *
+from student.log import *
 import recommender.models as re
 
 import StringIO
@@ -61,16 +62,13 @@ def login(request):
         if form.is_valid():
             username = form.cleaned_data['username']
             gtid = form.cleaned_data['gtid']
-            print "Finding a user with " + str(username)
-
             try:
                 s = Student.objects.get(username=username, gtid=gtid)
-                print "Found"
                 request.session['user'] = s.username
+                log_login(s, True)
                 messages.success(request, 'You are logged in.')
                 return HttpResponseRedirect(reverse('student:index'))
             except Student.DoesNotExist:
-                print "Not Found"
                 messages.warning(request, "User does not exist. Try again.")
                 return HttpResponseRedirect(reverse('student:index'))
 
@@ -82,7 +80,6 @@ def pass_request(request):
         passform = ForgotPasswordForm(request.POST)
         if passform.is_valid():
             try:
-                print "Finding user with " + passform.cleaned_data['username']
                 s = Student.objects.get(username=passform.cleaned_data['username'])
                 if send_email(s.email, s.gtid) == 200:
                     messages.success(request, "Sent a message with GTID to your GT email. Check your SPAM folder if you can't find it.")

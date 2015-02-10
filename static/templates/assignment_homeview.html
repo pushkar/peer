@@ -13,7 +13,7 @@
 <ul>
     {% for r in review_assigned %}
     <li>
-        <a href="{% url 'assignment:review' a_name r.pk %}">Review {{ r.pk }}</a>
+        <a href="{% url 'assignment:review' a_name r.pk %}">Review {{ r.pk }} {{ r.read }}</a>
     </li>
     {% empty %}
     <li>No reviews assigned to you yet.</li>
@@ -27,7 +27,7 @@
         {{ s }}
         <ul>
             {% for r in review_submission %}
-            <li><a href="{% url 'assignment:review' a_name r.pk %}">Review {{ r.pk }}</a></li>
+            <li><a href="{% url 'assignment:review' a_name r.pk %}">Review {{ r.pk }} {{ r.read }}</a></li>
             {% empty %}
             <li>No Reviews.</li>
             {% endfor %}
@@ -41,7 +41,7 @@
 <h4>Other</h4>
 <ul>
     {% for p in permissions %}
-    <li><a href="{% url 'assignment:review' a_name p.review.pk %}">Review {{ p.review.pk }} for {{ p.review.submission.student }}</a></li>
+    <li><a href="{% url 'assignment:review' a_name p.review.pk %}">Review {{ p.review.pk }} for {{ p.review.submission.student }} {{ p.review.read }}</a></li>
     {% empty %}
     <li>None.</li>
     {% endfor %}

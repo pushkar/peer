@@ -7,3 +7,4 @@ from student.models import *
 admin.site.register(Global, GlobalAdmin)
 admin.site.register(Student, StudentAdmin)
 admin.site.register(OptIn, OptInAdmin)
+admin.site.register(StudentLog, StudentLogAdmin)

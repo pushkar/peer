@@ -43,6 +43,7 @@ class Review(models.Model):
     submission = models.ForeignKey(Submission)
     assigned = models.ForeignKey(Student)
     score = models.CharField(max_length=10)
+    details = models.CharField(default=None, max_length=1000)
 
     def __unicode__(self):
         return unicode("Review for " + unicode(self.submission.student) + " - " + unicode(self.pk))
@@ -61,6 +62,7 @@ class ReviewConvo(models.Model):
 
     class Meta:
         ordering = ['created']
+        get_latest_by = ['created']
 
 
 # Admin Views

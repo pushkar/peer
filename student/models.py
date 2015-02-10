@@ -51,7 +51,20 @@ class OptIn(models.Model):
 class OptInAdmin(admin.ModelAdmin):
     list_display = ('student', 'value')
     search_fields = ('student__username', 'student__firstname', 'student__lastname')
-    list_filter = ('value',)
+    list_filter = ('value', 'student__group_id')
+
+class StudentLog(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    student = models.ForeignKey(Student)
+    details = models.CharField(default=None, max_length=1000)
+
+    class Meta:
+        ordering = ['created']
+
+class StudentLogAdmin(admin.ModelAdmin):
+    list_display = ('created', 'student', 'details')
+    search_fields = ('student__username', 'student__firstname', 'student__lastname', 'details')
+    list_filter = ('created', )
 
 class LoginForm(forms.Form):
     username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'pkolhe3'}))

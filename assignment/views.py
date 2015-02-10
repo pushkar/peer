@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 from django.contrib import messages
 from assignment.models import *
 from student.models import *
+from student.log import *
 
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.urlresolvers import reverse
@@ -69,16 +70,35 @@ def home(request, a_name):
     # TODO Doesn't check which assignment
     try:
         review_assigned = Review.objects.filter(assigned=s)
+        for r in review_assigned:
+            c = log_isread(s, r)
+            if c > 0:
+                r.read = "("+ str(c) +")"
+            elif c == -1:
+                r.read = "(New)"
+
     except:
         review_assigned = Review.objects.none()
 
     try:
         review_submission = Review.objects.filter(submission=submission)
+        for r in review_submission:
+            c = log_isread(s, r)
+            if c > 0:
+                r.read = "("+ str(c) +")"
+            elif c == -1:
+                r.read = "(New)"
     except:
         review_submission = Review.objects.none()
 
     try:
         permissions = Permission.objects.filter(student=s)
+        for p in permissions:
+            c = log_isread(s, p.review)
+            if c > 0:
+                p.review.read = "("+ str(c) +")"
+            elif c == -1:
+                p.review.read = "(New)"
     except:
         permissions = Permission.objects.none()
 
@@ -121,6 +141,8 @@ def review(request, a_name, id="1"):
     convo = ReviewConvo.objects.filter(review=review)
 
     form = ReviewConvoForm()
+
+    log_review(s, review, True)
 
     return render(request, 'assignment_review.html', {
             'student': s,
