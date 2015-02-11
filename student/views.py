@@ -100,7 +100,6 @@ def pass_request(request):
         return render(request, 'index.html', {
             'passform': passform,
         })
-        return HttpResponseRedirect(reverse('student:index'))
 
 
 def logout(request):
