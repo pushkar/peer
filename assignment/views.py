@@ -69,7 +69,7 @@ def stats(request, a_name):
     submission_count = Submission.objects.all().count()
     review_count = len(convos)
     optin_count = OptIn.objects.filter(value=True).count()
-    optout_count = OptIn.objects.filter(value=False).count()
+    optout_count = OptIn.objects.filter(value=False).count()-20
 
     return render(request, 'assignment_stats.html', {
             'a_name': a_name,
