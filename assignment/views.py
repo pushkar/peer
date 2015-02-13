@@ -61,6 +61,7 @@ def stats(request, a_name):
     for c in convos:
         count = len(c.text.split())
         count = count / 100 * 100
+        count += 99
         if word_count.has_key(count):
             word_count[count] += 1
         else:

@@ -11,7 +11,7 @@
 <script src="https://s3.amazonaws.com/static-style/dist/ChartNew.js"></script>
 <script>
     var wcChartData = {
-        labels : [{% for key,value in wc.items %}{{key}}, {% endfor %} "words"],
+        labels : [{% for key,value in wc.items %} "<{{key}} ", {% endfor %} "words"],
         datasets : [
             {
                 fillColor : "rgba(151,187,205,0.5)",
