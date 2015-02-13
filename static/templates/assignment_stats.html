@@ -1,0 +1,79 @@
+{% extends "assignment_pagebase.html" %}
+
+{% block breadcrumb %}
+<li><a href="{% url 'assignment:index' %}">Assignments</a></li>
+<li><a href="{% url 'assignment:home' a_name %}">{{ ap.0.assignment }}</a></li>
+<li class="active">Stats</li>
+{% endblock %}
+
+{% block assignment_content %}
+{% autoescape off %}
+<script src="https://s3.amazonaws.com/static-style/dist/ChartNew.js"></script>
+<script>
+    var wcChartData = {
+        labels : [{% for key,value in wc.items %}{{key}}, {% endfor %} "words"],
+        datasets : [
+            {
+                fillColor : "rgba(151,187,205,0.5)",
+                strokeColor : "rgba(151,187,205,0.8)",
+                highlightFill : "rgba(151,187,205,0.75)",
+                highlightStroke : "rgba(151,187,205,1)",
+                data : [{% for key,value in wc.items %}{{value}}, {% endfor %} "reviews"],
+                title: "Word Count"
+            }
+        ]
+    }
+
+    var optChartData = [
+        {
+            value: {{optout}},
+            color:"#F7464A",
+            highlight: "#FF5A5E",
+            title: "Not Yet Opted In"
+        },
+        {
+            value: {{optin}},
+            color: "#46BFBD",
+            highlight: "#5AD3D1",
+            title: "Opted In"
+        },
+    ];
+
+    window.onload = function(){
+        var ctx = document.getElementById("word_count").getContext("2d");
+        window.myBar = new Chart(ctx).Bar(wcChartData, {
+            responsive : true,
+            barShowStroke: false,
+            graphTitle : "Word Count (X) vs Reviews (Y)",
+            legend : true,
+            inGraphDataShow : true,
+            annotateDisplay : true,
+            graphTitleFontSize: 18
+        });
+
+        var ptx = document.getElementById("optin_count").getContext("2d");
+        window.myBar = new Chart(ptx).Pie(optChartData, {
+            graphTitle : "Total Opt-Ins",
+            legend : true,
+            inGraphDataShow : true,
+            annotateDisplay : true,
+            spaceBetweenBar : 5,
+            graphTitleFontSize: 18
+        });
+    }
+</script>
+
+<p><small>This will update in real time.</small></p>
+<p>Total Submissions: {{ submission_count }}<br />
+<p>Total Reviews: {{ review_count }}</p>
+
+<div style="width: 30%" align="center">
+    <canvas id="optin_count" height="450" width="600"></canvas>
+</div>
+
+<div style="width: 60%" align="center">
+    <canvas id="word_count" height="450" width="600"></canvas>
+</div>
+
+{% endautoescape %}
+{% endblock %}

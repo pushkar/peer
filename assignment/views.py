@@ -53,6 +53,34 @@ def page(request, a_name, p_name):
             'a_name': a_name,
         })
 
+def stats(request, a_name):
+    ap = AssignmentPage.objects.filter(assignment__short_name=a_name)
+    convos = ReviewConvo.objects.all()
+
+    word_count = {}
+    for c in convos:
+        count = len(c.text.split())
+        count = count / 100 * 100
+        if word_count.has_key(count):
+            word_count[count] += 1
+        else:
+            word_count[count] = 1
+
+    submission_count = Submission.objects.all().count()
+    review_count = len(convos)
+    optin_count = OptIn.objects.filter(value=True).count()
+    optout_count = OptIn.objects.filter(value=False).count()
+
+    return render(request, 'assignment_stats.html', {
+            'a_name': a_name,
+            'ap': ap,
+            'wc': word_count,
+            'optin': optin_count,
+            'optout': optout_count,
+            'submission_count': submission_count,
+            'review_count': review_count,
+        })
+
 # Default view for assignments
 # Enlists tasks
 def home(request, a_name):
