@@ -31,6 +31,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_mathjax',
+    'ganalytics',
     'student',
     'recommender',
     'assignment',
@@ -59,6 +60,7 @@ ROOT_URLCONF = 'peer.urls'
 
 WSGI_APPLICATION = 'peer.wsgi.application'
 
+GANALYTICS_TRACKING_CODE = 'UA-59742834-1'
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
