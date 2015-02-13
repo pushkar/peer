@@ -26,8 +26,9 @@ def log_logout(s, new=False):
         log[0].save()
     return log[0].created
 
-def log_review(s, review, new=False):
+def log_review(username, review, new=False):
     review_details = "review_" + str(review.pk)
+    s = Student.objects.get(username=username)
     log = StudentLog.objects.get_or_create(student=s, details=review_details)
     if log[1] == False and new:
         now = datetime.now()
@@ -36,10 +37,10 @@ def log_review(s, review, new=False):
         log[0].save()
     return log[0].created
 
-def log_isread(s, review):
+def log_isread(username, review):
     review_details = "review_" + str(review.pk)
     try:
-        log = StudentLog.objects.get(student=s, details=review_details)
+        log = StudentLog.objects.get(student__username=username, details=review_details)
         return ReviewConvo.objects.filter(review=review, created__gt=log.created).count()
     except ReviewConvo.DoesNotExist:
         return -1

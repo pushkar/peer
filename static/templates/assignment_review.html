@@ -2,7 +2,7 @@
 
 {% block breadcrumb %}
 <li><a href="{% url 'assignment:index' %}">Assignments</a></li>
-<li><a href="{% url 'assignment:home' a_name %}">{{ assignment }}</a></li>
+<li><a href="{% url 'assignment:home' a_name %}">{{ ap.0.assignment }}</a></li>
 <li class="active">Review {{ review.pk }}</li>
 {% endblock %}
 
@@ -25,7 +25,7 @@
 <br />
 <h4>Score:</h4>
 <p>The reviewer has assigned a score of <b>{{ review.score }}</b>. <br /><small>(Scores are between 1 (bad) - 5 (good). It does not reflect your final score. That will be decided by your TA independent of these reviews.)</small></p>
-{% if student.pk == review.assigned.pk %}
+{% if allow_to_score %}
 <p>Change score to: <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "1" %}">1 (bad)</a>,
                     <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "2" %}">2</a>,
                     <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "3" %}">3</a>,

@@ -2,7 +2,7 @@
 
 {% block breadcrumb %}
 <li><a href="{% url 'assignment:index' %}">Assignments</a></li>
-<li><a href="{% url 'assignment:home' a_name %}">{{ assignment }}</a></li>
+<li><a href="{% url 'assignment:home' a_name %}">{{ ap_this.0.assignment }}</a></li>
 <li class="active">{{ ap_this.0.title }}</li>
 {% endblock %}
 

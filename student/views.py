@@ -65,6 +65,7 @@ def login(request):
             try:
                 s = Student.objects.get(username=username, gtid=gtid)
                 request.session['user'] = s.username
+                request.session['usertype'] = s.usertype
                 log_login(s, True)
                 messages.success(request, 'You are logged in.')
                 return HttpResponseRedirect(reverse('student:index'))

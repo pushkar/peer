@@ -2,46 +2,35 @@
 
 {% block breadcrumb %}
 <li><a href="{% url 'assignment:index' %}">Assignments</a></li>
-<li class="active">{{ assignment }}</li>
+<li class="active">{{ ap.0.assignment }}</li>
 {% endblock %}
 
 
 {% block assignment_content %}
 
-<h2>{{ assignment }}</h2>
-<h4>Tasks</h4>
-<ul>
+<h2>{{ ap.0.assignment.name }}</h2>
+<h4>Review Tasks</h4>
+<ul class="list-group" style="width: 500px;">
     {% for r in review_assigned %}
-    <li>
-        <a href="{% url 'assignment:review' a_name r.pk %}">Review {{ r.pk }} {{ r.read }}</a>
-    </li>
+    <li class="list-group-item" style="border-style:none; padding: 1px 1px;">{{ r.end | safe }}<a href="{% url 'assignment:review' a_name r.pk %}">Review {{ r.pk }}</a></li>
     {% empty %}
     <li>No reviews assigned to you yet.</li>
     {% endfor %}
 </ul>
 
-<h4>Submission</h4>
-<ul>
-    {% for s in submission %}
-    <li>
-        {{ s }}
-        <ul>
-            {% for r in review_submission %}
-            <li><a href="{% url 'assignment:review' a_name r.pk %}">Review {{ r.pk }} {{ r.read }}</a></li>
-            {% empty %}
-            <li>No Reviews.</li>
-            {% endfor %}
-        </ul>
-    </li>
+<h4>Reviews for your Submission</h4>
+<ul class="list-group" style="width: 500px;">
+    {% for r in review_submission %}
+    <li class="list-group-item" style="border-style:none; padding: 1px 1px;">{{ r.end | safe }}<a href="{% url 'assignment:review' a_name r.pk %}">Review {{ r.pk }}</a></li>
     {% empty %}
-    <li>No submissions.</li>
+    <li>No Reviews.</li>
     {% endfor %}
 </ul>
 
 <h4>Other</h4>
-<ul>
-    {% for p in permissions %}
-    <li><a href="{% url 'assignment:review' a_name p.review.pk %}">Review {{ p.review.pk }} for {{ p.review.submission.student }} {{ p.review.read }}</a></li>
+<ul class="list-group" style="width: 500px;">
+    {% for r in review_permissions %}
+    <li class="list-group-item" style="border-style:none; padding: 1px 1px;">{{ r.end | safe }}<a href="{% url 'assignment:review' a_name r.pk %}">Review {{ r.pk }} for {{ r.submission.student }}</a></li>
     {% empty %}
     <li>None.</li>
     {% endfor %}
