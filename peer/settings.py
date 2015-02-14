@@ -12,7 +12,7 @@ BASE_DIR = os.path.dirname(__file__)
 SECRET_KEY = '2e4-osx759)6^jf^67l59s_r3j!ky9c0vg0ca(c2zma*js+uci'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 TEMPLATE_DEBUG = True
 
