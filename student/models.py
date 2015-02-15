@@ -53,7 +53,7 @@ class OptIn(models.Model):
 class OptInAdmin(admin.ModelAdmin):
     list_display = ('student', 'value')
     search_fields = ('student__username', 'student__firstname', 'student__lastname')
-    list_filter = ('value', 'student__group_id')
+    list_filter = ('value', 'student__group_id', 'student__usertype')
 
     actions = ['optin', 'optout']
 

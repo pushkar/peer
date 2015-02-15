@@ -245,7 +245,9 @@ class PermissionAdmin(admin.ModelAdmin):
 
 class ReviewConvoAdmin(admin.ModelAdmin):
     list_display = ('created', 'student', 'text')
-    search_fields = ('text',)
+    search_fields = ('student__username', 'student__firstname', 'student__lastname', 'review__submission__student__username',
+                'review__submission__student__firstname', 'review__submission__student__lastname')
+    list_filter = ('review',)
 
 
 # Form Views
