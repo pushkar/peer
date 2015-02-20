@@ -1,0 +1,25 @@
+{% for c in convo %}
+<div class="panel panel-default">
+  <div class="panel-body">
+      {{ c.text | safe | urlize | linebreaks }}
+  </div>
+  <div class="panel-footer">
+  <small>
+      {{ c.student.firstname }}
+      {% if c.student.usertype == "ta" %}
+      (TA)
+      {% elif c.student.usertype == "superta" %}
+      (The Lord)
+      {% endif %}
+      <span class="pull-right">Edit
+      {% if usertype == "ta" or usertype == "superta" %}
+        | <a href="{% url 'assignment:delete_reviewconvo' a_name c.pk %}" data-ajax="true" data-method="post" data-success="load_review_convo">Delete</a>
+      {% endif %}
+      </span>
+  </small>
+  </div>
+</div>
+{% empty %}
+<p>No discussion yet.</p>
+{% endfor %}
+</ul>

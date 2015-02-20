@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib import admin, messages
+from django_ajax.decorators import ajax
 
 from student.models import *
 from student.log import *
@@ -19,6 +20,7 @@ import sendgrid
 def check_session(request):
     if not 'user' in request.session:
         request.session['user'] = ""
+        request.session['usertype'] = ""
 
     if not request.session['user']:
         return False
@@ -42,6 +44,10 @@ def send_email(email, gtid):
     message.set_from('GTML TAs ')
     status, msg = sg.send(message)
     return status
+
+@ajax
+def messages_all(request):
+    return render(request, 'messages.html', {})
 
 def index(request):
     if check_session(request):

@@ -1,13 +1,60 @@
-{% extends "assignment_base.html" %}
+{% extends "base.html" %}
 
-{% block assignment_menu %}
-<li><a href="{% url 'assignment:home' a_name %}">Tasks</a></li>
-{% for page in ap %}
-    {% if page.link|length > 0 %}
-        <li><a href="{{ page.link }}">{{ page.title }}</a></li>
-    {% else %}
-        <li><a href="{% url 'assignment:page' a_name page.name %}">{{ page.title }}</a></li>
-    {% endif %}
-{% endfor %}
+{% block title %}ML Spring 2015 - Assignments {% endblock %}
 
+{% block menu %}
+{% endblock %}
+
+{% block breadcrumb %}
+<li><a href="{% url 'assignment:index' %}">Assignments</a></li>
+<li class="active">{{ ap.0.assignment }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-3 col-md-2 sidebar">
+        <div id="assignment_menu">
+            <ul class="nav nav-bar">
+                <li><a href="{% url 'assignment:home' a_name %}">Home</a></li>
+                {% for page in ap %}
+                {% if page.link|length > 0 %}
+                    <li><a href="{{ page.link }}">{{ page.title }}</a></li>
+                {% else %}
+                    <li><a href="{% url 'assignment:page' a_name page.name %}" data-ajax="true" data-success="load_content">{{ page.title }}</a></li>
+                {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div id="assignment_review_menu">
+        </div>
+    </div>
+
+    <div class="col-sm-9 main">
+
+        <h2>{{ ap.0.assignment.name }}</h2>
+        <div id="assignment_content">
+            <h4>Home</h4>
+
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function load_review_menu() {
+        console.log(' - load_review_menu')
+        ajaxGet("{% url 'assignment:review_menu' a_name %}", function(content) {
+            $('#assignment_review_menu').html(content)
+        });
+    }
+
+    function load_content(content) {
+        console.log('start load_content')
+        $('#assignment_content').html(content);
+        load_review_menu();
+        console.log('done with load_content')
+    }
+
+    load_review_menu();
+</script>
 {% endblock %}

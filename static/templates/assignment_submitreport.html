@@ -1,33 +1,81 @@
-{% extends "assignment_pagebase.html" %}
+{% extends "assignment_base.html" %}
+
+
+{% block breadcrumb %}
+<li><a href="{% url 'assignment:index' %}">Assignments</a></li>
+<li><a href="{% url 'assignment:home' a_name %}">{{ ap.0.assignment }}</a></li>
+<li class="active">Submission</li>
+{% endblock %}
+
+
 {% block assignment_content %}
-<h2>{{ assignment.0.name }}</h2>
-<br />
-<p>Submit a link to your report. We advise you to write up your report in Google Docs and share the link here.</p>
+
+<h2>{{ ap.0.assignment.name }}</h2>
+<h4>Submitted Files</h4>
+<div id="submission-files" class="content" data-refresh-url="{% url 'assignment:submission_files' a_name username %}">
+</div>
 
 <br />
-<form class="form-group" action="report" method="post">{% csrf_token %}
+<h4>Add Files</h4>
+<br />
+<form id="sub-form" class="form-horizontal" action="{% url 'assignment:submission_add' a_name %}" method="post">
+    {% csrf_token %}
     <div class="form-group">
-        <div class="fieldWrapper">
-            <label for="report_link">Link to Report:</label>
-            <br /> {{ form.report_link }} {{ form.report_link.errors }}
+        <label for="file_name" class="col-sm-2 control-label">File Name</label>
+        <div class="col-sm-10">
+            {{ form.file_name }}
         </div>
     </div>
     <div class="form-group">
-        <p>
-            <input class="btn btn-default" type="submit" value="Submit" />
-        </p>
+        <label for="file_link" class="col-sm-2 control-label">Link</label>
+        <div class="col-sm-10">
+            {{ form.file_link }}
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" value="Add" class="btn btn-default">Add</button>
+        </div>
     </div>
 </form>
-<br />
-<p>Current Submission: <a href="{{ report_message }}">{{ report_message }}</a>
-</p>
-<p>Current Reviews:</b>
-    <ul>
-        {% for r in review %}
-        <li><a href="review/{{ r.pk }}">Review {{ r.pk }}</a>
-        </li>
-        {% empty %}
-        <li>No reviews yet.</li>
-        {% endfor %}
-    </ul>
+<small>You can write up your report in Google Docs and share the link here.</small>
+
+<script type="text/javascript">
+
+    function load_submission_files() {
+        ajaxGet( $('#submission-files').attr('data-refresh-url'), function(content) {
+            $('#submission-files').html(content)
+        });
+        load_messages();
+    }
+
+    load_submission_files();
+
+    // Submit post on submit
+    $('#sub-form').on('submit', function(event){
+        event.preventDefault();
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "{% url 'assignment:submission_add' a_name %}",
+            data: { file_name : $('#id_file_name').val(), file_link : $("#id_file_link").val(), },
+            beforeSend: function(xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            },
+            success: function(result) {
+                console.log(result);
+                load_submission_files();
+                $('#sub-form')[0].reset();
+            },
+            error : function(xhr, errmsg, err) {
+                $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+ errmsg +
+                    " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+                console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            }
+        })
+    });
+</script>
+
 {% endblock %}

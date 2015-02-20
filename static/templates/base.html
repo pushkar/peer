@@ -15,11 +15,10 @@
         padding: 8px 25px 8px 14px;
     }
     .breadcrumb {
-        background: #FFFFFF;
         font-size: 10pt;
     }
     </style>
-
+<!--
     <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -30,21 +29,56 @@
       ga('send', 'pageview');
 
     </script>
+-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://s3.amazonaws.com/static-style/django_ajax/js/jquery.ajax.min.js"></script>
+    <script type="text/javascript" src="https://s3.amazonaws.com/static-style/django_ajax/js/jquery.ajax-plugin.min.js"></script>
+    <script type="text/javascript" src="https://s3.amazonaws.com/static-style/jquery.cookie.js"></script>
+    <script type="text/javascript">
+        var csrftoken = $.cookie('csrftoken');
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+        function load_messages() {
+            console.log(" - load_messages")
+            if($("#convoModal").length) {
+                if($("#convoModal").hasClass('in')) {
+                    ajaxGet( $('#messages').attr('data-refresh-url'), function(content) {
+                        $('#convoModalMessages').html(content)
+                    });
+                    return true
+                }
+            }
+            ajaxGet( $('#messages').attr('data-refresh-url'), function(content) {
+                $('#messages').html(content)
+            });
+        }
+    </script>
+
 </head>
 
 <body>
-    <div class="container">
-        <nav class="navbar navbar-default navbar-static-top" role="navigation">
+    <div class="container" style="width:100%">
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
             <ul class="nav navbar-nav">
                 <li><a href="/student/">Home</a>
                 </li>
                 <li><a href="/assignment">Assignments</a>
                 </li>
                 {% block menu %}{% endblock %}
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Me <span class="caret"></span></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Account <span class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
                         {% block accountmenu %}{% endblock %}
                         <li><a href="/student/logout">Logout </a>
@@ -54,17 +88,23 @@
             </ul>
         </nav>
     </div>
-    <div class="container">
-        {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-        {% endfor %}
-        {% endif %}
+    <div class="container" style="width:100%">
+        <br />
+        <br />
+        <br />
+        <div id="breadcrumb">
+            <ol class="breadcrumb">
+              {% block breadcrumb %}{% endblock %}
+            </ol>
+        </div>
 
-        <ol class="breadcrumb">
-          {% block breadcrumb %}{% endblock %}
-        </ol>
-
+        <div id="messages" class="content" data-refresh-url="{% url 'student:messages_all' %}">
+            {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+        </div>
 
         {% block content %}{% endblock %}
         <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

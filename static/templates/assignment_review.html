@@ -1,17 +1,3 @@
-{% extends "assignment_pagebase.html" %}
-
-{% block breadcrumb %}
-<li><a href="{% url 'assignment:index' %}">Assignments</a></li>
-<li><a href="{% url 'assignment:home' a_name %}">{{ ap.0.assignment }}</a></li>
-<li class="active">Review {{ review.pk }}</li>
-{% endblock %}
-
-{% block assignment_content %}
-{% load mathjax %}
-{% mathjax_scripts %}
-
-<h2>{{ assignment }}</h2>
-
 <h4>Review {{ review.pk }}</h4>
 <h4>{{ review.0.submission }}</h4>
 <ul>
@@ -33,41 +19,83 @@
                     <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "5" %}">5 (good)</a>.</p>
 {% endif %}
 <br />
+{% load mathjax %}
+{% mathjax_scripts %}
 <h4>Discussion:</h4>
-<ul class="list-group">
-{% for c in convo %}
-<li class="list-group-item">
-    <span class="badge">
-        {{ c.student.firstname }}
-        {% if c.student.usertype == "ta" %}
-        (TA)
-        {% elif c.student.usertype == "superta" %}
-        (The Lord)
-        {% endif %}
+<div id="reviewconvo" data-refresh-url="{% url 'assignment:review_convo' a_name review.pk %}">
+</div>
 
-    </span>
-    {{ c.text | safe | urlize | linebreaks }}</p>
-</li>
-{% empty %}
-<p>No discussion yet.</p>
-{% endfor %}
-</ul>
 
-<br />
-<p></p>
-<form class="form-group" action="{% url 'assignment:submit_reviewconvo' a_name review.pk %}" method="post">{% csrf_token %}
-    <div class="form-group">
-        <div class="fieldWrapper">
-            <label for="text">Enter Review:</label>
-            {{ form.text }} {{ form.text.errors }}
-            <small><br />(You can use Latex. Examples: Inline <code>\( x^2 \)</code> is \( x^2 \) or new line equations with <code>$$ \E = mc^2 $$</code>.</small>
-        </div>
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#convoModal">
+    Add Review
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="convoModal" tabindex="-1" role="dialog" aria-labelledby="convoModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="convoModalLabel">Review</h4>
+      </div>
+      <div id="convoModalMessages">
+      </div>
+      <form id="convo-form" class="form-group" action="{% url 'assignment:submit_reviewconvo' a_name review.pk %}" method="post">{% csrf_token %}
+          <div class="modal-body">
+              <div class="form-group">
+                  <div class="fieldWrapper">
+                      <label for="text">Enter Review:</label><br />
+                      {{ form.text }} {{ form.text.errors }}
+                      <small><br />You can use Latex. Examples: Inline <code>\( x^2 \)</code> is \( x^2 \) or new line equations with <code>$$ \E = mc^2 $$</code>.</small>
+                  </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+              <button class="btn btn-default" data-dismiss="modal">Close</button>
+              <button class="btn btn-primary" type="submit" value="Submit">Save changes</button>
+          </div>
+      </form>
     </div>
-    <div class="form-group">
-        <p>
-            <input class="btn btn-default" type="submit" value="Submit" />
-        </p>
-    </div>
-</form>
+  </div>
+</div>
 
-{% endblock %}
+<script type="text/javascript">
+
+    function load_review_convo() {
+        console.log('start load_review_convo')
+        ajaxGet( $('#reviewconvo').attr('data-refresh-url'), function(content) {
+            $('#reviewconvo').html(content)
+        });
+        load_review_menu();
+        load_messages();
+        console.log('done with load_review_convo')
+    }
+
+    // Submit post on submit
+    $('#convo-form').on('submit', function(event){
+        event.preventDefault();
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "{% url 'assignment:submit_reviewconvo' a_name review.pk %}",
+            data: { text : $('#id_text').val(), },
+            beforeSend: function(xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            },
+            success: function(result) {
+                load_review_convo();
+                $('#convo-form')[0].reset();
+            },
+            error : function(xhr, errmsg, err) {
+                $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+ errmsg +
+                    " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+                console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            }
+        })
+    });
+
+    load_review_convo();
+</script>

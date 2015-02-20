@@ -260,5 +260,6 @@ class ScoreForm(forms.Form):
     field = ('score')
 
 class ReportForm(forms.Form):
-    report_link = forms.CharField(max_length=100)
-    fields = ('link')
+    file_name = forms.CharField(max_length=100)
+    file_link = forms.CharField(max_length=1000)
+    fields = ('file_name', 'file_link')
