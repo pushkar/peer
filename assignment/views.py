@@ -94,12 +94,25 @@ def home(request, a_name):
     if not check_session(request):
         return HttpResponseRedirect(reverse('student:index'))
 
+    extra_scripts = ""
+    if request.method == "GET":
+        if request.GET.has_key('page'):
+            p_name = request.GET['page']
+            extra_scripts = "load_div(\'"+ reverse('assignment:page', args=[a_name, p_name]) +"\', \'#assignment_content\'); \n"
+
+        if request.GET.has_key('review'):
+            review_pk = request.GET['review']
+            extra_scripts = "load_div(\'"+ reverse('assignment:review', args=[a_name, review_pk]) +"\', \'#assignment_content\'); \n"
+
     username = request.session['user']
     ap = AssignmentPage.objects.filter(assignment__short_name=a_name)
+
+    print extra_scripts
 
     return render(request, 'assignment_pagebase.html', {
         'ap': ap,
         'a_name': a_name,
+        'extra_scripts': extra_scripts,
     })
 
 @ajax
@@ -199,7 +212,7 @@ def review_menu(request, a_name):
 
     # TODO Doesn't check which assignment
     log = StudentLog.objects.filter(student__username=username)
-    reviews = Review.objects.filter(Q(assigned__username=username) | Q(submission__student__username=username)).select_related('assigned', 'submission__student')
+    reviews = Review.objects.filter(Q(assigned__username=username, submission__assignment__short_name=a_name) | Q(submission__student__username=username)).select_related('assigned', 'submission__student')
     convos = ReviewConvo.objects.all().select_related('review')
 
     log_dict = {}
@@ -219,7 +232,8 @@ def review_menu(request, a_name):
     review_submission = set()
     review_permission = set()
 
-    convo_new = "<img src=\"https://s3.amazonaws.com/static-style/dist/green_dot.png\">"
+    #convo_new = "<img src=\"https://s3.amazonaws.com/static-style/dist/green_dot.png\">"
+    convo_new = ""
 
     def get_review_details(r):
         r.end = ""
@@ -245,7 +259,7 @@ def review_menu(request, a_name):
 
     review_permissions = set()
     try:
-        permissions = Permission.objects.filter(student__username=username).prefetch_related('review', 'review__submission__student')
+        permissions = Permission.objects.filter(student__username=username, review__submission__assignment__short_name=a_name).prefetch_related('review', 'review__submission__student')
         for p in permissions:
             review_permissions.add(get_review_details(p.review))
     except:

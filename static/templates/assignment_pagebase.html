@@ -11,6 +11,7 @@
 {% endblock %}
 
 {% block content %}
+{% autoescape off %}
 <div class="row">
     <div class="col-sm-3 col-md-2 sidebar">
         <div id="assignment_menu">
@@ -41,20 +42,26 @@
 </div>
 
 <script type="text/javascript">
+
+    function load_div(url, div) {
+        ajaxGet(url, function(content) {
+            $(div).html(content)
+        });
+    }
+
     function load_review_menu() {
-        console.log(' - load_review_menu')
         ajaxGet("{% url 'assignment:review_menu' a_name %}", function(content) {
             $('#assignment_review_menu').html(content)
         });
     }
 
     function load_content(content) {
-        console.log('start load_content')
         $('#assignment_content').html(content);
-        load_review_menu();
-        console.log('done with load_content')
     }
 
     load_review_menu();
+
+    {{ extra_scripts }}
 </script>
+{% endautoescape %}
 {% endblock %}

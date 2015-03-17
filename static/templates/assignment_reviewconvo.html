@@ -11,7 +11,7 @@
       {% elif c.student.usertype == "superta" %}
       (The Lord)
       {% endif %}
-      <span class="pull-right">Edit
+      <span class="pull-right"><!--Edit-->
       {% if usertype == "ta" or usertype == "superta" %}
         | <a href="{% url 'assignment:delete_reviewconvo' a_name c.pk %}" data-ajax="true" data-method="post" data-success="load_review_convo">Delete</a>
       {% endif %}

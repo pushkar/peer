@@ -41,7 +41,7 @@
       </div>
       <div id="convoModalMessages">
       </div>
-      <form id="convo-form" class="form-group" action="{% url 'assignment:submit_reviewconvo' a_name review.pk %}" method="post">{% csrf_token %}
+      <form id="convo-form" class="form-group" action="" method="post">{% csrf_token %}
           <div class="modal-body">
               <div class="form-group">
                   <div class="fieldWrapper">
@@ -61,15 +61,23 @@
 </div>
 
 <script type="text/javascript">
+    (function(window,undefined){
+
+        // Bind to StateChange Event
+        History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate
+            var State = History.getState(); // Note: We are using History.getState() instead of event.state
+        });
+
+        // Change our States
+        History.pushState({review:{{ review.pk }}}, "Review {{ review.pk }}", "?review={{ review.pk }}"); // logs {state:1}, "State 1", "?state=1"
+    })(window);
 
     function load_review_convo() {
-        console.log('start load_review_convo')
         ajaxGet( $('#reviewconvo').attr('data-refresh-url'), function(content) {
             $('#reviewconvo').html(content)
         });
         load_review_menu();
         load_messages();
-        console.log('done with load_review_convo')
     }
 
     // Submit post on submit

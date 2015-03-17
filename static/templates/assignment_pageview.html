@@ -5,4 +5,18 @@
 <h4>{{ ap_this.0.title }}</h4>
 
 {{ ap_this.0.content }}
+
+<script type="text/javascript">
+    (function(window,undefined){
+
+        // Bind to StateChange Event
+        History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate
+            var State = History.getState(); // Note: We are using History.getState() instead of event.state
+        });
+
+        // Change our States
+        History.pushState({page:"{{ ap_this.0.name }}"}, "Page {{ ap_this.0.title }}", "?page={{ ap_this.0.name }}"); // logs {state:1}, "State 1", "?state=1"
+    })(window);
+</script>
+
 {% endautoescape %}

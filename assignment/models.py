@@ -21,7 +21,7 @@ class AssignmentPage(models.Model):
     name = models.CharField(max_length=200)
     title = models.CharField(max_length=200)
     link = models.CharField(max_length=200, null=True, blank=True)
-    content = models.TextField(max_length=5000)
+    content = models.TextField(max_length=15000)
 
 class Submission(models.Model):
     student = models.ForeignKey(Student)
@@ -85,7 +85,8 @@ class AssignmentAdmin(admin.ModelAdmin):
                     files_total = files_total + 1
                     student = Student.objects.get(username=row[0])
                     if student:
-                        if Submission.objects.get_or_create(student=s, assignment=assignment)[1]:
+                        submission = Submission.objects.get_or_create(student=student, assignment=assignment)
+                        if submission[1]:
                             submissions_count += 1
                         if SubmissionFile.objects.get_or_create(submission=submission[0], name=row[1], link=row[2])[1]:
                             files_count += 1
@@ -162,7 +163,7 @@ class SubmissionAdmin(admin.ModelAdmin):
                 reviewers_3 = random.sample(reviewers, 3)
 
             for r in reviewers_3:
-                if Review.objects.get_or_create(submission=submission, assigned=r, score="0")[1]:
+                if Review.objects.get_or_create(submission=submission, assigned=r, score="0", details="")[1]:
                     reviewer_count += 1
 
 
@@ -177,7 +178,7 @@ class SubmissionAdmin(admin.ModelAdmin):
         for submission in queryset:
             tas = Student.objects.filter(group_id=submission.student.group_id, usertype="ta")
             for ta in tas:
-                if Review.objects.get_or_create(submission=submission, assigned=ta, score="0")[1]:
+                if Review.objects.get_or_create(submission=submission, assigned=ta, score="0", details="")[1]:
                     reviewer_count += 1
 
         self.message_user(request, "Assigned %s reviewers to %s submissions." % (str(reviewer_count), str(submission_count)) )
