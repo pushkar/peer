@@ -32,7 +32,6 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django_ajax',
     'django_mathjax',
-    'debug_toolbar',
     'student',
     'recommender',
     'assignment',
