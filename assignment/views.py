@@ -59,6 +59,7 @@ def page(request, a_name, p_name):
         })
 
 
+@ajax
 def stats(request, a_name):
     ap = AssignmentPage.objects.filter(assignment__short_name=a_name)
     convos = ReviewConvo.objects.all()

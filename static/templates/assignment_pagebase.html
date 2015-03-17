@@ -19,7 +19,7 @@
                 <li><a href="{% url 'assignment:home' a_name %}">Home</a></li>
                 {% for page in ap %}
                 {% if page.link|length > 0 %}
-                    <li><a href="{{ page.link }}">{{ page.title }}</a></li>
+                    <li><a href="{{ page.link }}" data-ajax="true" data-success="load_content">{{ page.title }}</a></li>
                 {% else %}
                     <li><a href="{% url 'assignment:page' a_name page.name %}" data-ajax="true" data-success="load_content">{{ page.title }}</a></li>
                 {% endif %}

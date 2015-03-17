@@ -1,12 +1,3 @@
-{% extends "assignment_base.html" %}
-
-{% block breadcrumb %}
-<li><a href="{% url 'assignment:index' %}">Assignments</a></li>
-<li><a href="{% url 'assignment:home' a_name %}">{{ ap.0.assignment }}</a></li>
-<li class="active">Stats</li>
-{% endblock %}
-
-{% block assignment_content %}
 {% autoescape off %}
 <script src="https://s3.amazonaws.com/static-style/dist/ChartNew.js"></script>
 <script>
@@ -38,29 +29,6 @@
             title: "Opted In"
         },
     ];
-
-    window.onload = function(){
-        var ctx = document.getElementById("word_count").getContext("2d");
-        window.myBar = new Chart(ctx).Bar(wcChartData, {
-            responsive : true,
-            barShowStroke: false,
-            graphTitle : "Word Count (X) vs Reviews (Y)",
-            legend : true,
-            inGraphDataShow : true,
-            annotateDisplay : true,
-            graphTitleFontSize: 18
-        });
-
-        var ptx = document.getElementById("optin_count").getContext("2d");
-        window.myBar = new Chart(ptx).Pie(optChartData, {
-            graphTitle : "Total Opt-Ins",
-            legend : false,
-            inGraphDataShow : true,
-            annotateDisplay : true,
-            spaceBetweenBar : 5,
-            graphTitleFontSize: 18
-        });
-    }
 </script>
 
 <p><small>This will update in real time.</small></p>
@@ -75,5 +43,39 @@
     <canvas id="word_count" height="450" width="600"></canvas>
 </div>
 
+<script type="text/javascript">
+    var ctx = document.getElementById("word_count").getContext("2d");
+    window.myBar = new Chart(ctx).Bar(wcChartData, {
+        responsive : true,
+        barShowStroke: false,
+        graphTitle : "Word Count (X) vs Reviews (Y)",
+        legend : true,
+        inGraphDataShow : true,
+        annotateDisplay : true,
+        graphTitleFontSize: 18
+    });
+
+    var ptx = document.getElementById("optin_count").getContext("2d");
+    window.myBar = new Chart(ptx).Pie(optChartData, {
+        graphTitle : "Total Opt-Ins",
+        legend : false,
+        inGraphDataShow : true,
+        annotateDisplay : true,
+        spaceBetweenBar : 5,
+        graphTitleFontSize: 18
+    });
+
+    (function(window,undefined){
+
+        // Bind to StateChange Event
+        History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate
+            var State = History.getState(); // Note: We are using History.getState() instead of event.state
+        });
+
+        // Change our States
+        History.pushState({page:"stats"}, "Stats Page", "?page=stats"); // logs {state:1}, "State 1", "?state=1"
+    })(window);
+
+</script>
+
 {% endautoescape %}
-{% endblock %}

@@ -9,6 +9,7 @@ from recommender.models import *
 
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.urlresolvers import reverse
+from django_ajax.decorators import ajax
 
 import re
 import numpy as np
@@ -30,6 +31,7 @@ def index(request):
 
     return HttpResponseRedirect('leaderboard')
 
+@ajax
 def leaderboard(request):
     if not check_session(request):
         return HttpResponseRedirect(reverse('student:index'))
@@ -54,6 +56,7 @@ def leaderboard(request):
         'a_name': a_name,
     })
 
+@ajax
 def submit_prediction(request):
     if not check_session(request):
         return HttpResponseRedirect(reverse('student:index'))
@@ -98,8 +101,10 @@ def submit_prediction(request):
                 messages.success(request, 'New score is %s.' % str(score[0].value))
             else:
                 messages.info(request, 'Something went wrong.')
+            return
         except:
             messages.info(request, 'Something went wrong.')
+            return
     else:
         form = PredictionForm()
 

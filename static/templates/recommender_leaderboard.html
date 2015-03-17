@@ -1,13 +1,3 @@
-{% extends "assignment_pagebase.html" %}
-
-{% block breadcrumb %}
-<li><a href="{% url 'assignment:index' %}">Assignments</a></li>
-<li><a href="{% url 'assignment:home' a_name %}">{{ assignment.name }}</a></li>
-<li class="active">Leaderboard</li>
-{% endblock %}
-
-
-{% block assignment_content %}
 <h4>Leaderboard</h4>
 
 <table class="table">
@@ -28,4 +18,17 @@
     </tbody>
     {% endfor %}
 </table>
-{% endblock %}
+
+<script type="text/javascript">
+    (function(window,undefined){
+
+        // Bind to StateChange Event
+        History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate
+            var State = History.getState(); // Note: We are using History.getState() instead of event.state
+        });
+
+        // Change our States
+        History.pushState({page:"leaderboard"}, "Leaderboard Page", "?page=leaderboard"); // logs {state:1}, "State 1", "?state=1"
+    })(window);
+
+</script>

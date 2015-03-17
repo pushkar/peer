@@ -6,7 +6,7 @@ from student.models import *
 
 class Score(models.Model):
     student = models.ForeignKey(Student)
-    value = models.FloatField()
+    value = models.FloatField(default=None)
 
     def __unicode__(self):
         return unicode(self.student)
