@@ -1,5 +1,4 @@
 {% autoescape off %}
-<script src="https://s3.amazonaws.com/static-style/dist/ChartNew.js"></script>
 <script>
     var wcChartData = {
         labels : [{% for key,value in wc.items %} "<{{key}} ", {% endfor %} "words"],
