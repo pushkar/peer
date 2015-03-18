@@ -273,6 +273,7 @@ def review_menu(request, a_name):
         'a_name': a_name,
     })
 
+@ajax
 def submission(request, a_name):
     username = request.session["user"]
     ap = AssignmentPage.objects.filter(assignment__short_name=a_name)
