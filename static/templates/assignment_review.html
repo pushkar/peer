@@ -12,11 +12,11 @@
 <h4>Score:</h4>
 <p>The reviewer has assigned a score of <b>{{ review.score }}</b>. <br /><small>(Scores are between 1 (bad) - 5 (good). It does not reflect your final score. That will be decided by your TA independent of these reviews.)</small></p>
 {% if allow_to_score %}
-<p>Change score to: <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "1" %}">1 (bad)</a>,
-                    <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "2" %}">2</a>,
-                    <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "3" %}">3</a>,
-                    <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "4" %}">4</a> or
-                    <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "5" %}">5 (good)</a>.</p>
+<p>Change score to: <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "1" %}" data-ajax="true" data-success="load_content">1 (bad)</a>,
+                    <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "2" %}" data-ajax="true" data-success="load_content">2</a>,
+                    <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "3" %}" data-ajax="true" data-success="load_content">3</a>,
+                    <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "4" %}" data-ajax="true" data-success="load_content">4</a> or
+                    <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "5" %}" data-ajax="true" data-success="load_content">5 (good)</a>.</p>
 {% endif %}
 <br />
 {% load mathjax %}
