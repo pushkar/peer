@@ -309,7 +309,15 @@ def submission_files(request, a_name, username):
 @ajax
 def submission_add(request, a_name):
     username = request.session["user"]
-    submission = Submission.objects.get(student__username=username, assignment__short_name=a_name)
+    try:
+        submission = Submission.objects.get(student__username=username, assignment__short_name=a_name)
+    except:
+        s = Student.objects.get(username=username)
+        a = Assignment.objects.get(short_name=a_name)
+        submission = Submission()
+        submission.student = s
+        submission.assignment = a
+        submission.save()
 
     if request.method == "POST":
         form = ReportForm(request.POST)
@@ -317,6 +325,8 @@ def submission_add(request, a_name):
             file = SubmissionFile()
             file.name = form.cleaned_data['file_name']
             file.link = form.cleaned_data['file_link']
+            print file.name
+            print file.link
             file.submission = submission
             file.save()
             messages.success(request, "File was added successfully.")
