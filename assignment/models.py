@@ -110,6 +110,8 @@ class SubmissionAdmin(admin.ModelAdmin):
     list_display = ('pk', 'student', 'assignment')
     search_fields = ('student__lastname', 'student__firstname', 'student__username', 'student__group_id')
     actions = ['assign_reviewers',  'assign_ta_review']
+    list_filter = ('assignment__name',)
+
 
     def assign_reviewers(self, request, queryset):
         submission_count = len(queryset)
