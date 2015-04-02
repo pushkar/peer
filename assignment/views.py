@@ -213,7 +213,7 @@ def review_menu(request, a_name):
 
     # TODO Doesn't check which assignment
     log = StudentLog.objects.filter(student__username=username)
-    reviews = Review.objects.filter(Q(assigned__username=username, submission__assignment__short_name=a_name) | Q(submission__student__username=username)).select_related('assigned', 'submission__student')
+    reviews = Review.objects.filter(Q(assigned__username=username) & Q(submission__assignment__short_name=a_name) | Q(submission__student__username=username) & Q(submission__assignment__short_name=a_name)).select_related('assigned', 'submission__student')
     convos = ReviewConvo.objects.all().select_related('review')
 
     log_dict = {}
@@ -272,6 +272,41 @@ def review_menu(request, a_name):
         'review_permissions': review_permissions,
         'a_name': a_name,
     })
+
+def review_debug(request, a_name):
+    if not check_session(request):
+        return HttpResponseRedirect(reverse('student:index'))
+
+    username = request.session["user"]
+
+    class reviews:
+        submission = None
+        reviews = None
+        assigns = None
+
+        def __init__(self, s, r, a):
+            self.submission = s
+            self.reviews = r
+            self.assigns = a
+
+    reviews_dict = {}
+
+    students = Student.objects.all()
+
+    for student in students:
+        submission = Submission.objects.filter(assignment__short_name=a_name, student=student)
+        review = Review.objects.filter(submission=submission)
+        assigned = Review.objects.filter(submission__assignment__short_name=a_name, assigned=student)
+        optin = OptIn.objects.filter(student=student)
+
+        r = reviews(submission, review, assigned)
+        reviews_dict[student] = r
+
+    return render(request, 'assignment_reviewdebug.html', {
+        'a_name': a_name,
+        'reviews_dict': reviews_dict,
+    })
+
 
 @ajax
 def submission(request, a_name):
