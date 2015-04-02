@@ -273,11 +273,19 @@ def review_menu(request, a_name):
         'a_name': a_name,
     })
 
+@ajax
 def review_debug(request, a_name):
     if not check_session(request):
         return HttpResponseRedirect(reverse('student:index'))
 
     username = request.session["user"]
+
+    if False:
+        reviews = Review.objects.filter(submission__assignment__short_name=a_name)
+        for r in reviews:
+            count = ReviewConvo.objects.filter(review=r).count()
+            if count == 0:
+                r.delete()
 
     class reviews:
         submission = None

@@ -125,8 +125,10 @@ class SubmissionAdmin(admin.ModelAdmin):
             reviewers_all.add(optins.student)
 
         for submission in queryset:
+            a_name = submission.assignment.short_name
             ## Check if they have opted in
             if submission.student not in reviewers_all:
+                reviewers_all.discard(submission.student)
                 self.message_user(request, "%s has not opted in." % str(submission.student), level=messages.WARNING)
                 continue
 
@@ -144,16 +146,22 @@ class SubmissionAdmin(admin.ModelAdmin):
             ## Remove the current submission student from reviewers set
             ## If cannot remove, then they probably did not opt in
             if submission.student in reviewers:
-                reviewers.remove(submission.student)
+                reviewers.discard(submission.student)
+
+            ## Remove reviewers who haven't submitted an assignment
+            reviewers_nosub = set()
+            for r in reviewers:
+                if Submission.objects.filter(student=r, assignment__short_name=a_name).count() <= 0:
+                    reviewers_nosub.add(r)
+            reviewers -= reviewers_nosub
 
             ## Remove all reviewers who have been assigned 3 reviews
             reviewers_assigned = set()
             for r in reviewers:
-                if Review.objects.filter(assigned=r).count() >= 3:
+                if Review.objects.filter(assigned=r, submission__assignment__short_name=a_name).count() >= 3:
                     reviewers_assigned.add(r)
 
             reviewers -= reviewers_assigned
-            reviewers_all -= reviewers_assigned # Also remove from the _all set
 
             ## Find 3 random reviewers
             reviewers_3 = set()
@@ -192,8 +200,21 @@ class SubmissionAdmin(admin.ModelAdmin):
 class ReviewAdmin(admin.ModelAdmin):
     list_display = ('pk', 'submission', 'assigned', 'score')
     search_fields = ('submission__student__lastname', 'submission__student__firstname', 'submission__student__username', 'submission__student__group_id')
-    list_filter = ('assigned__username',)
-    actions = ['permit_ta', 'permit_superta']
+    list_filter = ('submission__assignment__name', 'assigned__usertype', )
+    actions = ['remove_zero_convos','permit_ta', 'permit_superta']
+
+    def remove_zero_convos(self, request, queryset):
+        del_count = 0
+
+        for review in queryset:
+            count = ReviewConvo.objects.filter(review=review).count()
+            if count == 0:
+                review.delete()
+                del_count += 1
+
+        self.message_user(request, "Needed to delete %s reviews." % (str(del_count)) )
+
+    remove_zero_convos.short_description = "Remove Reviews with no convos"
 
     def permit_ta(self, request, queryset):
         permit_instructions = 0

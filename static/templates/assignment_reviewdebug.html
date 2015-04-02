@@ -1,0 +1,27 @@
+<p>Review Debug</p>
+
+<ol>
+{% for student, reviews in reviews_dict.items %}
+    <li>{{ student }}
+        <ul>
+            <li>{{ reviews.submission }}</li>
+            <li>Reviews:</li>
+            <ul>
+                {% for r in reviews.reviews %}
+                <li>{{ r }}</li>
+                {% endfor %}
+            </ul>
+            <li>Assigned:</li>
+            <ul>
+                {% for r in reviews.assigns %}
+                <li>{{ r }}</li>
+                {% endfor %}
+            </ul>
+        </ul>
+    </li>
+{% endfor %}
+</ol>
+
+
+<br />
+<br />
