@@ -74,7 +74,7 @@ def stats(request, a_name):
         else:
             word_count[count] = 1
 
-    submission_count = Submission.objects.all().count()
+    submission_count = Submission.objects.filter(assignment__short_name=a_name).count()
     review_count = len(convos)
     optin_count = OptIn.objects.filter(value=True).count()
     optout_count = OptIn.objects.filter(value=False).count()-20
