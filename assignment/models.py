@@ -23,6 +23,9 @@ class AssignmentPage(models.Model):
     link = models.CharField(max_length=200, null=True, blank=True)
     content = models.TextField(max_length=15000)
 
+    class Meta:
+        ordering = ['pk']
+
 class Submission(models.Model):
     student = models.ForeignKey(Student)
     assignment = models.ForeignKey(Assignment)
