@@ -52,8 +52,13 @@ def messages_all(request):
 def index(request):
     if check_session(request):
         s = Student.objects.get(username=request.session['user'])
+        opt = OptIn.objects.get_or_create(student=s)
+        opt_str = "Opted out"
+        if opt[0].value == True:
+            opt_str = "Opted in"
         return render(request, 'index.html', {
             'student': s,
+            'opt': opt_str,
         })
     else:
         form = LoginForm()
@@ -121,12 +126,17 @@ def optin(request):
         s = Student.objects.get(username=request.session['user'])
 
     try:
+        print s
         opt = OptIn.objects.get(student=s)
-        opt.value = True
+        if opt.value == True:
+            opt.value = False
+        else:
+            opt.value = True
         opt.save()
-        messages.success(request, "Thank you for opting in. You will soon have reviewers assigned to your submission.")
-    except:
-        messages.warning(request, "You should have reviews and reviewers assigned to you. Look in Assignments > Tasks. If not, wait for a few hours and check again.")
+        messages.success(request, "Your status was changed in the peer review program..")
+    except Exception as e:
+        print e
+        messages.warning(request, "Something went wrong. Let your TA know.")
 
     return HttpResponseRedirect(reverse('student:index'))
 

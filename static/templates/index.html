@@ -16,8 +16,12 @@
 {% autoescape off %}
 <p>Welcome {{ student.firstname }} {{ student.lastname }}!</p>
 <ul>
-    <li><a href="{% url 'student:optin' %}">Opt In the Peer Review program.</a></li>
     <li><a href="{% url 'assignment:index' %}">Go to Assignments</a>.</li>
+</ul>
+<p>Peer Review program</p>
+<ul>
+    <li>Your status in this program: <b>{{ opt }}</b></li>
+    <li><a href="{% url 'student:optin' %}">Change your status.</a> <br /><small>(If you change your status, it will be reflected when reviews are assigned for the next assignment)</small></li>
 </ul>
 {% endautoescape %}
 
