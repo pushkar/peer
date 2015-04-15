@@ -8,7 +8,8 @@ from django_ajax.decorators import ajax
 
 from student.models import *
 from student.log import *
-import recommender.models as re
+#import recommender.models as re
+from assignment.models import *
 
 import StringIO
 import csv
@@ -139,6 +140,118 @@ def optin(request):
         messages.warning(request, "Something went wrong. Let your TA know.")
 
     return HttpResponseRedirect(reverse('student:index'))
+
+def profile(request):
+    if not check_session(request):
+        return HttpResponseRedirect(reverse('student:index'))
+
+    try:
+        s = Student.objects.get(username=request.session['user'])
+        opt = OptIn.objects.get(student=s)
+
+        data = {}
+
+        assignment_count = Assignment.objects.all().count()
+        submission_count = Submission.objects.filter(student=s).count()
+        reviews_assigned = Review.objects.filter(assigned=s)
+        reviews_filled_count = 0
+        for r in reviews_assigned:
+            convo = ReviewConvo.objects.filter(review=r, student=s)
+            if len(convo) > 0:
+                reviews_filled_count += 1
+        reviews_assigned_count = len(reviews_assigned)
+        count = {}
+        count['assignment'] = assignment_count
+        count['submission'] = submission_count
+        count['reviews_assigned'] = reviews_assigned_count
+        count['reviews_filled'] = reviews_filled_count
+
+        for a in Assignment.objects.all():
+            submission = Submission.objects.filter(student=s, assignment=a)
+            if len(submission) > 0:
+                reviews = Review.objects.filter(submission=submission)
+                reviews_assigned = Review.objects.filter(submission__assignment=a, assigned=s)
+                data_a = {}
+                data_a['reviews'] = reviews
+                data_a['reviews_assigned'] = reviews_assigned
+                data[a] = data_a
+
+        return render(request, 'profile.html', {
+            'student': s,
+            'opt': opt,
+            'data': data,
+            'count': count,
+        })
+
+    except Exception as e:
+        print e
+        messages.warning(request, "Something went wrong. Let your TA know.")
+
+    return HttpResponseRedirect(reverse('student:index'))
+
+def updates(request):
+    if not check_session(request):
+        return HttpResponseRedirect(reverse('student:index'))
+
+    try:
+        s = Student.objects.get(username=request.session['user'])
+
+        data = {}
+        reviews = Review.objects.filter(submission__student=s)
+        for r in reviews:
+            count = log_isread(s.username, r)
+            if count != 0:
+                data[r] = count
+
+        reviews_assigned = Review.objects.filter(assigned=s)
+        for r in reviews_assigned:
+            count = log_isread(s.username, r)
+            if count != 0:
+                data[r] = count
+
+        return render(request, 'updates.html', {
+            'student': s,
+            'data': data,
+        })
+
+
+    except Exception as e:
+        print e
+        messages.warning(request, "Something went wrong. Let your TA know.")
+
+    return HttpResponseRedirect(reverse('student:index'))
+
+
+
+@login_required
+def admin(request):
+    if not check_session(request):
+        return HttpResponseRedirect(reverse('student:index'))
+
+    try:
+        s = Student.objects.get(username=request.session['user'])
+        s_all = Student.objects.all()
+        return render(request, 'admin.html', {
+            'student': s,
+            'student_all': s_all,
+        })
+
+    except Exception as e:
+        print e
+        messages.warning(request, "Something went wrong.")
+
+    return HttpResponseRedirect(reverse('student:index'))
+
+@login_required
+def login_change(request, user):
+    if not check_session(request):
+        return HttpResponseRedirect(reverse('student:index'))
+
+    s = Student.objects.get(username=user)
+    request.session['user'] = s.username
+    request.session['usertype'] = s.usertype
+
+    return HttpResponseRedirect(reverse('student:admin'))
 
 @login_required
 def populate(request):

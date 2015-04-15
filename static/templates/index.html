@@ -1,9 +1,6 @@
 {% extends "base.html" %}
 
 {% block menu %}
-{% if student.usertype|stringformat:"s" == "superta" %}
-<li><a href="/admin">Admin</a></li>
-{% endif %}
 {% endblock %}
 
 {% block breadcrumb %}
@@ -17,6 +14,7 @@
 <p>Welcome {{ student.firstname }} {{ student.lastname }}!</p>
 <ul>
     <li><a href="{% url 'assignment:index' %}">Go to Assignments</a>.</li>
+    <li>Check your <a href="{% url 'student:profile' %}">Profile</a> and <a href="{% url 'student:updates' %}">Updates</a> under Account.</li>
 </ul>
 <p>Peer Review program</p>
 <ul>

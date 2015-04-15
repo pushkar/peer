@@ -74,16 +74,22 @@
     <div class="container" style="width:100%">
         <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
             <ul class="nav navbar-nav">
-                <li><a href="/student/">Home</a>
+                <li><a href="{% url 'student:index' %}">Home</a>
                 </li>
-                <li><a href="/assignment">Assignments</a>
+                <li><a href="{% url 'assignment:index' %}">Assignments</a>
                 </li>
                 {% block menu %}{% endblock %}
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Account <span class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
                         {% block accountmenu %}{% endblock %}
-                        <li><a href="/student/logout">Logout </a>
+                        {% if user.is_authenticated %}
+                        <li><a href="{% url 'student:admin' %}">Admin</a></li>
+                        <li><a href="/admin">Backend Admin</a></li>
+                        {% endif %}
+                        <li><a href="{% url 'student:profile' %}">My Profile </a>
+                        <li><a href="{% url 'student:updates' %}">Updates </a>
+                        <li><a href="{% url 'student:logout' %}">Logout </a>
                         </li>
                     </ul>
                 </li>

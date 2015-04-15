@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block menu %}
+{% endblock %}
+
+{% block breadcrumb %}
+<li><a href="{% url 'student:index' %}">Home</a></li>
+<li class="active">Admin</li>
+{% endblock %}
+
+
+{% block content %}
+
+<p>Welcome {{ student.firstname }} {{ student.lastname }}!</p>
+<p>Log in as:</p>
+
+<ul>
+{% for s in student_all %}
+    <li><a href="{% url 'student:login_change' s.username %}">{{ s }}</a></li>
+{% endfor %}
+</ul>
+
+{% endblock %}

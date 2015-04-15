@@ -413,7 +413,6 @@ def submit_reviewconvo(request, a_name, id):
             convo.review = review
             convo.student = s
             convo.text = form.cleaned_data['text']
-            print convo.text
             convo.score = "0.0"
             convo.save()
             messages.success(request, "Review comment entered successfully.")

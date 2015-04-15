@@ -96,7 +96,7 @@
             type: "POST",
             dataType: "json",
             url: "{% url 'assignment:submit_reviewconvo' a_name review.pk %}",
-            data: { text : $('#id_text').val(), },
+            data: { text : $('#id_text').val().replace(/[^\x00-\x7F]/g, ""), },
             beforeSend: function(xhr, settings) {
                 if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
                     xhr.setRequestHeader("X-CSRFToken", csrftoken);

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block menu %}
+{% endblock %}
+
+{% block breadcrumb %}
+<li><a href="{% url 'student:index' %}">Home</a></li>
+<li class="active">Updates</li>
+{% endblock %}
+
+
+{% block content %}
+
+<ul>
+{% for review, count in data.items %}
+    <li><a href="/assignment/{{review.submission.assignment.short_name}}/?review={{review.pk}}">{{ review }}</a>
+        <b>{% if count == -1 %} (New)
+        {% else %} ({{ count }} new messages)
+        {% endif %}</b>
+    </li>
+{% empty %}
+    No updates!
+{% endfor %}
+</ul>
+
+{% endblock %}

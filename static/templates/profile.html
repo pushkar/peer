@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block menu %}
+{% endblock %}
+
+{% block breadcrumb %}
+<li><a href="{% url 'student:index' %}">Home</a></li>
+<li class="active">Profile</li>
+{% endblock %}
+
+
+{% block content %}
+
+<h3>Personal Details</h3>
+<p>Name: {{ student.firstname }} {{ student.lastname }}</p>
+<p>User: {{ student.username }}</p>
+<p>Email: {{ student.email }}</p>
+<p>Opted in Peer Review? {{ opt.value }}</p>
+<p>Submissions: {{ count.submission }}/{{ count.assignment }}</p>
+<p>Reviews Filled: {{ count.reviews_filled }}/{{ count.reviews_assigned }}</p>
+
+<h3>Assignments and Reviews</h3>
+<ul>
+{% for assignment, reviews in data.items %}
+    <li>
+        {{assignment}}
+        <ul>
+        {% for key, r in reviews.items %}
+            {% if key == "reviews" %}
+                <li>Reviews
+                    <ul>
+                        {% for i in r %}
+                            <li><a href="/assignment/{{assignment.short_name}}/?review={{i.pk}}">{{i}}</a></li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+        <ul>
+        {% for key, r in reviews.items %}
+            {% if key == "reviews_assigned" %}
+                <li>Reviews Assigned
+                    <ul>
+                        {% for i in r %}
+                            <li><a href="/assignment/{{assignment.short_name}}/?review={{i.pk}}">{{i}}</a></li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+    </li>
+{% endfor %}
+</ul>
+
+
+{% endblock %}
