@@ -10,13 +10,13 @@
     <li class="disabled"><a href="#"><b>Reviews for your Submission</b></a></li>
     {% endif %}
     {% for r in review_submission %}
-    <li><a href="{% url 'assignment:review' a_name r.pk %}" data-ajax="true" data-success="load_content">{{ r.end | safe }} Review {{ r.pk }}</a></li>
+    <li><a href="{% url 'assignment:review' a_name r.pk %}" data-ajax="true" data-success="load_content">{{ r.end | safe }} Review {{ r.pk }} {% if r.assigned.usertype == "ta" %}(TA){% endif %}</a></li>
     {% endfor %}
 
     {% if review_permissions %}
     <li class="disabled"><a href="#"><b>Reviews you can View</b></a></li>
     {% endif %}
     {% for r in review_permissions %}
-    <li><a href="{% url 'assignment:review' a_name r.pk %}" data-ajax="true" data-success="load_content">{{ r.end | safe }} Review {{ r.pk }}</a></li>
+    <li><a href="{% url 'assignment:review' a_name r.pk %}" data-ajax="true" data-success="load_content">{{ r.end | safe }} Review {{ r.pk }} {% if r.assigned.usertype == "ta" %}(TA){% endif %}</a></li>
     {% endfor %}
 </ul>
