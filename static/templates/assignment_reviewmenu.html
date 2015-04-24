@@ -3,7 +3,7 @@
     <li class="disabled"><a href="#"><b>Reviews Assigned to you</b></a></li>
     {% endif %}
     {% for r in review_assigned %}
-    <li id="li_review_{{r.pk}}"><a href="{% url 'assignment:review' a_name r.pk %}" data-ajax="true" data-success="load_content">Review {{ r.pk }} {{ r.end | safe }}</a></li>
+    <li id="li_review_{{r.pk}}"><a href="{% url 'assignment:review' a_name r.pk %}" data-ajax="true" data-success="load_content">Review {{ r.pk }} {{ r.end | safe }} {% if r.assigned.usertype == "ta" %}(TA){% endif %}</a></li>
     {% endfor %}
 
     {% if review_submission %}
