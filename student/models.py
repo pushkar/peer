@@ -21,7 +21,6 @@ class Student(models.Model):
     gtid = models.CharField(max_length=12)
     lastname = models.CharField(max_length=50)
     firstname = models.CharField(max_length=50)
-    group_id = models.IntegerField()
 
     def __unicode__(self):
         return unicode(self.lastname + ", " + self.firstname + " (" + self.username + ")")
@@ -29,7 +28,7 @@ class Student(models.Model):
 class StudentAdmin(admin.ModelAdmin):
     list_display = ('id', 'username', 'gtid', 'firstname', 'lastname', 'email', 'usertype')
     search_fields = ('username', 'gtid', 'firstname', 'lastname')
-    list_filter = ('group_id', )
+    list_filter = ('usertype', )
 
     actions = ['optin_program']
 
@@ -53,7 +52,7 @@ class OptIn(models.Model):
 class OptInAdmin(admin.ModelAdmin):
     list_display = ('student', 'value')
     search_fields = ('student__username', 'student__firstname', 'student__lastname')
-    list_filter = ('value', 'student__group_id', 'student__usertype')
+    list_filter = ('value', 'student__usertype')
 
     actions = ['optin', 'optout']
 

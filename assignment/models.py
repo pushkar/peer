@@ -29,38 +29,34 @@ class AssignmentPage(models.Model):
 class Submission(models.Model):
     student = models.ForeignKey(Student)
     assignment = models.ForeignKey(Assignment)
+    files = models.CharField(max_length=15000)
 
     def __unicode__(self):
-        return unicode("Submission of " + unicode(self.student))
-
-class SubmissionFile(models.Model):
-    submission = models.ForeignKey(Submission)
-    link = models.CharField(max_length=1000)
-    name = models.CharField(max_length=100)
-
-    def __unicode__(self):
-        return unicode(self.submission)
+        return unicode(unicode(self.student) + ", " + unicode(self.assignment))
 
 # Each Review is assigned to someone and has a score
 class Review(models.Model):
     submission = models.ForeignKey(Submission)
     assigned = models.ForeignKey(Student)
-    score = models.CharField(max_length=10)
-    details = models.CharField(default=None, max_length=1000)
+    score = models.CharField(max_length=10, null=True, blank=True)
+    details = models.CharField(default=None, max_length=1000, null=True, blank=True)
 
     def __unicode__(self):
-        return unicode("Review for " + unicode(self.submission.student) + " - " + unicode(self.pk))
+        return unicode(unicode(self.submission.student) + " - R" + unicode(self.pk) + ", " + unicode(self.submission.assignment))
 
 # Who can access the review other than the one who it was assigned to?
 class Permission(models.Model):
-    review = models.ForeignKey(Review)
-    student = models.ManyToManyField(Student)
+    student = models.ForeignKey(Student)
+    review = models.ManyToManyField(Review)
+
+    def __unicode__(self):
+        return unicode(unicode(self.student) + " Permissions ")
 
 class ReviewConvo(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     review = models.ForeignKey(Review)
     student = models.ForeignKey(Student)
-    text =  models.CharField(max_length=10000, null=True)
+    text =  models.CharField(max_length=10000, null=True, blank=True)
     score = models.CharField(max_length=10, null=True, blank=True)
 
     class Meta:
@@ -71,47 +67,13 @@ class ReviewConvo(models.Model):
 # Admin Views
 class AssignmentAdmin(admin.ModelAdmin):
     list_display = ('short_name', 'name', 'due_date')
-    actions = ['populate_submissions']
-
-    def populate_submissions(self, request, queryset):
-        files_count = 0
-        files_total = 0
-        submissions_count = 0
-
-        for assignment in queryset:
-            try:
-                g = Global.objects.get(key="submissions")
-                self.message_user(request, "Reading from %s." % g.value)
-                submission_str = urllib2.urlopen(g.value).read()
-                reader = csv.reader(submission_str.split('\n'), delimiter=',')
-                for row in reader:
-                    files_total = files_total + 1
-                    student = Student.objects.get(username=row[0])
-                    if student:
-                        submission = Submission.objects.get_or_create(student=student, assignment=assignment)
-                        if submission[1]:
-                            submissions_count += 1
-                        if SubmissionFile.objects.get_or_create(submission=submission[0], name=row[1], link=row[2])[1]:
-                            files_count += 1
-            except:
-                self.message_user(request, "Could not find submission file.")
-
-
-        self.message_user(request, "%s student submissions were added. %s of %s files were added." % (str(submissions_count), str(files_count), str(files_total)) )
-
-    populate_submissions.short_description = "Populate with Submissions"
 
 class AssignmentPageAdmin(admin.ModelAdmin):
     list_display = ('assignment', 'name', 'title')
 
-class SubmissionFileAdmin(admin.ModelAdmin):
-    list_display = ('submission', 'name', 'link')
-    search_fields = ('submission__student__lastname', 'submission__student__firstname', 'submission__student__username')
-
-
 class SubmissionAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'student', 'assignment')
-    search_fields = ('student__lastname', 'student__firstname', 'student__username', 'student__group_id')
+    list_display = ('pk', 'student', 'assignment', 'files')
+    search_fields = ('student__lastname', 'student__firstname', 'student__username')
     actions = ['assign_reviewers',  'assign_ta_review']
     list_filter = ('assignment__name',)
 
@@ -265,9 +227,9 @@ class ReviewAdmin(admin.ModelAdmin):
 
 
 class PermissionAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'review',)
-    list_filter = ('review__submission__student__username',)
-    filter_horizontal = ('student',)
+    list_display = ('pk', 'student',)
+    list_filter = ('review',)
+    filter_horizontal = ('review',)
 
 
 class ReviewConvoAdmin(admin.ModelAdmin):

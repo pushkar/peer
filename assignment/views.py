@@ -46,13 +46,15 @@ def page(request, a_name, p_name):
         return HttpResponseRedirect(reverse('student:index'))
 
     s = Student.objects.get(username=request.session['user'])
-    a = Assignment.objects.get(short_name=a_name)
+    a_all = Assignment.objects.all()
+    a = a_all.filter(short_name=a_name)
     ap = AssignmentPage.objects.filter(assignment=a)
     ap_this = ap.filter(name=p_name)
 
     return render(request, 'assignment_pageview.html', {
             'student': s,
-            'assignment': a,
+            'a': a,
+            'assignments': a_all,
             'ap': ap,
             'ap_this': ap_this,
             'a_name': a_name,
@@ -105,12 +107,17 @@ def home(request, a_name):
             review_pk = request.GET['review']
             extra_scripts = "load_div(\'"+ reverse('assignment:review', args=[a_name, review_pk]) +"\', \'#assignment_content\'); \n"
 
-    username = request.session['user']
+    s = Student.objects.get(username=request.session['user'])
+    a_all = Assignment.objects.all()
+    a = a_all.filter(short_name=a_name)
     ap = AssignmentPage.objects.filter(assignment__short_name=a_name)
 
     print extra_scripts
 
     return render(request, 'assignment_pagebase.html', {
+        'student': s,
+        'a': a,
+        'assignments': a_all,
         'ap': ap,
         'a_name': a_name,
         'extra_scripts': extra_scripts,
@@ -140,7 +147,7 @@ def review(request, a_name, id="1"):
         messages.info(request, 'You are not allowed to participate in this review.')
         return HttpResponseRedirect(reverse('assignment:home', args=[a_name]))
 
-    files = SubmissionFile.objects.filter(submission=review.submission)
+    files = json.loads(review.submission.files)
     convo = ReviewConvo.objects.filter(review=review)
 
     form = ReviewConvoForm()
@@ -157,6 +164,7 @@ def review(request, a_name, id="1"):
             'review': review,
             'files': files,
             'convo': convo,
+            'files': files,
             'a_name': a_name,
             'form': form,
         })
@@ -260,11 +268,14 @@ def review_menu(request, a_name):
 
     review_permissions = set()
     try:
-        permissions = Permission.objects.filter(student__username=username, review__submission__assignment__short_name=a_name).prefetch_related('review', 'review__submission__student')
+        permissions = Permission.objects.filter(student__username=username).prefetch_related('review') #, review__submission__assignment__short_name=a_name).prefetch_related('review', 'review__submission__student')
         for p in permissions:
-            review_permissions.add(get_review_details(p.review))
+            for r in p.review.all():
+                review_permissions.add(get_review_details(r))
     except:
         permissions = Permission.objects.none()
+
+    print review_permissions
 
     return render(request, 'assignment_reviewmenu.html', {
         'review_assigned': review_assigned,
@@ -394,6 +405,18 @@ def submit_reviewscore(request, a_name, review_id, value):
     try:
         review = Review.objects.get(pk=review_id)
         review.score = value
+        review.save()
+        messages.success(request, "Changed score to %s" % str(value))
+    except:
+        messages.warning(request, "Couldn't find the review. Something went wrong!")
+
+    return HttpResponseRedirect(reverse('assignment:review', args=[a_name, review_id]))
+
+def submit_add_reviewscore(request, a_name, review_id, value):
+    try:
+        review = Review.objects.get(pk=review_id)
+        score = int(review.score)
+        review.score = str(score + int(value))
         review.save()
         messages.success(request, "Changed score to %s" % str(value))
     except:

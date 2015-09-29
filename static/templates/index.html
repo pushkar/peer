@@ -18,21 +18,24 @@
 </ul>
 <p>Peer Review program</p>
 <ul>
-    <li>Your status in this program: <b>{{ opt }}</b></li>
-    <li><a href="{% url 'student:optin' %}">Change your status.</a> <br /><small>(If you change your status, it will be reflected when reviews are assigned for the next assignment)</small></li>
+    {% if opt == "opted out" %}
+    <li style="width:500px">The peer review program enables you to participate in peer reviewing your peers. On top of that it will also monitor other activies such as how many times you use the peer review system, how your reviews are perceived by your peers. </li>
+    <li style="width:500px">Participating in peer review will not directly affect your grade, but we will consider it as class participation. It will matter if you fall between grades.</li>
+    <li style="width:500px">By signing up, you agree to help your peers with evaluating their work.</li>
+    <li><a href="{% url 'student:optin' %}">Ok, sign me up.</a></li>
+    {% else %}
+    <li>You have {{opt}} in the peer review program.</li>
+    {% endif %}
 </ul>
+<small>If you have any questions regarding this, you should email Pushkar Kolhe (pushkar@cc.gatech.edu) or leave a message on Piazza.</small>
 {% endautoescape %}
 
 {% if student.usertype == "superta" %}
 <p>You are a Super TA. Respect!</p>
-<ul>
-    <li><a href="{% url 'student:group' student.group_id %}">See your Group</a></li>
-</ul>
+
 {% elif student.usertype == "ta" %}
 <p>You are a TA!</p>
-<ul>
-    <li><a href="{% url 'student:group' student.group_id %}">See your Group</a></li>
-</ul>
+
 {% endif %}
 
 {% elif form %}

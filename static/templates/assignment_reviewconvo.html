@@ -7,9 +7,9 @@
   <small>
       {{ c.student.firstname }}
       {% if c.student.usertype == "ta" %}
-      (TA)
+      (Archduke/TA)
       {% elif c.student.usertype == "superta" %}
-      (The Lord)
+      (Lord)
       {% endif %}
       <span class="pull-right"><!--Edit-->
       {% if usertype == "ta" or usertype == "superta" %}

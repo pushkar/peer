@@ -16,43 +16,32 @@
 <p>User: {{ student.username }}</p>
 <p>Email: {{ student.email }}</p>
 <p>Opted in Peer Review? {{ opt.value }}</p>
-<p>Submissions: {{ count.submission }}/{{ count.assignment }}</p>
-<p>Reviews Filled: {{ count.reviews_filled }}/{{ count.reviews_assigned }}</p>
 
 <h3>Assignments and Reviews</h3>
-<ul>
-{% for assignment, reviews in data.items %}
-    <li>
+<br />
+{% for student, data in reviews_data.items %}
+    {% for assignment, reviews in data.items %}
+    <ul>
         {{assignment}}
-        <ul>
-        {% for key, r in reviews.items %}
-            {% if key == "reviews" %}
-                <li>Reviews
-                    <ul>
-                        {% for i in r %}
-                            <li><a href="/assignment/{{assignment.short_name}}/?review={{i.pk}}">{{i}}</a></li>
-                        {% endfor %}
-                    </ul>
-                </li>
-            {% endif %}
+        {% for r in reviews %}
+            <li><a href="{% url 'assignment:home' assignment.short_name %}?review={{r.pk}}">
+            Review by {{r.assigned.firstname}} {{r.assigned.lastname}}</a></li>
         {% endfor %}
-        </ul>
-        <ul>
-        {% for key, r in reviews.items %}
-            {% if key == "reviews_assigned" %}
-                <li>Reviews Assigned
-                    <ul>
-                        {% for i in r %}
-                            <li><a href="/assignment/{{assignment.short_name}}/?review={{i.pk}}">{{i}}</a></li>
-                        {% endfor %}
-                    </ul>
-                </li>
-            {% endif %}
-        {% endfor %}
-        </ul>
-    </li>
+    </ul>
+    {% endfor %}
 {% endfor %}
-</ul>
+
+{% for student, data in assigned_data.items %}
+    {% for assignment, reviews in data.items %}
+    <ul>
+        {{assignment}}
+        {% for r in reviews %}
+            <li><a href="{% url 'assignment:home' assignment.short_name %}?review={{r.pk}}">
+            Review for {{r.submission.student.firstname}} {{r.submission.student.lastname}}</a></li>
+        {% endfor %}
+    </ul>
+    {% endfor %}
+{% endfor %}
 
 
 {% endblock %}

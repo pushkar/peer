@@ -1,8 +1,8 @@
 <h4>Review {{ review.pk }}</h4>
 <h4>{{ review.0.submission }}</h4>
 <ul>
-    {% for f in files %}
-    <li><a href="{{ f.link }}">{{ f.name }}</a></li>
+    {% for f_link, f_name in files.items %}
+    <li><a href="{{ f_link }}">{{ f_name }}</a></li>
     {% empty %}
     <li>No files.</li>
     {% endfor %}
@@ -10,22 +10,38 @@
 
 <br />
 <h4>Score:</h4>
-<p>The reviewer has assigned a score of <b>{{ review.score }}</b>. <br /><small>(Scores are between 1 (bad) - 5 (good). It does not reflect your final score. That will be decided by your TA independent of these reviews.)</small></p>
+<p>The reviewer has assigned a score of <b>{{ review.score }}</b>. <br />
 <small>
-<ul>
-    <li>Score is 1: If the report is incomplete.</li>
-    <li>Score is 2: If the report is complete, but the graphs are not properly labelled and the analysis is incomplete or missing.</li>
-    <li>Score is 3: If the report has all experiments and is complete. However the report does not contain analysis: explanation of the results and graphs is missing.</li>
-    <li>Score is 4: If the report has all experiments and contains analysis of all the results and graphs.</li>
-    <li>Score is 5: If the report shows shows an original or new method of analysis the data. Or if the report helped you learn something that you could use in your own assignment.</li>
-</ul>
+    <ul>
+        <li>Score is 1: If the report is incomplete.</li>
+        <li>Score is 2: If the report is complete, but the graphs are not properly labelled and the analysis is incomplete or missing.</li>
+        <li>Score is 3: If the report has all experiments and is complete. However the report does not contain analysis: explanation of the results and graphs is missing.</li>
+        <li>Score is 4: If the report has all experiments and contains analysis of all the results and graphs.</li>
+        <li>Score is 5: If the report shows shows an original or new method of analysis the data. Or if the report helped you learn something that you could use in your own assignment.</li>
+    </ul>
 </small>
+
 {% if allow_to_score %}
-<p>Change score to: <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "1" %}" data-ajax="true" data-success="load_content">1 (bad)</a>,
-                    <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "2" %}" data-ajax="true" data-success="load_content">2</a>,
-                    <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "3" %}" data-ajax="true" data-success="load_content">3</a>,
-                    <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "4" %}" data-ajax="true" data-success="load_content">4</a> or
-                    <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "5" %}" data-ajax="true" data-success="load_content">5 (good)</a>.</p>
+{% if usertype == "ta" or usertype == "superta" %}
+<p>Change score by:
+    <a href="{% url 'assignment:submit_add_reviewscore' a_name review.pk "-10" %}" data-ajax="true" data-success="load_content">-10</a>,
+    <a href="{% url 'assignment:submit_add_reviewscore' a_name review.pk "-5" %}" data-ajax="true" data-success="load_content">-5</a>,
+    <a href="{% url 'assignment:submit_add_reviewscore' a_name review.pk "-2" %}" data-ajax="true" data-success="load_content">-2</a>,
+    <a href="{% url 'assignment:submit_add_reviewscore' a_name review.pk "-1" %}" data-ajax="true" data-success="load_content">-1</a> or
+    <a href="{% url 'assignment:submit_add_reviewscore' a_name review.pk "1" %}" data-ajax="true" data-success="load_content">+1</a>,
+    <a href="{% url 'assignment:submit_add_reviewscore' a_name review.pk "2" %}" data-ajax="true" data-success="load_content">+2</a>,
+    <a href="{% url 'assignment:submit_add_reviewscore' a_name review.pk "5" %}" data-ajax="true" data-success="load_content">+5</a>,
+    <a href="{% url 'assignment:submit_add_reviewscore' a_name review.pk "10" %}" data-ajax="true" data-success="load_content">+10</a>,
+    <a href="{% url 'assignment:submit_add_reviewscore' a_name review.pk "20" %}" data-ajax="true" data-success="load_content">+20</a>,
+    </p>
+{% else %}
+<p>Change score to:
+    <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "1" %}" data-ajax="true" data-success="load_content">1 (bad)</a>,
+    <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "2" %}" data-ajax="true" data-success="load_content">2</a>,
+    <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "3" %}" data-ajax="true" data-success="load_content">3</a>,
+    <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "4" %}" data-ajax="true" data-success="load_content">4</a> or
+    <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "5" %}" data-ajax="true" data-success="load_content">5 (good)</a>.</p>
+{% endif %}
 {% endif %}
 <br />
 {% load mathjax %}
@@ -68,6 +84,7 @@
     </div>
   </div>
 </div>
+
 
 <script type="text/javascript">
     (function(window,undefined){

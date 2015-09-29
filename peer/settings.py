@@ -33,8 +33,8 @@ INSTALLED_APPS = (
     'django_ajax',
     'django_mathjax',
     'student',
-    'recommender',
     'assignment',
+    'api',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -69,8 +69,8 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
         "NAME": "peerspring2015",
-        "USER": "",
-        "PASSWORD": "",
+        "USER": "postgres",
+        "PASSWORD": "pushkar",
         "HOST": "localhost",
         "PORT": "",
     }

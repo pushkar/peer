@@ -9,8 +9,8 @@ urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'student.views.index', name='index'),
     url(r'^student/', include('student.urls', namespace="student")),
-    url(r'^recommender/', include('recommender.urls', namespace="recommender")),
     url(r'^assignment/', include('assignment.urls', namespace="assignment")),
+    url(r'^api/', include('api.urls', namespace="api")),
     url(r'^admin/', include(admin.site.urls)),
 )
 

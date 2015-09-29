@@ -8,8 +8,8 @@ from django_ajax.decorators import ajax
 
 from student.models import *
 from student.log import *
-#import recommender.models as re
 from assignment.models import *
+from reviews_info import *
 
 import StringIO
 import csv
@@ -53,12 +53,14 @@ def messages_all(request):
 def index(request):
     if check_session(request):
         s = Student.objects.get(username=request.session['user'])
+        assignments = Assignment.objects.all()
         opt = OptIn.objects.get_or_create(student=s)
-        opt_str = "Opted out"
+        opt_str = "opted out"
         if opt[0].value == True:
-            opt_str = "Opted in"
+            opt_str = "opted in"
         return render(request, 'index.html', {
             'student': s,
+            'assignments': assignments,
             'opt': opt_str,
         })
     else:
@@ -147,40 +149,22 @@ def profile(request):
 
     try:
         s = Student.objects.get(username=request.session['user'])
+        assignments = Assignment.objects.all()
         opt = OptIn.objects.get(student=s)
 
-        data = {}
-
-        assignment_count = Assignment.objects.all().count()
-        submission_count = Submission.objects.filter(student=s).count()
-        reviews_assigned = Review.objects.filter(assigned=s)
-        reviews_filled_count = 0
-        for r in reviews_assigned:
-            convo = ReviewConvo.objects.filter(review=r, student=s)
-            if len(convo) > 0:
-                reviews_filled_count += 1
-        reviews_assigned_count = len(reviews_assigned)
-        count = {}
-        count['assignment'] = assignment_count
-        count['submission'] = submission_count
-        count['reviews_assigned'] = reviews_assigned_count
-        count['reviews_filled'] = reviews_filled_count
-
-        for a in Assignment.objects.all():
-            submission = Submission.objects.filter(student=s, assignment=a)
-            if len(submission) > 0:
-                reviews = Review.objects.filter(submission=submission)
-                reviews_assigned = Review.objects.filter(submission__assignment=a, assigned=s)
-                data_a = {}
-                data_a['reviews'] = reviews
-                data_a['reviews_assigned'] = reviews_assigned
-                data[a] = data_a
+        review_info = reviews_info()
+        review_info.get_all_reviews()
+        reviews = review_info.filter_by_student(s)
+        reviews_data = review_info.get_data(reviews)
+        assigned = review_info.filter_by_assigned(s)
+        assigned_data = review_info.get_data(assigned)
 
         return render(request, 'profile.html', {
             'student': s,
+            'assignments': assignments,
+            'reviews_data': reviews_data,
+            'assigned_data': assigned_data,
             'opt': opt,
-            'data': data,
-            'count': count,
         })
 
     except Exception as e:
@@ -195,6 +179,7 @@ def updates(request):
 
     try:
         s = Student.objects.get(username=request.session['user'])
+        assignments = Assignment.objects.all()
 
         data = {}
         reviews = Review.objects.filter(submission__student=s)
@@ -211,6 +196,7 @@ def updates(request):
 
         return render(request, 'updates.html', {
             'student': s,
+            'assignments': assignments,
             'data': data,
         })
 
@@ -262,11 +248,10 @@ def populate(request):
         total_count = 0
         added_count = 0
         for row in reader:
-            if len(row) == 7:
+            if len(row) == 6:
                 total_count += 1
                 s = Student.objects.get_or_create(username=row[0], email=row[1],
-                    gtid=row[2], usertype=row[3], lastname=row[4], firstname=row[5],
-                    group_id=row[6])
+                    gtid=row[2], usertype=row[3], lastname=row[4], firstname=row[5])
                 if s[1]:
                     added_count += 1
 
@@ -285,3 +270,24 @@ def group(request, group_id="1"):
         'student': s,
         'student_group': s_g,
     })
+
+@login_required
+def admin_review_assignments(request):
+    if not check_session(request):
+        return HttpResponseRedirect(reverse('student:index'))
+
+    try:
+        s = Student.objects.get(username=request.session['user'])
+        review_info = reviews_info()
+        review_info.get_all_reviews()
+        reviews_data = review_info.get_data()
+        return render(request, 'admin_review_assignments.html', {
+            'student': s,
+            'reviews_data': reviews_data,
+        })
+
+    except Exception as e:
+        print e
+        messages.warning(request, "Something went wrong.")
+
+    return HttpResponseRedirect(reverse('student:index'))
