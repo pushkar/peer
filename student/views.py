@@ -9,7 +9,7 @@ from django_ajax.decorators import ajax
 from student.models import *
 from student.log import *
 from assignment.models import *
-from reviews_info import *
+from assignment.reviews_info import *
 
 import StringIO
 import csv

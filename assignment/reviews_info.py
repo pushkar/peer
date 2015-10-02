@@ -36,3 +36,42 @@ class reviews_info():
             data[r.submission.student][r.submission.assignment].append(r)
 
         return data
+
+class review_convo_info():
+    review = None
+
+    def __init__(self):
+        pass
+
+    def get_review_by_pk(self, pk):
+        self.review = ReviewConvo.objects.get(pk=pk)
+
+    def get_by_submission_and_assigned(self, submission, student):
+        self.review = ReviewConvo.objects.get(submission=submission, assigned=student)
+
+    def add_like(self, s):
+        details = self.review.details
+        if not details.has_key('likes'):
+            details['likes'] = []
+        details['likes'].append(s)
+        self.review.details = details
+        self.review.save()
+
+    def remove_like(self, s):
+        self.review.details['likes'].remove(s)
+        self.review.save()
+
+    def get_total_likes(self):
+        return self.review.details['likes'].count()
+
+    def has_liked(self, s):
+        if s in self.review.details['likes']:
+            return True
+        return False
+
+    def change_score(self, score):
+        self.review.score = score
+        self.review.save()
+
+    def get_score(self):
+        return self.review.score

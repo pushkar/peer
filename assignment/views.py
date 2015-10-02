@@ -12,6 +12,9 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.core.urlresolvers import reverse
 from django_ajax.decorators import ajax
 
+from reviews_info import *
+from submission_info import *
+
 import re
 import numpy as np
 import csv
@@ -59,6 +62,27 @@ def page(request, a_name, p_name):
             'ap_this': ap_this,
             'a_name': a_name,
         })
+
+def find_reviewers(request, a_name, submission_id):
+    if not check_session(request):
+        return HttpResponseRedirect(reverse('student:index'))
+
+    s = Student.objects.get(username=request.session['user'])
+
+    sub_info = submission_info()
+    submission = sub_info.get_by_id(submission_id)
+
+    if s != submission.student:
+        messages.error(request, "You are not allowed to request reviewers")
+        return HttpResponseRedirect(reverse('assignment:home', args=[a_name]))
+
+
+    if sub_info.assign_reviewers(submission) == True:
+        messages.success(request, sub_info.get_message())
+    else:
+        messages.warning(request, sub_info.get_message())
+
+    return HttpResponseRedirect(reverse('assignment:home', args=[a_name]))
 
 
 @ajax
@@ -112,6 +136,10 @@ def home(request, a_name):
     a = a_all.filter(short_name=a_name)
     ap = AssignmentPage.objects.filter(assignment__short_name=a_name)
 
+    sub_info = submission_info()
+    submission = sub_info.get_by_student_and_assignment(s, a)
+    submission.files = sub_info.get_files(submission)
+
     print extra_scripts
 
     return render(request, 'assignment_pagebase.html', {
@@ -120,6 +148,7 @@ def home(request, a_name):
         'assignments': a_all,
         'ap': ap,
         'a_name': a_name,
+        'submission': submission,
         'extra_scripts': extra_scripts,
     })
 
@@ -274,8 +303,6 @@ def review_menu(request, a_name):
                 review_permissions.add(get_review_details(r))
     except:
         permissions = Permission.objects.none()
-
-    print review_permissions
 
     return render(request, 'assignment_reviewmenu.html', {
         'review_assigned': review_assigned,

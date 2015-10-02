@@ -14,6 +14,8 @@ urlpatterns = patterns('',
     url(r'^(?P<a_name>\w+)/submission/add$', views.submission_add, name='submission_add'),
     url(r'^(?P<a_name>\w+)/submission/(?P<id>[0-9]+)/delete$', views.submission_delete, name='submission_delete'),
 
+    url(r'^(?P<a_name>\w+)/(?P<submission_id>[0-9]+)/find_reviewers$', views.find_reviewers, name='find_reviewers'),
+
     url(r'^(?P<a_name>\w+)/review/(?P<id>[0-9]+)$', views.review, name='review'),
     url(r'^(?P<a_name>\w+)/reviewconvo/(?P<id>[0-9]+)$', views.review_convo, name='review_convo'),
     url(r'^(?P<a_name>\w+)/reviewmenu/1$', views.review_menu, name='review_menu'),

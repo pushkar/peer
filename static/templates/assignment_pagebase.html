@@ -34,7 +34,15 @@
         <h2>{{ ap.0.assignment.name }}</h2>
         <div id="assignment_content">
             <h4>Home</h4>
-
+            <br />
+            <h4>Submission</h4>
+            <p>{{submission}}</p>
+            <ul>
+            {% for f_link, f_name in submission.files.items %}
+              <li><a href="{{f_link}}">{{f_name}}</a></li>
+            {% endfor %}
+            </ul>
+            <a class="btn btn-info" role="button" href="{% url 'assignment:find_reviewers' a_name submission.pk %}">Find Reviewers</a>
         </div>
     </div>
 </div>

@@ -58,6 +58,7 @@ class ReviewConvo(models.Model):
     student = models.ForeignKey(Student)
     text =  models.CharField(max_length=10000, null=True, blank=True)
     score = models.CharField(max_length=10, null=True, blank=True)
+    details = models.CharField(default=None, max_length=1000, null=True, blank=True)
 
     class Meta:
         ordering = ['created']

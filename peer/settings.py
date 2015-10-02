@@ -69,8 +69,8 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
         "NAME": "peerspring2015",
-        "USER": "postgres",
-        "PASSWORD": "pushkar",
+        "USER": "",
+        "PASSWORD": "",
         "HOST": "localhost",
         "PORT": "",
     }
