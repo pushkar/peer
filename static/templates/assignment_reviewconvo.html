@@ -12,8 +12,7 @@
       (Lord)
       {% endif %}
       <span class="pull-right"><!--Edit-->
-        (Status: {{c.details.has_liked}})
-        {% if c.details.has_liked == "False" %}
+        {% if c.details.has_liked|stringformat:"s" == "False" %}
         <a href="{% url 'assignment:reviewconvo_addlike' a_name c.id %}" data-ajax="true" data-method="post" data-success="load_review_convo">Like</a>
         {% else %}
         <a href="{% url 'assignment:reviewconvo_removelike' a_name c.id %}" data-ajax="true" data-method="post" data-success="load_review_convo">Unlike</a>

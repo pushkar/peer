@@ -94,7 +94,7 @@ class review_convo_info():
         details = json.loads(self.review.details)
         info = {}
         info['total_likes'] = len(details['likes'])
-        if s in details['likes']:
+        if s.username in details['likes']:
             info['has_liked'] = True
         else:
             info['has_liked'] = False
