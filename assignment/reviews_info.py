@@ -1,5 +1,6 @@
 from student.models import *
 from assignment.models import *
+import json
 
 class reviews_info():
     reviews = None
@@ -43,31 +44,61 @@ class review_convo_info():
     def __init__(self):
         pass
 
-    def get_review_by_pk(self, pk):
-        self.review = ReviewConvo.objects.get(pk=pk)
+    def set_convo(self, convo):
+        self.review = convo
+
+    def get_convo_by_id(self, id):
+        self.review = ReviewConvo.objects.get(pk=id)
 
     def get_by_submission_and_assigned(self, submission, student):
         self.review = ReviewConvo.objects.get(submission=submission, assigned=student)
 
+    def check_details(self):
+        if self.review.details == None or self.review.details == "":
+            details = {}
+            details['likes'] = list()
+            self.review.details = json.dumps(details)
+            self.review.save()
+            return True
+        return False
+
     def add_like(self, s):
-        details = self.review.details
-        if not details.has_key('likes'):
-            details['likes'] = []
-        details['likes'].append(s)
-        self.review.details = details
+        self.check_details()
+        details = json.loads(self.review.details)
+        if s.username not in details['likes']:
+            details['likes'].append(s.username)
+        self.review.details = json.dumps(details)
         self.review.save()
 
     def remove_like(self, s):
-        self.review.details['likes'].remove(s)
+        self.check_details()
+        details = json.loads(self.review.details)
+        details['likes'].remove(s.username)
+        self.review.details = json.dumps(details)
         self.review.save()
 
     def get_total_likes(self):
-        return self.review.details['likes'].count()
+        self.check_details()
+        details = json.loads(self.review.details)
+        return len(details['likes'])
 
     def has_liked(self, s):
-        if s in self.review.details['likes']:
-            return True
-        return False
+        self.check_details()
+        details = json.loads(self.review.details)
+        if s.username in details['likes']:
+            return "True"
+        return "False"
+
+    def get_likes_info(self, s):
+        self.check_details()
+        details = json.loads(self.review.details)
+        info = {}
+        info['total_likes'] = len(details['likes'])
+        if s in details['likes']:
+            info['has_liked'] = True
+        else:
+            info['has_liked'] = False
+        return info
 
     def change_score(self, score):
         self.review.score = score

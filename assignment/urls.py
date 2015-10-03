@@ -18,6 +18,8 @@ urlpatterns = patterns('',
 
     url(r'^(?P<a_name>\w+)/review/(?P<id>[0-9]+)$', views.review, name='review'),
     url(r'^(?P<a_name>\w+)/reviewconvo/(?P<id>[0-9]+)$', views.review_convo, name='review_convo'),
+    url(r'^(?P<a_name>\w+)/reviewconvo_addlike/(?P<review_id>[0-9]+)$', views.reviewconvo_addlike, name='reviewconvo_addlike'),
+    url(r'^(?P<a_name>\w+)/reviewconvo_removelike/(?P<review_id>[0-9]+)$', views.reviewconvo_removelike, name='reviewconvo_removelike'),
     url(r'^(?P<a_name>\w+)/reviewmenu/1$', views.review_menu, name='review_menu'),
 
 

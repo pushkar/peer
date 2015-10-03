@@ -205,6 +205,8 @@ def review_convo(request, a_name, id="1"):
 
     username = request.session["user"]
     usertype = request.session["usertype"]
+    s = Student.objects.get(username=request.session['user'])
+
     review = Review.objects.get(pk=id)
 
     allowed = False
@@ -213,7 +215,7 @@ def review_convo(request, a_name, id="1"):
 
     if not allowed:
         try:
-            permissions = Permission.objects.get(review=review, student__username=username)
+            permissions = Permission.objects.get(review=review, student=s)
             allowed = True
         except:
             allowed = False
@@ -223,6 +225,11 @@ def review_convo(request, a_name, id="1"):
         return HttpResponseRedirect(reverse('assignment:home', args=[a_name]))
 
     convo = ReviewConvo.objects.filter(review=review)
+    convo_info = {}
+    for c in convo:
+        c_info = review_convo_info()
+        c_info.set_convo(c)
+        c.details = c_info.get_likes_info(s)
 
     form = ReviewConvoForm()
 
@@ -310,6 +317,26 @@ def review_menu(request, a_name):
         'review_permissions': review_permissions,
         'a_name': a_name,
     })
+
+@ajax
+def reviewconvo_addlike(request, a_name, review_id):
+    if not check_session(request):
+        return HttpResponseRedirect(reverse('student:index'))
+
+    s = Student.objects.get(username=request.session["user"])
+    convo_info = review_convo_info()
+    convo_info.get_convo_by_id(review_id)
+    convo_info.add_like(s)
+
+@ajax
+def reviewconvo_removelike(request, a_name, review_id):
+    if not check_session(request):
+        return HttpResponseRedirect(reverse('student:index'))
+
+    s = Student.objects.get(username=request.session["user"])
+    convo_info = review_convo_info()
+    convo_info.get_convo_by_id(review_id)
+    convo_info.remove_like(s)
 
 @ajax
 def review_debug(request, a_name):
