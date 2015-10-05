@@ -131,10 +131,7 @@ def optin(request):
     try:
         print s
         opt = OptIn.objects.get(student=s)
-        if opt.value == True:
-            opt.value = False
-        else:
-            opt.value = True
+        opt.value = True
         opt.save()
         messages.success(request, "Your status was changed in the peer review program..")
     except Exception as e:

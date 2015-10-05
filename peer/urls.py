@@ -11,6 +11,7 @@ urlpatterns = patterns('',
     url(r'^student/', include('student.urls', namespace="student")),
     url(r'^assignment/', include('assignment.urls', namespace="assignment")),
     url(r'^api/', include('api.urls', namespace="api")),
+    url(r'^record/', include('record.urls', namespace="record")),
     url(r'^admin/', include(admin.site.urls)),
 )
 
