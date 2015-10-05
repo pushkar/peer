@@ -35,6 +35,7 @@
         <div id="assignment_content">
             <h4>Home</h4>
             <br />
+            {% if submission %}
             <h4>Submission</h4>
             <p>{{submission}}</p>
             <ul>
@@ -43,6 +44,7 @@
             {% endfor %}
             </ul>
             <a class="btn btn-info" role="button" href="{% url 'assignment:find_reviewers' a_name submission.pk %}">Find Reviewers</a>
+            {% endif %}
         </div>
     </div>
 </div>

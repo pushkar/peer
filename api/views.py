@@ -33,6 +33,18 @@ def get_assignment(response, short_name):
 
     return assignment
 
+def get_submission(response, student, assignment):
+    try:
+        submission = Submission.objects.get(student=student, assignment=assignment)
+    except Submission.DoesNotExist:
+        if student == None:
+            response['message'] = "Student does not exist"
+        else:
+            response['message'] += "Submission does not exist for " + student.username
+        submission = None
+
+    return submission
+
 def index(request):
     response = {}
     if request.method == 'GET':
@@ -124,5 +136,27 @@ def add_submission(request):
                     response['message'] = 'Updated submission for ' + username
             else:
                 response['message'] += ". Adding this submission failed"
+
+    return JsonResponse(response)
+
+def add_review(request):
+    response = {}
+    response['message'] = ""
+    if request.method == "GET":
+        check_key(response, request.GET.get('apikey', ''))
+        if not response['error']:
+            assignment_short_name = request.GET.get('assignment_short_name', '')
+            submission_username = request.GET.get('submission_username', '')
+            assigned_to_username = request.GET.get('assigned_to_username', '')
+            assignment = get_assignment(response, assignment_short_name)
+            student = get_student(response, submission_username)
+            assigned_to = get_student(response, assigned_to_username)
+            submission = get_submission(response, student, assignment)
+            if submission and assigned_to:
+                r, created = Review.objects.get_or_create(submission=submission, assigned=assigned_to)
+                if created == True:
+                    response['message'] = "Created review for " + student.username
+                else:
+                    response['message'] = "Review already assigned for " + submission_username
 
     return JsonResponse(response)

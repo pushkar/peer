@@ -22,7 +22,10 @@ class submission_info():
         return self.submissions
 
     def get_by_student_and_assignment(self, s, a):
-        self.submissions = Submission.objects.get(student=s, assignment=a)
+        try:
+            self.submissions = Submission.objects.get(student=s, assignment=a)
+        except Submission.DoesNotExist:
+            self.submissions = None
         return self.submissions
 
     def get_by_id(self, id):
@@ -45,8 +48,8 @@ class submission_info():
         if submission == None:
             return False
 
-        #optin_reviewers = OptIn.objects.filter(value=True, student__usertype='student').select_related('student')
-        optin_reviewers = OptIn.objects.filter(value=True).select_related('student')
+        optin_reviewers = OptIn.objects.filter(value=True, student__usertype='student').select_related('student')
+        #optin_reviewers = OptIn.objects.filter(value=True).select_related('student')
 
         ## All reviewers who have opted in
         reviewers_all = set()
@@ -88,11 +91,7 @@ class submission_info():
         ## Find 3 random reviewers
         reviewer_count = 0
         reviewers_3 = set()
-        if len(reviewers_all) == 0:
-            self.message = "Not enough reviewers to match you. Try again later."
-            return False
-        elif len(reviewers_all) < 3:
-            reviewers_3 = random.sample(reviewers_al, len(reviewers))
+        if len(reviewers_all) < 20:
             self.message = "Not enough reviewers to match you. Try again later to find more reviewers."
             return False
         else:

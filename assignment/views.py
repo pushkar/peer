@@ -138,7 +138,8 @@ def home(request, a_name):
 
     sub_info = submission_info()
     submission = sub_info.get_by_student_and_assignment(s, a)
-    submission.files = sub_info.get_files(submission)
+    if submission:
+        submission.files = sub_info.get_files(submission)
 
     print extra_scripts
 
@@ -163,6 +164,9 @@ def review(request, a_name, id="1"):
 
     allowed = False
     if review.submission.student.username == username or review.assigned.username == username:
+        allowed = True
+
+    if usertype == "superta":
         allowed = True
 
     if not allowed:
@@ -211,6 +215,9 @@ def review_convo(request, a_name, id="1"):
 
     allowed = False
     if review.submission.student.username == username or review.assigned.username == username:
+        allowed = True
+
+    if s.usertype == "superta":
         allowed = True
 
     if not allowed:
@@ -469,10 +476,12 @@ def submit_reviewscore(request, a_name, review_id, value):
 def submit_add_reviewscore(request, a_name, review_id, value):
     try:
         review = Review.objects.get(pk=review_id)
+        if review.score == None or review.score == "":
+            review.score = "0"
         score = int(review.score)
         review.score = str(score + int(value))
         review.save()
-        messages.success(request, "Changed score to %s" % str(value))
+        messages.success(request, "Changed score to %s" % str(review.score))
     except:
         messages.warning(request, "Couldn't find the review. Something went wrong!")
 

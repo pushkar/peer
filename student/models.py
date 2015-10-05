@@ -22,6 +22,9 @@ class Student(models.Model):
     lastname = models.CharField(max_length=50)
     firstname = models.CharField(max_length=50)
 
+    class Meta:
+        ordering = ['lastname']
+
     def __unicode__(self):
         return unicode(self.lastname + ", " + self.firstname + " (" + self.username + ")")
 
