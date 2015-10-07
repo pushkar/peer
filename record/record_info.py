@@ -10,7 +10,10 @@ class record_info():
         self.student = student
 
     def get_record(self):
-        self.record = Record.objects.get(student=self.student)
+        try:
+            self.record = Record.objects.get(student=self.student)
+        except Record.DoesNotExist:
+            self.add_empty_record()
         return self.record
 
     def add_empty_record(self):
@@ -22,25 +25,36 @@ class record_info():
         record.student = self.student
         record.details = json.dumps(details)
         record.save()
+        self.get_record()
         return True
 
     def get_details(self):
+        topics = Topic.objects.all()
         if self.record.details == None or self.record.details == "":
             details = {}
             self.record.details = json.dumps(details)
             self.record.save()
-        return json.loads(self.record.details)
+        data = {}
+        details = json.loads(self.record.details)
 
-    def add_details(self, topic_name, topic_detail):
-        details = get_details()
-        details['topic_name'] = topic_detail
+        for t in topics:
+            if not details.has_key(unicode(t.pk)):
+                data[t.name] = ""
+            else:
+                data[t.name] = details[unicode(t.pk)]
+        return data
+
+    def add_details(self, topic_pk, topic_detail):
+        self.get_record()
+        details = json.loads(self.record.details)
+        details[topic_pk] = topic_detail
         self.record.details = json.dumps(details)
         self.record.save()
 
-    def get_topic_details(self, topic_name):
-        details = get_details()
-        if details.has_key(topic_name):
-            return details[topic_name]
+    def get_topic_details(self, topic_pk):
+        details = self.get_details()
+        if details.has_key(topic_pk):
+            return details[topic_pk]
         return ""
 
 

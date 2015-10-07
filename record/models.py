@@ -18,10 +18,10 @@ class Topic(models.Model):
     details = models.CharField(max_length=1000)
 
     class Meta:
-        ordering = ['order']
+        ordering = ['-order']
 
 class RecordAdmin(admin.ModelAdmin):
     list_display = ('student', 'details')
 
 class TopicAdmin(admin.ModelAdmin):
-    list_display = ('order', 'name', 'details')
+    list_display = ('pk', 'order', 'name', 'details')

@@ -11,8 +11,10 @@ from record.record_info import *
 from student.views import *
 
 def index(request):
-    if check_session(request):
-        s = Student.objects.get(username=request.session['user'])
+    if not check_session(request):
+            return HttpResponseRedirect(reverse('student:index'))
+
+    s = Student.objects.get(username=request.session['user'])
     record = record_info(s)
     record.get_record()
     record.details = record.get_details()
@@ -22,19 +24,27 @@ def index(request):
     })
 
 def form(request):
-    if check_session(request):
-        s = Student.objects.get(username=request.session['user'])
+    if not check_session(request):
+        return HttpResponseRedirect(reverse('student:index'))
+
+    s = Student.objects.get(username=request.session['user'])
+
     record = record_info(s)
     record.get_record()
+    record.add_details(1, "Yes")
+
     record.details = record.get_details()
+
     return render(request, 'record_form.html', {
         'student': s,
         'record': record,
     })
 
 def add(request):
-    if check_session(request):
-        s = Student.objects.get(username=request.session['user'])
+    if not check_session(request):
+        return HttpResponseRedirect(reverse('student:index'))
+
+    s = Student.objects.get(username=request.session['user'])
     record = record_info(s)
     record.add_empty_record()
     return HttpResponseRedirect(reverse('record:index'))
