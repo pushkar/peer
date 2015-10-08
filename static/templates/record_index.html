@@ -1,0 +1,8 @@
+<h2>Record</h2>
+{{record.student}}
+<br />
+<ul>
+    {% for key, item in record.details.items %}
+    <li>{{key}}: {{item}}</li>
+    {% endfor %}
+</ul>

@@ -69,7 +69,7 @@ GANALYTICS_TRACKING_CODE = 'UA-59742834-1'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": "peerspring2015",
+        "NAME": "peerfall2015",
         "USER": "",
         "PASSWORD": "",
         "HOST": "localhost",
@@ -94,9 +94,7 @@ USE_L10N = True
 USE_TZ = True
 
 import dj_database_url
-import os
-if os.getcwd() == "/app":
-    DATABASES = {'default': dj_database_url.config(default='postgres://localhost')}
+DATABASES['default'] = dj_database_url.config(default=os.environ["HEROKU_POSTGRESQL_BROWN_URL"])
 
 
 # Static asset configuration
