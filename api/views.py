@@ -160,3 +160,38 @@ def add_review(request):
                     response['message'] = "Review already assigned for " + submission_username
 
     return JsonResponse(response)
+
+
+def update_review(request):
+    response = {}
+    response['message'] = ""
+    if request.method == "GET":
+        check_key(response, request.GET.get('apikey', ''))
+        if not response['error']:
+            assignment_short_name = request.GET.get('assignment_short_name', '')
+            submission_username = request.GET.get('submission_username', '')
+            assigned_to_username = request.GET.get('assigned_to_username', '')
+            score = request.GET.get('score', 0)
+            comments = request.GET.get('comments', '')
+            assignment = get_assignment(response, assignment_short_name)
+            student = get_student(response, submission_username)
+            assigned_to = get_student(response, assigned_to_username)
+            submission = get_submission(response, student, assignment)
+            if submission and assigned_to:
+                r = Review.objects.get(submission=submission, assigned=assigned_to)
+                if r:
+                    r.score = score
+                    r.save()
+                    if len(comments) > 0:
+                        rc = ReviewConvo()
+                        rc.review = r
+                        rc.student = assigned_to
+                        rc.text = comments
+                        rc.save()
+                    response['message'] = "Created review for " + student.username
+                    response['message'] += ". Assigned score of " + str(score)
+                else:
+                    response['message'] = "Failed to find review for " + submission_username
+
+
+    return JsonResponse(response)
