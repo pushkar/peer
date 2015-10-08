@@ -49,8 +49,6 @@ class submission_info():
             return False
 
         optin_reviewers = OptIn.objects.filter(value=True, student__usertype='student').select_related('student')
-        #optin_reviewers = OptIn.objects.filter(value=True).select_related('student')
-
         ## All reviewers who have opted in
         reviewers_all = set()
         for optins in optin_reviewers:
@@ -60,12 +58,12 @@ class submission_info():
         ## Check if they have opted in
         if submission.student not in reviewers_all:
             reviewers_all.discard(submission.student)
-            self.message += str(submission.student.username) + " not opted in the peer review program yet"
+            self.message += "You have not opted in the peer review program yet."
             return False
 
         ## Skip if 3 reviewers have been assigned
         if Review.objects.filter(submission=submission).count() >= 3:
-            self.message += str(submission.student.username) + " has already been assigned."
+            self.message += "You have already been assigned 3 reviewers."
             return False
 
         ## Remove the current submission student from reviewers set
@@ -101,5 +99,61 @@ class submission_info():
             if Review.objects.get_or_create(submission=submission, assigned=r, score="0", details="")[1]:
                 reviewer_count += 1
 
-        self.message = "Assigned " + str(reviewer_count) + " reviewers"
+        self.message = "Assigned " + str(reviewer_count) + " reviewers."
+        return True
+
+    def assign_submissions(self, assignment, student=None):
+        if student == None:
+            return False
+
+        if Review.objects.filter(submission__assignment=assignment, assigned=student).count() >= 3:
+            self.message += "You have already been assigned 3 submissions to review."
+            return False
+
+        optin_reviewers = OptIn.objects.filter(value=True, student__usertype='student').select_related('student')
+        optins = set()
+        for opt in optin_reviewers:
+            optins.add(opt.student)
+
+        if student not in optins:
+            self.message += "You not opted in the peer review program yet."
+            return False
+
+        ## All submissions
+        student_has_submitted = False
+        submissions_all = set()
+        for s in self.submissions:
+            submissions_all.add(s)
+            if s.student == student:
+                student_has_submitted = True
+
+        if not student_has_submitted:
+            self.message += "You need to submit an assignment to review others."
+            return False
+
+        submissions_discard = set()
+        for s in submissions_all:
+            # Remove the student's submission
+            if s.student == student:
+                submissions_discard.add(s)
+
+            # Remove if 3 reviews are assigned
+            if Review.objects.filter(submission=s).count() >= 3:
+                submissions_discard.add(s)
+
+            if s.student not in optins:
+                submissions_discard.add(s)
+        submissions_all -= submissions_discard
+
+        reviews_assigned = 0
+        if len(submissions_all) < 3:
+            self.message += "Not enough submissions to review."
+            return False
+        else:
+            submissions_3 = random.sample(submissions_all, 3)
+            for s in submissions_3:
+                if Review.objects.get_or_create(submission=s, assigned=student, score="0", details="")[1]:
+                    reviews_assigned += 1
+
+        self.message = "Assigned " + str(reviews_assigned) + " reviews."
         return True

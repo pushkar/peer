@@ -43,7 +43,10 @@
               <li><a href="{{f_link}}">{{f_name}}</a></li>
             {% endfor %}
             </ul>
+            <br />
             <a class="btn btn-info" role="button" href="{% url 'assignment:find_reviewers' a_name submission.pk %}">Find Reviewers</a>
+            <br /><br />
+            <a class="btn btn-info" role="button" href="{% url 'assignment:find_reviews' a_name submission.pk %}">Find Submissions to Review</a>
             {% endif %}
         </div>
     </div>

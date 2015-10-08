@@ -84,6 +84,24 @@ def find_reviewers(request, a_name, submission_id):
 
     return HttpResponseRedirect(reverse('assignment:home', args=[a_name]))
 
+def find_reviews(request, a_name, submission_id):
+    if not check_session(request):
+        return HttpResponseRedirect(reverse('student:index'))
+
+    s = Student.objects.get(username=request.session['user'])
+    a = Assignment.objects.get(short_name=a_name)
+
+    sub_info = submission_info()
+    sub_info.get_all_submissions()
+    sub_info.filter_by_assignment(a)
+
+    if sub_info.assign_submissions(a, s) == True:
+        messages.success(request, sub_info.get_message())
+    else:
+        messages.warning(request, sub_info.get_message())
+
+    return HttpResponseRedirect(reverse('assignment:home', args=[a_name]))
+
 
 @ajax
 def stats(request, a_name):
