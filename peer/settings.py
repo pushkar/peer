@@ -94,8 +94,9 @@ USE_L10N = True
 USE_TZ = True
 
 import dj_database_url
-DATABASES['default'] = dj_database_url.config(default=os.environ["HEROKU_POSTGRESQL_BROWN_URL"])
-
+import os
+if os.getcwd() == "/app":
+    DATABASES = {'default': dj_database_url.config(default=os.environ["HEROKU_POSTGRESQL_BROWN_URL"])}
 
 # Static asset configuration
 TEMPLATE_DIRS = (
