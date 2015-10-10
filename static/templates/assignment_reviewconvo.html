@@ -11,6 +11,7 @@
       {% elif c.student.usertype == "superta" %}
       (Lord)
       {% endif %}
+      &nbsp;({{ c.created }})
       <span class="pull-right"><!--Edit-->
         {% if c.details.has_liked|stringformat:"s" == "False" %}
         <a href="{% url 'assignment:reviewconvo_addlike' a_name c.id %}" data-ajax="true" data-method="post" data-success="load_review_convo">Like</a>
