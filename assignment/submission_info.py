@@ -89,7 +89,7 @@ class submission_info():
         ## Find 3 random reviewers
         reviewer_count = 0
         reviewers_3 = set()
-        if len(reviewers_all) < 20:
+        if len(reviewers_all) < 3:
             self.message = "Not enough reviewers to match you. Try again later to find more reviewers."
             return False
         else:
@@ -147,6 +147,8 @@ class submission_info():
 
         reviews_assigned = 0
         if len(submissions_all) < 3:
+            # I am not sure if I should still assign these submissions
+            submissions_3 = random.sample(submissions_all, len(submissions_all))
             self.message += "Not enough submissions to review."
             return False
         else:
