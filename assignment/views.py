@@ -9,7 +9,6 @@ from student.models import *
 from student.log import *
 
 from django.contrib.auth.forms import AuthenticationForm
-from django.core.urlresolvers import reverse
 from django_ajax.decorators import ajax
 
 from reviews_info import *

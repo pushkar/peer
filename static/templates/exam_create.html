@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% block assignment_content %}
+    {{exam}} for {{student}}
+    <hr />
+    <form id="exam" action="{% url 'exam:save_exam' %}", method="post">{% csrf_token %}
+      {% for q_id, q in tempexam.iteritems %}
+
+      <b>({{q.question.id}}) {{q.question.text}}</b>
+        {% if q.tf %}
+          <p>Answer with True/False. Provide an explanation.</p>
+          <div class="radio">
+            <label><input type="radio" name="q{{q.question.id}}_label" value="True">True</label>
+          </div>
+          <div class="radio">
+            <label><input type="radio" name="q{{q.question.id}}_label" value="False">False</label>
+          </div>
+          <textarea class="input-medium" id="q{{q.question.id}}_exp" rows="3">{{q.tf.exp}}</textarea>
+        {% endif %}
+
+        {% if q.mc %}
+        <p>Choose answers that are correct.</p>
+        {% for a in q.mc.answers %}
+          <div class="checkbox">
+            <label><input type="checkbox" value="">{{a.label}}. {{a.text}}</label>
+          </div>
+        {% endfor %}
+        {% endif %}
+      <hr />
+      {% endfor %}
+
+      <button type="submit" class="btn btn-default">Save</button>
+    </form>
+    {% endblock %}
+{% endblock %}

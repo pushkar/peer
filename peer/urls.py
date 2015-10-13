@@ -12,6 +12,7 @@ urlpatterns = patterns('',
     url(r'^assignment/', include('assignment.urls', namespace="assignment")),
     url(r'^api/', include('api.urls', namespace="api")),
     url(r'^record/', include('record.urls', namespace="record")),
+    url(r'^exam/', include('exam.urls', namespace="exam")),
     url(r'^admin/', include(admin.site.urls)),
 )
 
