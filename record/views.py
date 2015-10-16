@@ -16,37 +16,44 @@ def index(request):
 
     s = Student.objects.get(username=request.session['user'])
     record = record_info(s)
-    record.get_record()
-    record.details = record.get_details()
+    record = record.get_details()
+    print record
+
     return render(request, 'record_index.html', {
         'student': s,
         'record': record,
     })
 
-def form(request):
+def form(request, group):
     if not check_session(request):
         return HttpResponseRedirect(reverse('student:index'))
 
     s = Student.objects.get(username=request.session['user'])
 
     record = record_info(s)
-    record.get_record()
-    record.add_details(1, "Yes")
-
-    record.details = record.get_details()
+    topics = topics_info()
+    topics = topics.get_topics_by_group_id(group)
+    topics_list = []
+    for t in topics:
+        t_dict = model_to_dict(t, fields=['id', 'name', 'details'])
+        t_dict['user'] = record.get_topic_detail(t.pk)
+        print t_dict['user']
+        topics_list.append(t_dict)
 
     return render(request, 'record_form.html', {
         'student': s,
-        'record': record,
+        'topics': topics_list,
+
     })
 
-def add(request):
+@ajax
+def update(request):
     if not check_session(request):
         return HttpResponseRedirect(reverse('student:index'))
 
     s = Student.objects.get(username=request.session['user'])
     record = record_info(s)
-    record.add_empty_record()
-    return HttpResponseRedirect(reverse('record:index'))
 
-#def update(request, topic_name, topic_detail):
+    if request.POST:
+        for topic_id, topic_detail in request.POST.iteritems():
+            record.add_topic_detail(topic_id, topic_detail)

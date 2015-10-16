@@ -30,14 +30,12 @@
       <hr />
       {% endfor %}
 
-      <button type="submit" class="btn btn-default">Save</button>
-    </form>
-
+      <button type="submit" name="save_button" class="btn btn-default">Save</button>
     <hr />
-    <form id="exam_submit" action="{% url 'exam:submit_exam' exam.short_name %}" method="post">{% csrf_token %}
       <p>After you submit the exam, you cannot go back.</p>
-      <button type="submit" class="btn btn-default">Submit</button>
+      <button type="submit" name="submit_button" class="btn btn-default">Submit</button>
     </form>
+    <br />
 
     {% endblock %}
 {% endblock %}

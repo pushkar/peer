@@ -46,5 +46,6 @@ class TempExam(models.Model):
     started = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     exam = models.ForeignKey(Exam)
+    finished = models.CharField(max_length=100, blank=True, null=True)
     student = models.ForeignKey(Student)
     details = models.CharField(max_length=50000, blank=True, null=True)

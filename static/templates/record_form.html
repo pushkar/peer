@@ -1,19 +1,57 @@
-<h2>Record Form</h2>
-{{record.student}}
-<br />
-<ul>
-    {% for key, item in record.details.items %}
-    <li>
-      {{key}}:
-      <label class="radio-inline">
-        <input type="radio" name="inlineRadioOptions" id="inlineRadio1" value="Yes" {% if item == "Yes" %}checked{% endif %}> Yes
-      </label>
-      <label class="radio-inline">
-        <input type="radio" name="inlineRadioOptions" id="inlineRadio2" value="May be" {% if item == "Yes" %}checked{% endif %}> May be
-      </label>
-      <label class="radio-inline">
-        <input type="radio" name="inlineRadioOptions" id="inlineRadio3" value="No"> No
-      </label>
-    </li>
-    {% endfor %}
-</ul>
+{% extends "base.html" %}
+
+{% block content %}
+    {% block assignment_content %}
+    <h2>Record Form</h2>
+    {{student}}
+    <hr />
+    <ul>
+      <form id="record-form" class="form-group" action="" method="post">{% csrf_token %}
+        {% for t in topics %}
+        <div class="form-group">
+          <label class="col-sm-2 control-label">{{t.name}}</label>
+          <label class="radio-inline">
+            <input type="radio" name="topic_{{t.id}}" id="topic_{{t.id}}" value="Yes" {% if t.user == "Yes" %}checked{% endif %}> Yes
+          </label>
+          <label class="radio-inline">
+            <input type="radio" name="topic_{{t.id}}" id="topic_{{t.id}}" value="May be" {% if t.user == "May be" %}checked{% endif %}> May be
+          </label>
+          <label class="radio-inline">
+            <input type="radio" name="topic_{{t.id}}" id="topic_{{t.id}}" value="No" {% if t.user == "No" %}checked{% endif %}> No
+          </label>
+        </div>
+        {% endfor %}
+      </form>
+    </ul>
+
+    <script type="text/javascript">
+    $('#record-form').on('change', function(event){
+        event.preventDefault();
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "{% url 'record:update' %}",
+            data: {
+                    {% for t in topics %}
+                      {{t.id}}:$('input[name=topic_{{t.id}}]:checked', '#record-form').val(),
+                    {% endfor %}
+                  },
+            beforeSend: function(xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            },
+            success: function(result) {
+            },
+            error : function(xhr, errmsg, err) {
+                $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+ errmsg +
+                    " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+                console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            }
+        })
+    });
+    </script>
+
+
+    {% endblock %}
+{% endblock %}

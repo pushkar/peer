@@ -162,6 +162,15 @@ class tempexam_info():
             self.create_exam()
         return json.loads(self.tempexam.details)
 
+    def has_finished(self, exam_name):
+        if self.tempexam.finished == None or self.tempexam.details == "":
+            self.tempexam.finished = json.dumps({})
+            self.tempexam.save()
+        finished = json.loads(self.tempexam.finished)
+        if finished.has_key(exam_name):
+            return True
+        return False
+
     def create_exam(self):
         details = {}
         questions = question_set_info(self.exam)
@@ -245,6 +254,10 @@ class tempexam_info():
                         a = answer_info()
                         a.get_answer_by_id(aid)
                         a.add_grade(s, 0)
+        finished = json.loads(self.tempexam.finished)
+        finished[e.short_name] = 1
+        self.tempexam.finished = json.dumps(finished)
+        self.tempexam.save()
         return True
 
     def delete_exam(self):

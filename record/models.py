@@ -11,17 +11,23 @@ class Record(models.Model):
     def __unicode__(self):
         return unicode(self.student)
 
+## Add their final objective in life, things they want to achieve!
+
+class TopicGroup(models.Model):
+    name = models.CharField(max_length=100)
+    details = models.CharField(max_length=1000, blank=True, null=True)
+
+    def __unicode__(self):
+        return unicode(self.name)
 
 class Topic(models.Model):
     order = models.IntegerField()
+    group = models.ForeignKey(TopicGroup)
     name = models.CharField(max_length=100)
-    details = models.CharField(max_length=1000)
+    details = models.CharField(max_length=1000, blank=True, null=True)
+
+    def __unicode__(self):
+        return unicode(self.name)
 
     class Meta:
-        ordering = ['-order']
-
-class RecordAdmin(admin.ModelAdmin):
-    list_display = ('student', 'details')
-
-class TopicAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'order', 'name', 'details')
+        ordering = ['order']
