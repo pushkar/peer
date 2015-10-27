@@ -3,6 +3,46 @@ from student.models import *
 from record.models import *
 import json
 
+class student_details_info():
+    sdetails = StudentDetails.objects.none()
+    def __init__(self, student):
+        d = StudentDetails.objects.get_or_create(student=student)
+        self.sdetails = d[0]
+
+    def get_student_details(self):
+        return self.sdetails
+
+    def get_student_details_dict(self):
+        data = model_to_dict(self.sdetails, fields=['profession', 'company', 'details'])
+        if self.sdetails.objectives == None or self.sdetails.objectives == "":
+            self.sdetails.objectives = json.dumps([])
+            self.sdetails.save()
+        objs = json.loads(self.sdetails.objectives)
+        data['objectives'] = objs
+        return data
+
+    def set_profession(self, p):
+        self.sdetails.profession = p
+        self.sdetails.save()
+
+    def set_company(self, c):
+        self.sdetails.company = c
+        self.sdetails.save()
+
+    def add_objective(self, o):
+        if self.sdetails.objectives == None or self.sdetails.objectives == "":
+            objectives = []
+        else:
+            objectives = json.loads(self.sdetails.objectives)
+        objectives.append(o)
+        self.sdetails.objectives = json.dumps(objectives)
+        self.sdetails.save()
+
+    def update_details(self, d):
+        self.sdetails.details = d
+        self.sdetails.save()
+
+
 class topics_info():
     topics = Topic.objects.none()
     def __init__(self):
@@ -18,11 +58,17 @@ class topics_info():
 class record_info():
     student = Student.objects.none()
     record = Record.objects.none()
+    assigned = Record.objects.none()
 
-    def __init__(self, student):
+    def __init__(self, student, assigned):
         self.student = student
-        r = Record.objects.get_or_create(student=student)
+        self.assigned = assigned
+        r = Record.objects.get_or_create(student=student, assigned=assigned)
         self.record = r[0]
+
+    def set_lock(self):
+        self.record.locked = "1"
+        self.record.save()
 
     def get_record(self):
         return self.record
@@ -34,6 +80,8 @@ class record_info():
             self.record.save()
         details = json.loads(self.record.details)
         data = {}
+        if self.record.locked == "1":
+            return data
         topics = topics_info()
         for t in topics.get_all_topics():
             t_dict = model_to_dict(t, fields=['id', 'name'])
@@ -50,6 +98,8 @@ class record_info():
             details = {}
             self.record.details = json.dumps(details)
             self.record.save()
+        if self.record.locked == "1":
+            return
         details = json.loads(self.record.details)
         details[topic_pk] = topic_detail
         self.record.details = json.dumps(details)

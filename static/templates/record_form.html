@@ -21,6 +21,9 @@
           </label>
         </div>
         {% endfor %}
+        {% if student.username == assigned.username %}
+        <button type="submit" name="submit_button" class="btn btn-default">Submit</button>
+        {% endif %}
       </form>
     </ul>
 
@@ -30,7 +33,7 @@
         $.ajax({
             type: "POST",
             dataType: "json",
-            url: "{% url 'record:update' %}",
+            url: "{% url 'record:update' student.username %}",
             data: {
                     {% for t in topics %}
                       {{t.id}}:$('input[name=topic_{{t.id}}]:checked', '#record-form').val(),
@@ -42,11 +45,12 @@
                 }
             },
             success: function(result) {
+                load_messages();
             },
             error : function(xhr, errmsg, err) {
                 $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+ errmsg +
-                    " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
-                console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+                    " <a href='#' class='close'>&times;</a></div>");
+                console.log(xhr.status + ": " + xhr.responseText);
             }
         })
     });
