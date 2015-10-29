@@ -30,6 +30,7 @@ class Record(models.Model):
         return unicode(self.student)
 
 class TopicGroup(models.Model):
+    key = models.CharField(max_length=20)
     name = models.CharField(max_length=100)
     details = models.CharField(max_length=1000, blank=True, null=True)
 

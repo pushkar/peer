@@ -209,6 +209,7 @@ def review(request, a_name, id="1"):
         allow_to_score = True
 
     return render(request, 'assignment_review.html', {
+            'username': username,
             'usertype': usertype,
             'allow_to_score': allow_to_score,
             'review': review,

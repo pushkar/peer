@@ -51,8 +51,8 @@ class topics_info():
     def get_all_topics(self):
         return self.topics
 
-    def get_topics_by_group_id(self, group_id):
-        self.topics = self.topics.filter(group__pk=group_id)
+    def get_topics_by_group_key(self, group_key):
+        self.topics = self.topics.filter(group__key=group_key)
         return self.topics
 
 class record_info():

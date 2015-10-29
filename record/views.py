@@ -24,6 +24,7 @@ def index(request):
         'record': record,
     })
 
+@ajax
 def form(request, student, group):
     if not check_session(request):
         return HttpResponseRedirect(reverse('student:index'))
@@ -33,7 +34,10 @@ def form(request, student, group):
 
     record = record_info(s, a)
     topics = topics_info()
-    topics = topics.get_topics_by_group_id(group)
+    if group == "all":
+        topics = topics.get_all_topics()
+    else:
+        topics = topics.get_topics_by_group_key(group)
     topics_list = []
     for t in topics:
         t_dict = model_to_dict(t, fields=['id', 'name', 'details'])
@@ -45,7 +49,6 @@ def form(request, student, group):
         'student': s,
         'assigned': a,
         'topics': topics_list,
-
     })
 
 @ajax

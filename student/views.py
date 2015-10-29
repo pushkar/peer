@@ -170,6 +170,7 @@ def profile(request):
 
     return HttpResponseRedirect(reverse('student:index'))
 
+@ajax
 def updates(request):
     if not check_session(request):
         return HttpResponseRedirect(reverse('student:index'))

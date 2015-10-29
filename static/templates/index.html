@@ -12,11 +12,14 @@
 {% if student %}
 {% autoescape off %}
 <p>Welcome {{ student.firstname }} {{ student.lastname }}!</p>
-<ul>
-    <li><a href="{% url 'assignment:index' %}">Go to Assignments</a>.</li>
-    <li>Check your <a href="{% url 'student:profile' %}">Profile</a> and <a href="{% url 'student:updates' %}">Updates</a> under Account.</li>
-</ul>
-<p>Peer Review program</p>
+
+<h4>Tasks</h4>
+<div id="updates" class="content" data-refresh-url="{% url 'student:updates' %}"></div>
+<script type="text/javascript">
+  load_div("updates");
+</script>
+
+<h4>Peer Review program</h4>
 <ul>
     {% if opt == "opted out" %}
     <li style="width:500px">The peer review program enables you to participate in peer reviewing your peers. On top of that it will also monitor other activies such as how many times you use the peer review system, how your reviews are perceived by your peers. </li>

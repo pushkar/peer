@@ -1,61 +1,51 @@
-{% extends "base.html" %}
+<br />
+<ul>
+  <form id="record-form" class="form-group" action="" method="post">{% csrf_token %}
+    {% for t in topics %}
+    <div class="form-group">
+      <label class="col-sm-5 control-label">{{t.name}}</label>
+      <label class="radio-inline">
+        <input type="radio" name="topic_{{t.id}}" id="topic_{{t.id}}" value="Yes" {% if t.user == "Yes" %}checked{% endif %}> Yes
+      </label>
+      <label class="radio-inline">
+        <input type="radio" name="topic_{{t.id}}" id="topic_{{t.id}}" value="May be" {% if t.user == "May be" %}checked{% endif %}> May be
+      </label>
+      <label class="radio-inline">
+        <input type="radio" name="topic_{{t.id}}" id="topic_{{t.id}}" value="No" {% if t.user == "No" %}checked{% endif %}> No
+      </label>
+    </div>
+    {% endfor %}
+    {% if student.username == assigned.username %}
+    <button type="submit" name="submit_button" class="btn btn-default" style="display: none;">Submit</button>
+    {% endif %}
+  </form>
+</ul>
 
-{% block content %}
-    {% block assignment_content %}
-    <h2>Record Form</h2>
-    {{student}}
-    <hr />
-    <ul>
-      <form id="record-form" class="form-group" action="" method="post">{% csrf_token %}
-        {% for t in topics %}
-        <div class="form-group">
-          <label class="col-sm-2 control-label">{{t.name}}</label>
-          <label class="radio-inline">
-            <input type="radio" name="topic_{{t.id}}" id="topic_{{t.id}}" value="Yes" {% if t.user == "Yes" %}checked{% endif %}> Yes
-          </label>
-          <label class="radio-inline">
-            <input type="radio" name="topic_{{t.id}}" id="topic_{{t.id}}" value="May be" {% if t.user == "May be" %}checked{% endif %}> May be
-          </label>
-          <label class="radio-inline">
-            <input type="radio" name="topic_{{t.id}}" id="topic_{{t.id}}" value="No" {% if t.user == "No" %}checked{% endif %}> No
-          </label>
-        </div>
-        {% endfor %}
-        {% if student.username == assigned.username %}
-        <button type="submit" name="submit_button" class="btn btn-default">Submit</button>
-        {% endif %}
-      </form>
-    </ul>
-
-    <script type="text/javascript">
-    $('#record-form').on('change', function(event){
-        event.preventDefault();
-        $.ajax({
-            type: "POST",
-            dataType: "json",
-            url: "{% url 'record:update' student.username %}",
-            data: {
-                    {% for t in topics %}
-                      {{t.id}}:$('input[name=topic_{{t.id}}]:checked', '#record-form').val(),
-                    {% endfor %}
-                  },
-            beforeSend: function(xhr, settings) {
-                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                }
-            },
-            success: function(result) {
-                load_messages();
-            },
-            error : function(xhr, errmsg, err) {
-                $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+ errmsg +
-                    " <a href='#' class='close'>&times;</a></div>");
-                console.log(xhr.status + ": " + xhr.responseText);
+<script type="text/javascript">
+$('#record-form').on('change', function(event){
+    event.preventDefault();
+    $.ajax({
+        type: "POST",
+        dataType: "json",
+        url: "{% url 'record:update' student.username %}",
+        data: {
+                {% for t in topics %}
+                  {{t.id}}:$('input[name=topic_{{t.id}}]:checked', '#record-form').val(),
+                {% endfor %}
+              },
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
             }
-        })
-    });
-    </script>
-
-
-    {% endblock %}
-{% endblock %}
+        },
+        success: function(result) {
+            load_messages();
+        },
+        error : function(xhr, errmsg, err) {
+            $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+ errmsg +
+                " <a href='#' class='close'>&times;</a></div>");
+            console.log(xhr.status + ": " + xhr.responseText);
+        }
+    })
+});
+</script>
