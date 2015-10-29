@@ -158,8 +158,6 @@ def home(request, a_name):
     if submission:
         submission.files = sub_info.get_files(submission)
 
-    print extra_scripts
-
     return render(request, 'assignment_pagebase.html', {
         'student': s,
         'a': a,

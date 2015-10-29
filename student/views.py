@@ -205,8 +205,6 @@ def updates(request):
 
     return HttpResponseRedirect(reverse('student:index'))
 
-
-
 @login_required
 def admin(request):
     if not check_session(request):
@@ -259,15 +257,6 @@ def populate(request):
 
 
     return HttpResponseRedirect(reverse('admin:index'))
-
-def group(request, group_id="1"):
-    s = Student.objects.get(username=request.session['user'])
-    s_g = Student.objects.filter(group_id=group_id)
-
-    return render(request, 'group.html', {
-        'student': s,
-        'student_group': s_g,
-    })
 
 @login_required
 def admin_review_assignments(request):

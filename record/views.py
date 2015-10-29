@@ -42,7 +42,6 @@ def form(request, student, group):
     for t in topics:
         t_dict = model_to_dict(t, fields=['id', 'name', 'details'])
         t_dict['user'] = record.get_topic_detail(t.pk)
-        print t_dict['user']
         topics_list.append(t_dict)
 
     return render(request, 'record_form.html', {
