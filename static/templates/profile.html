@@ -24,30 +24,7 @@
   <div id="learning_record" class="content" data-refresh-url="{% url 'record:index' %}">
   </div>
   <p><a href="{% url 'record:form' student.username 'all' %}" data-ajax="true" data-success="load_learning_record">Edit</a></p>
-    
-  <h3>Assignments and Reviews</h3>
-  <br />
-  <ul>
-    {% for student, data in reviews_data.items %}
-      {% for assignment, reviews in data.items %}
-        {% for r in reviews %}
-            <li>{{assignment}}: <a href="{% url 'assignment:home' assignment.short_name %}?review={{r.pk}}">
-            Review by {{r.assigned.firstname}} {{r.assigned.lastname}}</a></li>
-        {% endfor %}
-      {% endfor %}
-    {% endfor %}
-  </ul>
-
-  <ul>
-    {% for student, data in assigned_data.items %}
-      {% for assignment, reviews in data.items %}
-          {% for r in reviews %}
-              <li>{{assignment}}: <a href="{% url 'assignment:home' assignment.short_name %}?review={{r.pk}}">
-              Review for {{r.submission.student.firstname}} {{r.submission.student.lastname}}</a></li>
-          {% endfor %}
-      {% endfor %}
-    {% endfor %}
-  </ul>
+  
 
   <script type="text/javascript">
     load_div('record_details');

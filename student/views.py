@@ -149,18 +149,9 @@ def profile(request):
         assignments = Assignment.objects.all()
         opt = OptIn.objects.get(student=s)
 
-        review_info = reviews_info()
-        review_info.get_all_reviews()
-        reviews = review_info.filter_by_student(s)
-        reviews_data = review_info.get_data(reviews)
-        assigned = review_info.filter_by_assigned(s)
-        assigned_data = review_info.get_data(assigned)
-
         return render(request, 'profile.html', {
             'student': s,
             'assignments': assignments,
-            'reviews_data': reviews_data,
-            'assigned_data': assigned_data,
             'opt': opt,
         })
 
@@ -204,6 +195,7 @@ def updates(request):
         messages.warning(request, "Something went wrong. Let your TA know.")
 
     return HttpResponseRedirect(reverse('student:index'))
+
 
 @login_required
 def admin(request):
