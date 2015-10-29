@@ -77,15 +77,20 @@ def details(request, type=None):
     if type == "form":
         page = "form"
 
+    if not type == "update":
+        return render(request, 'record_details.html', {
+            'student': s,
+            'details': details.get_student_details_dict(),
+            'page': page,
+        })
+
     if type == "update" or request.POST:
-        print request.POST
         details.set_profession(request.POST.get("profession", ""))
         details.set_company(request.POST.get("company", ""))
-        details.add_objective('')
+        details.reset_objectives()
+        for _id, _detail in request.POST.iteritems():
+            if _id.isdigit():
+                if _detail == u'true':
+                    details.add_objective_by_id(_id)
         details.update_details(request.POST.get("other", ""))
-
-    return render(request, 'record_details.html', {
-        'student': s,
-        'details': details.get_student_details_dict(),
-        'page': page,
-    })
+        message.success(request, "Personal Details Saved.")

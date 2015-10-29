@@ -18,7 +18,18 @@ class student_details_info():
             self.sdetails.objectives = json.dumps([])
             self.sdetails.save()
         objs = json.loads(self.sdetails.objectives)
-        data['objectives'] = objs
+        objs_all = Objectives.objects.all()
+        objs_list = []
+        for o in objs_all:
+            o_dict = {}
+            o_dict['id'] = o.id
+            o_dict['name'] = o.name
+            if unicode(o.id) in objs:
+                o_dict['checked'] = True
+            else:
+                o_dict['checked'] = False
+            objs_list.append(o_dict)
+        data['objectives'] = objs_list
         return data
 
     def set_profession(self, p):
@@ -29,7 +40,12 @@ class student_details_info():
         self.sdetails.company = c
         self.sdetails.save()
 
-    def add_objective(self, o):
+    def reset_objectives(self):
+        objectives = []
+        self.sdetails.objectives = json.dumps(objectives)
+        self.sdetails.save()
+
+    def add_objective_by_id(self, o):
         if self.sdetails.objectives == None or self.sdetails.objectives == "":
             objectives = []
         else:

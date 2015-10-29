@@ -1,9 +1,17 @@
 {% if page == "index" %}
   <p>Profession: {{ details.profession }}</p>
   <p>Company: {{ details.company }}</p>
-  <p>Objectives: <ul>{% for obj in details.objectives %}<li>{{obj}}</li>{% endfor %}</ul></p>
+  <p>Objectives: <ul>
+                    {% for obj in details.objectives %}
+                    {% if obj.checked == True %}
+                    <li>{{obj.name}}</li>
+                    {% endif %}
+                    {% endfor %}
+                </ul></p>
   <p>Other: {{ details.details }}</p>
 {% elif page == "form" %}
+<div class="row">
+<div class="col-md-6">
   <form id="record-details-form" class="form-horizontal" action="" method="post">{% csrf_token %}
     <div class="form-group">
       <label for="profession" class="col-sm-2 control-label">Profession</label>
@@ -18,8 +26,23 @@
         </div>
     </div>
     <div class="form-group">
+      <label for="objectives" class="col-sm-2 control-label">Objectives</label>
+      <div class="col-sm-10">
+        <div class="checkbox">
+        {% for o in details.objectives %}
+          <label>
+            <input type="checkbox" name="record_{{o.id}}" id="record_{{o.id}}" value="{{o.name}}" {% if o.checked == True %}checked{% endif %}>
+            {{o.name}}
+          </label>
+          <br />
+        {% endfor %}
+      </div>
+    </div>
+    </div>
+    <div class="form-group">
       <label for="other" class="col-sm-2 control-label">Other</label>
         <div class="col-sm-10">
+          <p><br />Why did you take this course?</p>
           <textarea class="form-control" name="other" id="other" rows="3">{{ details.details }}</textarea>
         </div>
     </div>
@@ -29,35 +52,38 @@
       </div>
     </div>
   </form>
-
-  <script type="text/javascript">
-  $('#record-detail-form').on('change', function(event){
-    alert('hi');
-      event.preventDefault();
-      $.ajax({
-          type: "POST",
-          dataType: "json",
-          url: "{% url 'record:details' 'update' %}",
-          data: {
-                  profession:$('profession', '#record-details-form').val(),
-                  company:$('company', '#record-details-form').val(),
-                  other:$('other', '#record-details-form').val(),
-                },
-          beforeSend: function(xhr, settings) {
-            alert(data);
-              if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                  xhr.setRequestHeader("X-CSRFToken", csrftoken);
-              }
-          },
-          success: function(result) {
-              load_messages();
-          },
-          error : function(xhr, errmsg, err) {
-              $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+ errmsg +
-                  " <a href='#' class='close'>&times;</a></div>");
-              console.log(xhr.status + ": " + xhr.responseText);
-          }
-      })
-  });
-  </script>
+</div>
+</div>
 {% endif %}
+
+<script type="text/javascript">
+$('#record-details-form').on('change', function(event){
+    event.preventDefault();
+    $.ajax({
+        type: "POST",
+        dataType: "json",
+        url: "{% url 'record:details' 'update' %}",
+        data: {
+                profession:$('#profession').val(),
+                company:$('#company').val(),
+                other:$('#other').val(),
+                {% for o in details.objectives %}
+                  {{o.id}}:$('#record_{{o.id}}').is(":checked"),
+                {% endfor %}
+              },
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        },
+        success: function(result) {
+            load_messages();
+        },
+        error : function(xhr, errmsg, err) {
+            $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+ errmsg +
+                " <a href='#' class='close'>&times;</a></div>");
+            console.log(xhr.status + ": " + xhr.responseText);
+        }
+    })
+});
+</script>
