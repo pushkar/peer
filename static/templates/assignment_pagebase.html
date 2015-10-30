@@ -23,8 +23,10 @@
                 {% endif %}
                 {% endfor %}
                 <li class="disabled"><a href="#"><b>Actions</b></a></li>
-                <li {% if not submission %}class="disabled"{% endif %}><a href="{% url 'assignment:find_reviewers' a_name submission.pk %}">Find Reviewers</a></li>
-                <li {% if not submission %}class="disabled"{% endif %}><a href="{% url 'assignment:find_reviews' a_name submission.pk %}">Find Submissions to Review</a></li>
+                {% if submission %}
+                <li><a href="{% url 'assignment:find_reviewers' a_name submission.pk %}">Find Reviewers</a></li>
+                <li><a href="{% url 'assignment:find_reviews' a_name submission.pk %}">Find Submissions to Review</a></li>
+                {% endif %}
             </ul>
         </div>
 
