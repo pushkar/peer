@@ -39,7 +39,7 @@ class TopicGroup(models.Model):
 
 class Topic(models.Model):
     order = models.IntegerField()
-    group = models.ForeignKey(TopicGroup)
+    group = models.ForeignKey(TopicGroup, related_name='group')
     name = models.CharField(max_length=100)
     details = models.CharField(max_length=1000, blank=True, null=True)
 
