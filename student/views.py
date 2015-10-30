@@ -161,6 +161,20 @@ def profile(request):
 
     return HttpResponseRedirect(reverse('student:index'))
 
+def about(request):
+    try:
+        assignments = Assignment.objects.all()
+
+        return render(request, 'about.html', {
+            'assignments': assignments,
+        })
+
+    except Exception as e:
+        print e
+        messages.warning(request, "Something went wrong. Let your TA know.")
+
+    return HttpResponseRedirect(reverse('student:index'))
+
 @ajax
 def updates(request):
     if not check_session(request):
@@ -204,9 +218,11 @@ def admin(request):
 
     try:
         s = Student.objects.get(username=request.session['user'])
+        a = Assignment.objects.all()
         s_all = Student.objects.all()
         return render(request, 'admin.html', {
             'student': s,
+            'assignments': a,
             'student_all': s_all,
         })
 

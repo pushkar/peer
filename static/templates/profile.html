@@ -11,32 +11,32 @@
 
 {% block content %}
 
-  <h3>Personal Details</h3>
-  <p>Name: {{ student.firstname }} {{ student.lastname }}</p>
-  <p>User: {{ student.username }}</p>
-  <p>Email: {{ student.email }}</p>
-  <p>Opted in Peer Review? {{ opt.value }}</p>
-  <div id="record_details" class="content" data-refresh-url="{% url 'record:details' '' %}">
-  </div>
-  <p><a href="{% url 'record:details' 'form' %}" data-ajax="true" data-success="load_record_details">Edit</a></p>
+<h3>Personal Details</h3>
+<p>Name: {{ student.firstname }} {{ student.lastname }}</p>
+<p>User: {{ student.username }}</p>
+<p>Email: {{ student.email }}</p>
+<p>Opted in Peer Review? {{ opt.value }}</p>
+<div id="record_details" class="content" data-refresh-url="{% url 'record:details' '' %}">
+</div>
+<p><a href="{% url 'record:details' 'form' %}" data-ajax="true" data-success="load_record_details">Edit</a></p>
 
-  <h3>Learning Records</h3>
-  <div id="learning_record" class="content" data-refresh-url="{% url 'record:index' %}">
-  </div>
-  <p><a href="{% url 'record:form' student.username 'all' %}" data-ajax="true" data-success="load_learning_record">Edit</a></p>
-  
+<h3>Learning Records</h3>
+<div id="learning_record" class="content" data-refresh-url="{% url 'record:index' %}">
+</div>
+<p><a href="{% url 'record:form' student.username 'all' %}" data-ajax="true" data-success="load_learning_record">Edit</a></p>
 
-  <script type="text/javascript">
-    load_div('record_details');
-    function load_record_details(content) {
-        $('#record_details').html(content);
-    }
 
-    load_div('learning_record');
-    function load_learning_record(content) {
-        $('#learning_record').html(content);
-        $('#learning_record').append('<p><a href="#" onclick="load_div(\'learning_record\');">Done</a></p>');
-    }
-  </script>
+<script type="text/javascript">
+  load_div('record_details');
+  function load_record_details(content) {
+      $('#record_details').html(content);
+  }
+
+  load_div('learning_record');
+  function load_learning_record(content) {
+      $('#learning_record').html(content);
+      $('#learning_record').append('<p><a href="#" onclick="load_div(\'learning_record\');">Done</a></p>');
+  }
+</script>
 
 {% endblock %}

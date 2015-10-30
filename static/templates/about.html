@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block menu %}
+{% endblock %}
+
+{% block breadcrumb %}
+<li><a href="{% url 'student:index' %}">Home</a></li>
+<li class="active">About</li>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="row">
+  <div class="col-md-6">
+    <p>This Peer Feedback website is experimental, in the sense that we are trying out various ways to give you feedback. This page will give you details on this.</p>
+
+    <h4>Learning Records</h4>
+    <p>Two new sections have been added on the website: in your <a href="{% url 'student:profile' %}">profile</a> page and review pages. Everyone who is taking this course weaves their own way through it. I will attempt to give feedback based on your goals after considering how you did on your exam and assignments. You can read more about how the real <a href="http://www.learningrecord.org/contents.html">learning records</a> worked when it was first tried in schools in London and California.</p>
+    <p>The current setup I have on the website is elementary, but we will see how it goes. For now, fill out your profiles. You will get some feedback from me after the next assignment is graded.</p>
+
+    <h4>Updates</h4>
+
+    <p>More to come...</p>
+    <ul>
+      <li>Updates on profile page to track your participation in peer review.</li>
+    </ul>
+
+    <p>Oct 29, 2014</p>
+    <ul>
+      <li>Assignment 2 submissions added.</li>
+    </ul>
+
+    <p>Oct 28, 2014</p>
+    <ul>
+      <li>The site now has only 3 main landing pages: <a href="{% url 'student:index' %}">home page</a>, your <a href="{% url 'student:profile' %}">profile page</a> and a page for each assignment.</li>
+      <li>A Tasks list has been added to the home page. It shows if you there is a new update for any of your reviews.</li>
+    </ul>
+
+    <p>Oct 7, 2014</p>
+    <ul>
+      <li>Assignment 1 submissions added.</li>
+    </ul>
+
+    <h4>Feedback</h4>
+    <p>If you have any questions or feedback, email Pushkar Kolhe (pushkar@cc.gatech.edu) or leave a message on Piazza (please tag it with "peer review website"). </p>
+
+  </div>
+
+
+  <div class="col-md-6">
+    <p><b>References</b></p>
+    <ul>
+      <li><a href="http://www.learningrecord.org/">The Learning Record</a></li>
+    </ul>
+  </div>
+</div>
+
+{% endblock %}

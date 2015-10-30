@@ -22,6 +22,9 @@
                     <li><a href="{% url 'assignment:page' a_name page.name %}" data-ajax="true" data-success="load_content">{{ page.title }}</a></li>
                 {% endif %}
                 {% endfor %}
+                <li class="disabled"><a href="#"><b>Actions</b></a></li>
+                <li {% if not submission %}class="disabled"{% endif %}><a href="{% url 'assignment:find_reviewers' a_name submission.pk %}">Find Reviewers</a></li>
+                <li {% if not submission %}class="disabled"{% endif %}><a href="{% url 'assignment:find_reviews' a_name submission.pk %}">Find Submissions to Review</a></li>
             </ul>
         </div>
 
@@ -44,9 +47,6 @@
             {% endfor %}
             </ul>
             <br />
-            <a class="btn btn-info" role="button" href="{% url 'assignment:find_reviewers' a_name submission.pk %}">Find Reviewers</a>
-            <br /><br />
-            <a class="btn btn-info" role="button" href="{% url 'assignment:find_reviews' a_name submission.pk %}">Find Submissions to Review</a>
             {% endif %}
         </div>
     </div>
