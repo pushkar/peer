@@ -9,7 +9,6 @@ from student.models import *
 from student.log import *
 
 from django.contrib.auth.forms import AuthenticationForm
-from django.core.urlresolvers import reverse
 from django_ajax.decorators import ajax
 
 from reviews_info import *
@@ -159,8 +158,6 @@ def home(request, a_name):
     if submission:
         submission.files = sub_info.get_files(submission)
 
-    print extra_scripts
-
     return render(request, 'assignment_pagebase.html', {
         'student': s,
         'a': a,
@@ -210,6 +207,7 @@ def review(request, a_name, id="1"):
         allow_to_score = True
 
     return render(request, 'assignment_review.html', {
+            'username': username,
             'usertype': usertype,
             'allow_to_score': allow_to_score,
             'review': review,

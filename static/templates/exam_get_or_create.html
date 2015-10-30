@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% block assignment_content %}
+    {{exam}} for {{student}}
+    <hr />
+    <form id="exam" action="{% url 'exam:save_exam' exam.short_name %}" method="post">{% csrf_token %}
+      {% for q_id, q in tempexam.iteritems %}
+
+      <b>({{q.question.id}}) {{q.question.text}}</b>
+        {% if q.tf %}
+          <p>Answer with True/False. Provide an explanation.</p>
+          <div class="radio">
+            <label><input type="radio" name="q{{q.question.id}}_label" value="True" {% if q.tf.label == "True" %}checked{% endif %}>True</label>
+          </div>
+          <div class="radio">
+            <label><input type="radio" name="q{{q.question.id}}_label" value="False" {% if q.tf.label == "False" %}checked{% endif %}>False</label>
+          </div>
+          <textarea class="input-medium" name="q{{q.question.id}}_exp" rows="3">{{q.tf.exp}}</textarea>
+        {% endif %}
+
+        {% if q.mc %}
+        <p>Choose answers that are correct.</p>
+        {% for a in q.mc.answers %}
+          <div class="checkbox">
+            <label><input type="checkbox" name="q{{q.question.id}}_mc" value="{{a.id}}" {% if a.id|slugify in q.mc.checked %}checked{% endif %}>{{a.label}}. {{a.text}}</label>
+          </div>
+        {% endfor %}
+        {% endif %}
+      <hr />
+      {% endfor %}
+
+      <button type="submit" name="save_button" class="btn btn-default">Save</button>
+    <hr />
+      <p>After you submit the exam, you cannot go back.</p>
+      <button type="submit" name="submit_button" class="btn btn-default">Submit</button>
+    </form>
+    <br />
+
+    {% endblock %}
+{% endblock %}

@@ -149,18 +149,9 @@ def profile(request):
         assignments = Assignment.objects.all()
         opt = OptIn.objects.get(student=s)
 
-        review_info = reviews_info()
-        review_info.get_all_reviews()
-        reviews = review_info.filter_by_student(s)
-        reviews_data = review_info.get_data(reviews)
-        assigned = review_info.filter_by_assigned(s)
-        assigned_data = review_info.get_data(assigned)
-
         return render(request, 'profile.html', {
             'student': s,
             'assignments': assignments,
-            'reviews_data': reviews_data,
-            'assigned_data': assigned_data,
             'opt': opt,
         })
 
@@ -170,6 +161,7 @@ def profile(request):
 
     return HttpResponseRedirect(reverse('student:index'))
 
+@ajax
 def updates(request):
     if not check_session(request):
         return HttpResponseRedirect(reverse('student:index'))
@@ -203,7 +195,6 @@ def updates(request):
         messages.warning(request, "Something went wrong. Let your TA know.")
 
     return HttpResponseRedirect(reverse('student:index'))
-
 
 
 @login_required
@@ -258,15 +249,6 @@ def populate(request):
 
 
     return HttpResponseRedirect(reverse('admin:index'))
-
-def group(request, group_id="1"):
-    s = Student.objects.get(username=request.session['user'])
-    s_g = Student.objects.filter(group_id=group_id)
-
-    return render(request, 'group.html', {
-        'student': s,
-        'student_group': s_g,
-    })
 
 @login_required
 def admin_review_assignments(request):

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% block assignment_content %}
+    <h2>Exams</h2>
+    <br />
+    <ul>
+        {% for e in exams %}
+        <li><a href="{% url 'exam:get_or_create_exam' e.short_name %}">{{ e.name }}</a> (Due on {{ e.end_time }})</li>
+        {% endfor %}
+    </ul>
+    {% endblock %}
+{% endblock %}

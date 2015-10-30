@@ -1,5 +1,5 @@
 <h4>Review {{ review.pk }}</h4>
-<h4>{{ review.0.submission }}</h4>
+<h4>{{ review.submission.student }}</h4>
 <ul>
     {% for f_link, f_name in files.items %}
     <li><a href="{{ f_link }}">{{ f_name }}</a></li>
@@ -42,6 +42,18 @@
     <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "4" %}" data-ajax="true" data-success="load_content">4</a> or
     <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "5" %}" data-ajax="true" data-success="load_content">5 (good)</a>.</p>
 {% endif %}
+{% endif %}
+<br />
+{{review.0.submission}}
+
+{% if username == review.assigned.username %}
+<h4>Learning Record</h4>
+<div id="learning_record" class="content">
+  Learning Records
+</div>
+<script type="text/javascript">
+  load_div("{% url 'record:form' review.submission.student.username a_name %}", "#learning_record");
+</script>
 {% endif %}
 <br />
 {% load mathjax %}

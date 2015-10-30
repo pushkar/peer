@@ -19,23 +19,11 @@
     }
     </style>
 
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-      ga('create', 'UA-59742834-1', 'auto');
-      ga('send', 'pageview');
-
-    </script>
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script type="text/javascript" src="https://s3.amazonaws.com/static-style/django_ajax/js/jquery.ajax.min.js"></script>
     <script type="text/javascript" src="https://s3.amazonaws.com/static-style/django_ajax/js/jquery.ajax-plugin.min.js"></script>
     <script type="text/javascript" src="https://s3.amazonaws.com/static-style/jquery.cookie.js"></script>
     <script src="https://s3.amazonaws.com/static-style/jquery.history.js"></script>
-    <script src="https://s3.amazonaws.com/static-style/dist/ChartNew.js"></script>
     <script type="text/javascript">
         var csrftoken = $.cookie('csrftoken');
 
@@ -45,6 +33,7 @@
         }
 
         $.ajaxSetup({
+            async: false,
             beforeSend: function(xhr, settings) {
                 if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
                     xhr.setRequestHeader("X-CSRFToken", csrftoken);
@@ -52,8 +41,16 @@
             }
         });
 
+        function load_div(div_id) {
+            div_name = '#' + div_id;
+            console.log(" - load " + div_id + " with " + $(div_name).attr('data-refresh-url'));
+            ajaxGet( $(div_name).attr('data-refresh-url'), function(content) {
+                $(div_name).html(content)
+            });
+        }
+
         function load_messages() {
-            console.log(" - load_messages")
+            console.log(" - load_messages");
             if($("#convoModal").length) {
                 if($("#convoModal").hasClass('in')) {
                     ajaxGet( $('#messages').attr('data-refresh-url'), function(content) {
@@ -92,9 +89,8 @@
                         <li><a href="{% url 'student:admin' %}">Admin</a></li>
                         <li><a href="/admin">Backend Admin</a></li>
                         {% endif %}
-                        <li><a href="{% url 'student:profile' %}">My Profile </a>
-                        <li><a href="{% url 'student:updates' %}">Updates </a>
-                        <li><a href="{% url 'student:logout' %}">Logout </a>
+                        <li><a href="{% url 'student:profile' %}">My Profile</a>
+                        <li><a href="{% url 'student:logout' %}">Logout</a>
                         </li>
                     </ul>
                 </li>
