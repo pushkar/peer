@@ -1,80 +1,39 @@
 {% autoescape off %}
-<script>
-    var wcChartData = {
-        labels : [{% for key,value in wc.items %} "<{{key}} ", {% endfor %} "words"],
-        datasets : [
-            {
-                fillColor : "rgba(151,187,205,0.5)",
-                strokeColor : "rgba(151,187,205,0.8)",
-                highlightFill : "rgba(151,187,205,0.75)",
-                highlightStroke : "rgba(151,187,205,1)",
-                data : [{% for key,value in wc.items %}{{value}}, {% endfor %} "reviews"],
-                title: "Word Count"
-            }
-        ]
-    }
-
-    var optChartData = [
-        {
-            value: {{optout}},
-            color:"#F7464A",
-            highlight: "#FF5A5E",
-            title: "Not Yet Opted In"
-        },
-        {
-            value: {{optin}},
-            color: "#46BFBD",
-            highlight: "#5AD3D1",
-            title: "Opted In"
-        },
-    ];
-</script>
-
-<p><small>This will update in real time.</small></p>
-<p>Total Submissions: {{ submission_count }}<br />
-<p>Total Reviews: {{ review_count }}</p>
-
-<div style="width: 30%" align="center">
-    <canvas id="optin_count" height="450" width="600"></canvas>
-</div>
-
-<div style="width: 60%" align="center">
-    <canvas id="word_count" height="450" width="600"></canvas>
-</div>
+<h4>Stats</h4>
+<p>Submission Count: {{submission_count}}</p>
+<p>Total Conversations in Reviews: {{convos_count}}</p>
+<br />
+<div id="barchart_material" style="width: 600px; height: 500px;"></div>
+<h3>Stats</h3>
+<p>Median: {{hist_scores_stats.median}}</p>
+<p>Standard Deviation: {{hist_scores_stats.std}}</p>
 
 <script type="text/javascript">
-    var ctx = document.getElementById("word_count").getContext("2d");
-    window.myBar = new Chart(ctx).Bar(wcChartData, {
-        responsive : true,
-        barShowStroke: false,
-        graphTitle : "Word Count (X) vs Reviews (Y)",
-        legend : true,
-        inGraphDataShow : true,
-        annotateDisplay : true,
-        graphTitleFontSize: 18
-    });
+  function drawChart() {
+    var data = google.visualization.arrayToDataTable([
+      ['Scores', 'n'],
+      {% for scores, count in hist_scores.iteritems %}
+      ['{{scores}}', '{{count}}'],
+      {% endfor %}
+    ]);
+    var options = {
+      chart: {
+        title: 'Histogram of Scores',
+        subtitle: '{{ap.0.assignment.name}}',
+      },
+      bars: 'vertical' // Required for Material Bar Charts.
+    };
+    var chart = new google.charts.Bar(document.getElementById('barchart_material'));
+    chart.draw(data, options);
+  }
 
-    var ptx = document.getElementById("optin_count").getContext("2d");
-    window.myBar = new Chart(ptx).Pie(optChartData, {
-        graphTitle : "Total Opt-Ins",
-        legend : false,
-        inGraphDataShow : true,
-        annotateDisplay : true,
-        spaceBetweenBar : 5,
-        graphTitleFontSize: 18
-    });
-
-    (function(window,undefined){
-
-        // Bind to StateChange Event
-        History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate
-            var State = History.getState(); // Note: We are using History.getState() instead of event.state
-        });
-
-        // Change our States
-        History.pushState({page:"stats"}, "Stats Page", "?page=stats"); // logs {state:1}, "State 1", "?state=1"
-    })(window);
-
+  (function(window,undefined){
+      History.Adapter.bind(window,'statechange',function(){
+          var State = History.getState();
+      });
+      History.pushState({page:"stats"}, "Stats Page", "?page=stats");
+  })(window);
+  drawChart();
 </script>
 
 {% endautoescape %}

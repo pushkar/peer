@@ -7,8 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}ML Fall 2015 Peer Grading{% endblock %}</title>
     {% load staticfiles %}
-    <!-- Bootstrap -->
-    <!--<link href="{% static "dist/css/bootstrap.min.css" %}" rel="stylesheet">-->
     <link href="https://s3.amazonaws.com/static-style/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
     .alert {
@@ -24,8 +22,10 @@
     <script type="text/javascript" src="https://s3.amazonaws.com/static-style/django_ajax/js/jquery.ajax-plugin.min.js"></script>
     <script type="text/javascript" src="https://s3.amazonaws.com/static-style/jquery.cookie.js"></script>
     <script src="https://s3.amazonaws.com/static-style/jquery.history.js"></script>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript">
         var csrftoken = $.cookie('csrftoken');
+        google.load("visualization", "1.1", {packages:["bar"]});
 
         function csrfSafeMethod(method) {
             // these HTTP methods do not require CSRF protection
@@ -117,10 +117,7 @@
         </div>
 
         {% block content %}{% endblock %}
-        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-        <!-- Include all compiled plugins (below), or include individual files as needed -->
-        <!--<script src="{% static "dist/js/bootstrap.min.js" %}"></script>-->
         <script src="https://s3.amazonaws.com/static-style/dist/js/bootstrap.min.js"></script>
         <script src="https://s3.amazonaws.com/static-style/eldarion-ajax.min.js"></script>
     </div>

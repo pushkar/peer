@@ -101,35 +101,38 @@ def find_reviews(request, a_name, submission_id):
 
     return HttpResponseRedirect(reverse('assignment:home', args=[a_name]))
 
-
 @ajax
 def stats(request, a_name):
     ap = AssignmentPage.objects.filter(assignment__short_name=a_name)
+    reviews = Review.objects.filter(submission__assignment__short_name=a_name, assigned__usertype="ta")
     convos = ReviewConvo.objects.filter(review__submission__assignment__short_name=a_name)
-
-    word_count = {}
-    for c in convos:
-        count = len(c.text.split())
-        count = count / 100 * 100
-        count += 99
-        if word_count.has_key(count):
-            word_count[count] += 1
-        else:
-            word_count[count] = 1
-
     submission_count = Submission.objects.filter(assignment__short_name=a_name).count()
-    review_count = len(convos)
-    optin_count = OptIn.objects.filter(value=True).count()
-    optout_count = OptIn.objects.filter(value=False).count()-20
+    convos_count = len(convos)
+
+    scores = np.array([])
+    for r in reviews:
+        if r.score:
+            score = float(r.score)
+            if score > 0:
+                scores = np.append(scores, score)
+
+    hist_scores = np.histogram(scores, range(0, 100, 4))
+    hist_scores_dict = {}
+    for i in range(0, len(hist_scores[0])):
+        hist_scores_dict[hist_scores[1][i]] = hist_scores[0][i]
+
+    hist_scores_stats = {}
+    hist_scores_stats['mean'] = np.mean(scores)
+    hist_scores_stats['std'] = np.std(scores)
+    hist_scores_stats['median'] = np.median(scores)
 
     return render(request, 'assignment_stats.html', {
             'a_name': a_name,
             'ap': ap,
-            'wc': word_count,
-            'optin': optin_count,
-            'optout': optout_count,
             'submission_count': submission_count,
-            'review_count': review_count,
+            'convos_count': convos_count,
+            'hist_scores': hist_scores_dict,
+            'hist_scores_stats': hist_scores_stats,
         })
 
 # Default view for assignments
@@ -166,6 +169,24 @@ def home(request, a_name):
         'a_name': a_name,
         'submission': submission,
         'extra_scripts': extra_scripts,
+    })
+
+@ajax
+def admin(request, a_name):
+    if not check_session(request):
+        return HttpResponseRedirect(reverse('student:index'))
+
+    s = Student.objects.get(username=request.session['user'])
+    a_all = Assignment.objects.all()
+    a = a_all.filter(short_name=a_name)
+
+    sub_info = submission_info()
+
+    return render(request, 'assignment_admin.html', {
+        'student': s,
+        'a': a,
+        'assignments': a_all,
+        'a_name': a_name,
     })
 
 @ajax
