@@ -3,30 +3,15 @@ from assignment.models import *
 import json
 
 class submission_info():
-    submissions = None
+    submission = None
     message = ""
-
-    def __init__(self):
-        pass
-
-    def get_all_submissions(self):
-        self.submissions = Submission.objects.all()
-        return self.submissions
-
-    def filter_by_student(self, s):
-        self.submissions = self.submissions.filter(student=s)
-        return self.submissions
-
-    def filter_by_assignment(self, a):
-        self.submissions = self.submissions.filter(assignment=a)
-        return self.submissions
 
     def get_by_student_and_assignment(self, s, a):
         try:
-            self.submissions = Submission.objects.get(student=s, assignment=a)
+            self.submission = Submission.objects.get(student=s, assignment=a)
         except Submission.DoesNotExist:
-            self.submissions = None
-        return self.submissions
+            self.submission = None
+        return self.submission
 
     def get_by_id(self, id):
         self.submission = Submission.objects.get(pk=id)
@@ -46,7 +31,7 @@ class submission_info():
 
     def assign_reviewers(self, submission=None):
         if submission == None:
-            return False
+            submission = self.submission
 
         optin_reviewers = OptIn.objects.filter(value=True, student__usertype='student').select_related('student')
         ## All reviewers who have opted in
@@ -122,7 +107,8 @@ class submission_info():
         ## All submissions
         student_has_submitted = False
         submissions_all = set()
-        for s in self.submissions:
+        submissions = Submission.objects.filter(assignment=assignment)
+        for s in submissions:
             submissions_all.add(s)
             if s.student == student:
                 student_has_submitted = True

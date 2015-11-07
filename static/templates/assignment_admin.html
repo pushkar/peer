@@ -2,5 +2,12 @@
 <h4>Admin</h4>
 
 
-
+<script type="text/javascript">
+  (function(window,undefined){
+      History.Adapter.bind(window,'statechange',function(){
+          var State = History.getState();
+      });
+      History.pushState({page:"admin"}, "Admin Page", "?page=admin");
+  })(window);
+</script>
 {% endautoescape %}

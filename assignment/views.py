@@ -11,8 +11,12 @@ from student.log import *
 from django.contrib.auth.forms import AuthenticationForm
 from django_ajax.decorators import ajax
 
-from reviews_info import *
 from submission_info import *
+from submissions_info import *
+from review_info import *
+from reviews_info import *
+from review_convo_info import *
+from review_convos_info import *
 
 import re
 import numpy as np
@@ -91,8 +95,6 @@ def find_reviews(request, a_name, submission_id):
     a = Assignment.objects.get(short_name=a_name)
 
     sub_info = submission_info()
-    sub_info.get_all_submissions()
-    sub_info.filter_by_assignment(a)
 
     if sub_info.assign_submissions(a, s) == True:
         messages.success(request, sub_info.get_message())
@@ -109,30 +111,31 @@ def stats(request, a_name):
     submission_count = Submission.objects.filter(assignment__short_name=a_name).count()
     convos_count = len(convos)
 
-    scores = np.array([])
+    scores = []
     for r in reviews:
         if r.score:
             score = float(r.score)
             if score > 0:
-                scores = np.append(scores, score)
-
-    hist_scores = np.histogram(scores, range(0, 100, 4))
-    hist_scores_dict = {}
-    for i in range(0, len(hist_scores[0])):
-        hist_scores_dict[hist_scores[1][i]] = hist_scores[0][i]
+                scores.append(score)
 
     hist_scores_stats = {}
     hist_scores_stats['mean'] = np.mean(scores)
     hist_scores_stats['std'] = np.std(scores)
     hist_scores_stats['median'] = np.median(scores)
 
+    display = False
+    completed = float(len(scores))/float(submission_count)
+    if completed > 0.95:
+        display = True
+
     return render(request, 'assignment_stats.html', {
             'a_name': a_name,
             'ap': ap,
             'submission_count': submission_count,
             'convos_count': convos_count,
-            'hist_scores': hist_scores_dict,
+            'scores': scores,
             'hist_scores_stats': hist_scores_stats,
+            'display': display,
         })
 
 # Default view for assignments
@@ -145,7 +148,13 @@ def home(request, a_name):
     if request.method == "GET":
         if request.GET.has_key('page'):
             p_name = request.GET['page']
-            extra_scripts = "load_div(\'"+ reverse('assignment:page', args=[a_name, p_name]) +"\', \'#assignment_content\'); \n"
+            if p_name != "":
+                if p_name == "stats":
+                    extra_scripts = "load_div(\'"+ reverse('assignment:stats', args=[a_name]) +"\', \'#assignment_content\'); \n"
+                elif p_name == "admin":
+                    extra_scripts = "load_div(\'"+ reverse('assignment:admin', args=[a_name]) +"\', \'#assignment_content\'); \n"
+                else:
+                    extra_scripts = "load_div(\'"+ reverse('assignment:page', args=[a_name, p_name]) +"\', \'#assignment_content\'); \n"
 
         if request.GET.has_key('review'):
             review_pk = request.GET['review']

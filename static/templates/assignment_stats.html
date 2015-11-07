@@ -2,38 +2,43 @@
 <h4>Stats</h4>
 <p>Submission Count: {{submission_count}}</p>
 <p>Total Conversations in Reviews: {{convos_count}}</p>
+{% if display %}
+<p>Median: <b>{{hist_scores_stats.median}}</b></p>
+<p>Standard Deviation: <b>{{hist_scores_stats.std}}</b></p>
 <br />
-<div id="barchart_material" style="width: 600px; height: 500px;"></div>
-<h3>Stats</h3>
-<p>Median: {{hist_scores_stats.median}}</p>
-<p>Standard Deviation: {{hist_scores_stats.std}}</p>
+<div id="histogram_scores" style="width: 800px; height: 600px;"></div>
 
 <script type="text/javascript">
   function drawChart() {
     var data = google.visualization.arrayToDataTable([
       ['Scores', 'n'],
-      {% for scores, count in hist_scores.iteritems %}
-      ['{{scores}}', '{{count}}'],
+      {% for score in scores %}
+      ['', {{score}}],
       {% endfor %}
     ]);
     var options = {
-      chart: {
-        title: 'Histogram of Scores',
-        subtitle: '{{ap.0.assignment.name}}',
-      },
-      bars: 'vertical' // Required for Material Bar Charts.
-    };
-    var chart = new google.charts.Bar(document.getElementById('barchart_material'));
+         title: 'Histogram for {{ap.0.assignment}}',
+         legend: { position: 'none' },
+         chartArea: {left:20,top:50, width:'90%', height:'75%'},
+       };
+    var chart = new google.visualization.Histogram(document.getElementById('histogram_scores'));
     chart.draw(data, options);
   }
-
+</script>
+{% else %}
+<br />
+<p>Enough assignments are not graded to display stats.</p>
+{% endif %}
+<script type="text/javascript">
   (function(window,undefined){
       History.Adapter.bind(window,'statechange',function(){
           var State = History.getState();
       });
       History.pushState({page:"stats"}, "Stats Page", "?page=stats");
   })(window);
+  {% if display %}
   drawChart();
+  {% endif %}
 </script>
 
 {% endautoescape %}
