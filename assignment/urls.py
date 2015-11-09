@@ -7,7 +7,7 @@ urlpatterns = patterns('',
     url(r'^(?P<a_name>\w+)/$', views.home, name='home'),
     url(r'^(?P<a_name>\w+)/(?P<p_name>\w+)/$', views.page, name='page'),
     url(r'^(?P<a_name>\w+)/page/stats/$', views.stats, name='stats'),
-    url(r'^(?P<a_name>\w+)/page/admin/$', views.admin, name='admin'),
+    url(r'^(?P<a_name>\w+)/page/admin/(?P<order_by>\w+)$', views.admin, name='admin'),
     url(r'^(?P<a_name>\w+)/page/rdebug/$', views.review_debug, name='rdebug'),
 
     url(r'^(?P<a_name>\w+)/submission$', views.submission, name='submission'),

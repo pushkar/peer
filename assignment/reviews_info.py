@@ -9,8 +9,15 @@ class reviews_info():
     def __init__(self):
         pass
 
+    def get_reviews(self):
+        return self.reviews
+
     def get_all_reviews(self):
         self.reviews = Review.objects.all()
+        return self.reviews
+
+    def get_reviews_by_assignment(self, assignment, order_by='pk'):
+        self.reviews = Review.objects.filter(submission__assignment=assignment).order_by(order_by, 'pk')
         return self.reviews
 
     def get_reviews_by_submission(self, sub):

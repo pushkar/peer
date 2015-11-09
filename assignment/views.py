@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.forms.models import model_to_dict
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.db.models import Q
@@ -152,7 +153,8 @@ def home(request, a_name):
                 if p_name == "stats":
                     extra_scripts = "load_div(\'"+ reverse('assignment:stats', args=[a_name]) +"\', \'#assignment_content\'); \n"
                 elif p_name == "admin":
-                    extra_scripts = "load_div(\'"+ reverse('assignment:admin', args=[a_name]) +"\', \'#assignment_content\'); \n"
+                    order_by = request.GET.get('order_by', 'assigned')
+                    extra_scripts = "load_div(\'"+ reverse('assignment:admin', args=[a_name, order_by]) +"\', \'#assignment_content\'); \n"
                 else:
                     extra_scripts = "load_div(\'"+ reverse('assignment:page', args=[a_name, p_name]) +"\', \'#assignment_content\'); \n"
 
@@ -181,7 +183,7 @@ def home(request, a_name):
     })
 
 @ajax
-def admin(request, a_name):
+def admin(request, a_name, order_by):
     if not check_session(request):
         return HttpResponseRedirect(reverse('student:index'))
 
@@ -189,13 +191,22 @@ def admin(request, a_name):
     a_all = Assignment.objects.all()
     a = a_all.filter(short_name=a_name)
 
-    sub_info = submission_info()
+    if order_by == "submission":
+        order_by = "submission__student__lastname"
+    elif order_by == "assigned":
+        order_by = "assigned__lastname"
+
+    reviews = reviews_info()
+    reviews.get_reviews_by_assignment(a, order_by)
+    reviews = reviews.get_reviews()
 
     return render(request, 'assignment_admin.html', {
         'student': s,
         'a': a,
         'assignments': a_all,
         'a_name': a_name,
+        'reviews': reviews,
+        'order_by': order_by,
     })
 
 @ajax

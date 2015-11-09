@@ -25,7 +25,7 @@
                 {% endfor %}
                 <li class="disabled"><a href="#"><b>Actions</b></a></li>
                 {% if student.usertype == "ta" or student.usertype == "superta" %}
-                <li><a href="{% url 'assignment:admin' a_name %}" data-ajax="true" data-success="load_content">Admin</a></li>
+                <li><a href="{% url 'assignment:admin' a_name 'assigned' %}" data-ajax="true" data-success="load_content">Admin</a></li>
                 {% endif %}
                 {% if submission %}
                 <li><a href="{% url 'assignment:find_reviewers' a_name submission.pk %}">Find Reviewers</a></li>

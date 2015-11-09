@@ -30,4 +30,3 @@ class submissions_info():
             submissions = self.submissions
         submissions = submissions.filter(assignment=a)
         return submissions
-        
