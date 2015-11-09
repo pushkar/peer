@@ -11,6 +11,8 @@
 <br />
 <h4>Score:</h4>
 <p>The reviewer has assigned a score of <b>{{ review.score }}</b>. <br />
+
+{% if review.assigned.usertype == "student" %}
 <small>
     <ul>
         <li>Score is 1: If the report is incomplete.</li>
@@ -20,6 +22,7 @@
         <li>Score is 5: If the report shows shows an original or new method of analysis the data. Or if the report helped you learn something that you could use in your own assignment.</li>
     </ul>
 </small>
+{% endif %}
 
 {% if allow_to_score %}
 {% if usertype == "ta" or usertype == "superta" %}
