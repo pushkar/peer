@@ -15,6 +15,8 @@
 <p>Name: {{ student.firstname }} {{ student.lastname }}</p>
 <p>User: {{ student.username }}</p>
 <p>Email: {{ student.email }}</p>
+
+{% if student.usertype == "student" %}
 <p>Opted in Peer Review? {{ opt.value }}</p>
 <div id="record_details" class="content" data-refresh-url="{% url 'record:details' '' %}">
 </div>
@@ -38,5 +40,13 @@
       $('#learning_record').append('<p><a href="#" onclick="load_div(\'learning_record\');">Done</a></p>');
   }
 </script>
+
+{% elif student.usertype == "superta" %}
+<p>You are a Super TA. Respect!</p>
+
+{% elif student.usertype == "ta" %}
+<p>You are a TA!</p>
+
+{% endif %}
 
 {% endblock %}

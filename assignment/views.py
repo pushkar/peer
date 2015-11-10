@@ -276,7 +276,7 @@ def review(request, a_name, id="1"):
     if review.submission.student.username == username or review.assigned.username == username:
         allowed = True
 
-    if usertype == "superta":
+    if usertype == "ta" or usertype == "superta":
         allowed = True
 
     if not allowed:
@@ -328,7 +328,7 @@ def review_convo(request, a_name, id="1"):
     if review.submission.student.username == username or review.assigned.username == username:
         allowed = True
 
-    if s.usertype == "superta":
+    if usertype == "ta" or usertype == "superta":
         allowed = True
 
     if not allowed:
