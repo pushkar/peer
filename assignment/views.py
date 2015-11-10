@@ -153,8 +153,12 @@ def home(request, a_name):
                 if p_name == "stats":
                     extra_scripts = "load_div(\'"+ reverse('assignment:stats', args=[a_name]) +"\', \'#assignment_content\'); \n"
                 elif p_name == "admin":
-                    order_by = request.GET.get('order_by', 'assigned')
-                    extra_scripts = "load_div(\'"+ reverse('assignment:admin', args=[a_name, order_by]) +"\', \'#assignment_content\'); \n"
+                    action = request.GET.get('action', 'stats')
+                    if action == "stats":
+                        extra_scripts = "load_div(\'"+ reverse('assignment:admin_stats', args=[a_name]) +"\', \'#assignment_content\'); \n"
+                    else:
+                        order_by = request.GET.get('order_by', 'assigned')
+                        extra_scripts = "load_div(\'"+ reverse('assignment:admin_reviews', args=[a_name, action, order_by]) +"\', \'#assignment_content\'); \n"
                 else:
                     extra_scripts = "load_div(\'"+ reverse('assignment:page', args=[a_name, p_name]) +"\', \'#assignment_content\'); \n"
 
@@ -183,7 +187,7 @@ def home(request, a_name):
     })
 
 @ajax
-def admin(request, a_name, order_by):
+def admin_stats(request, a_name):
     if not check_session(request):
         return HttpResponseRedirect(reverse('student:index'))
 
@@ -191,22 +195,72 @@ def admin(request, a_name, order_by):
     a_all = Assignment.objects.all()
     a = a_all.filter(short_name=a_name)
 
+    tas_stats = {}
+    tas = Student.objects.filter(usertype="ta")
+
+    reviews = reviews_info()
+    reviews.get_reviews_by_assignment(a)
+
+    for ta in tas:
+        tas_stats[ta.username] = {}
+        ta_dict = {}
+        ta_dict['lastname'] = ta.lastname
+        ta_dict['firstname'] = ta.firstname
+        ta_dict['username'] = ta.username
+        tas_stats[ta.username]['user'] = ta_dict
+        reviews_ta = reviews.filter_by_assigned(ta)
+        stats_ta = reviews.get_stats(reviews_ta)
+        tas_stats[ta.username]['stats'] = stats_ta
+
+    return render(request, 'assignment_admin_stats.html', {
+        'student': s,
+        'a': a,
+        'assignments': a_all,
+        'a_name': a_name,
+        'tas_stats': tas_stats,
+    })
+
+@ajax
+def admin_reviews(request, a_name, action, order_by):
+    if not check_session(request):
+        return HttpResponseRedirect(reverse('student:index'))
+
+    s = Student.objects.get(username=request.session['user'])
+    a_all = Assignment.objects.all()
+    a = a_all.filter(short_name=a_name)
+
+    ob = order_by
     if order_by == "submission":
         order_by = "submission__student__lastname"
     elif order_by == "assigned":
         order_by = "assigned__lastname"
 
     reviews = reviews_info()
-    reviews.get_reviews_by_assignment(a, order_by)
-    reviews = reviews.get_reviews()
+    if action == "ta":
+        reviews.get_reviews_by_assignment_and_usertype(a, "ta", order_by)
+        reviews = reviews.get_reviews()
+    elif action == "me":
+        reviews.get_reviews_by_assignment(a, order_by)
+        reviews = reviews.filter_by_assigned(s)
+    elif action == "me_all":
+        reviews.get_reviews_by_assignment(a, order_by)
+        reviews_all = []
+        for r in reviews.filter_by_assigned(s):
+            # Puting objects in the list destroys the order_by order
+            reviews_all.extend(reviews.filter_by_submission(r.submission))
+        reviews = reviews_all
+    else:
+        reviews.get_reviews_by_assignment(a, order_by)
+        reviews = reviews.get_reviews()
 
-    return render(request, 'assignment_admin.html', {
+    return render(request, 'assignment_admin_reviews.html', {
         'student': s,
         'a': a,
         'assignments': a_all,
         'a_name': a_name,
         'reviews': reviews,
-        'order_by': order_by,
+        'action': action,
+        'order_by': ob,
     })
 
 @ajax

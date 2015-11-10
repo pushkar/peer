@@ -20,6 +20,7 @@
          title: 'Histogram for {{ap.0.assignment}}',
          legend: { position: 'none' },
          chartArea: {left:20,top:50, width:'90%', height:'75%'},
+         histogram: {bucketSize: 5},
        };
     var chart = new google.visualization.Histogram(document.getElementById('histogram_scores'));
     chart.draw(data, options);
