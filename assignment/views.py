@@ -12,6 +12,7 @@ from student.log import *
 from django.contrib.auth.forms import AuthenticationForm
 from django_ajax.decorators import ajax
 
+from student.students_info import *
 from submission_info import *
 from submissions_info import *
 from review_info import *
@@ -23,6 +24,7 @@ import re
 import numpy as np
 import csv
 import json
+import random
 
 def check_session(request):
     if not 'user' in request.session:
@@ -106,36 +108,32 @@ def find_reviews(request, a_name, submission_id):
 
 @ajax
 def stats(request, a_name):
-    ap = AssignmentPage.objects.filter(assignment__short_name=a_name)
-    reviews = Review.objects.filter(submission__assignment__short_name=a_name, assigned__usertype="ta")
+    if not check_session(request):
+        return HttpResponseRedirect(reverse('student:index'))
+
+    s = Student.objects.get(username=request.session['user'])
+    a_all = Assignment.objects.all()
+    a = a_all.filter(short_name=a_name)
+
     convos = ReviewConvo.objects.filter(review__submission__assignment__short_name=a_name)
     submission_count = Submission.objects.filter(assignment__short_name=a_name).count()
     convos_count = len(convos)
 
-    scores = []
-    for r in reviews:
-        if r.score:
-            score = float(r.score)
-            if score > 0:
-                scores.append(score)
-
-    hist_scores_stats = {}
-    hist_scores_stats['mean'] = np.mean(scores)
-    hist_scores_stats['std'] = np.std(scores)
-    hist_scores_stats['median'] = np.median(scores)
+    r_info = reviews_info()
+    r_info.get_reviews_by_assignment_and_usertype(a, "ta")
+    stats = r_info.get_stats()
 
     display = False
-    completed = float(len(scores))/float(submission_count)
-    if completed > 0.95:
+    if stats['completed'] > 95:
         display = True
 
     return render(request, 'assignment_stats.html', {
+            'student': s,
             'a_name': a_name,
-            'ap': ap,
+            'a': a,
             'submission_count': submission_count,
             'convos_count': convos_count,
-            'scores': scores,
-            'hist_scores_stats': hist_scores_stats,
+            'stats': stats,
             'display': display,
         })
 
@@ -156,6 +154,8 @@ def home(request, a_name):
                     action = request.GET.get('action', 'stats')
                     if action == "stats":
                         extra_scripts = "load_div(\'"+ reverse('assignment:admin_stats', args=[a_name]) +"\', \'#assignment_content\'); \n"
+                    elif action == "superman":
+                        extra_scripts = "load_div(\'"+ reverse('assignment:admin', args=[a_name]) +"\', \'#assignment_content\'); \n"
                     else:
                         order_by = request.GET.get('order_by', 'assigned')
                         extra_scripts = "load_div(\'"+ reverse('assignment:admin_reviews', args=[a_name, action, order_by]) +"\', \'#assignment_content\'); \n"
@@ -187,6 +187,63 @@ def home(request, a_name):
     })
 
 @ajax
+def admin(request, a_name):
+    if not check_session(request):
+        return HttpResponseRedirect(reverse('student:index'))
+
+    s = Student.objects.get(username=request.session['user'])
+    a_all = Assignment.objects.all()
+    a = a_all.filter(short_name=a_name)
+
+    message = "<br />"
+    if s.usertype == "student":
+        messages.info(request, 'You are not allowed to use the Admin section.')
+        return HttpResponseRedirect(reverse('assignment:home', args=[a_name]))
+
+    if 'assign' in request.GET:
+        sub_info = submissions_info()
+        sub_info.get_submissions_by_assignment(a)
+        submissions = sub_info.shuffle()
+
+        r_info = reviews_info()
+        r_info.get_reviews_by_assignment_and_usertype(a, "ta")
+        reviews = r_info.get_reviews()
+
+        for r in reviews:
+            if r.submission in submissions:
+                message += "Already assigned for " + str(r.submission) + "<br />"
+                submissions.remove(r.submission)
+
+        s_info = students_info()
+        tas = s_info.get_all_tas()
+
+        tas_count = len(tas)
+        submissions_count = len(submissions)
+        reviews_per_ta = np.ceil(float(submissions_count)/tas_count)
+        reviews_per_ta = int(reviews_per_ta)
+
+        message += "Number of submissions: " + str(submissions_count) + "<br />"
+        message += "Number of TAs: " + str(tas_count) + "<br />"
+
+        i = 0
+        count = 0
+        for s in submissions:
+            Review.objects.get_or_create(submission=s, assigned=tas[i])
+            message += "Assigned " + str(s) + " to " + str(tas[i]) + "<br />"
+            if count >= reviews_per_ta:
+                count = 0
+                i = i + 1
+            count = count + 1
+
+    return render(request, 'assignment_admin.html', {
+        'student': s,
+        'a': a,
+        'assignments': a_all,
+        'a_name': a_name,
+        'message': message,
+    })
+
+@ajax
 def admin_stats(request, a_name):
     if not check_session(request):
         return HttpResponseRedirect(reverse('student:index'))
@@ -194,6 +251,10 @@ def admin_stats(request, a_name):
     s = Student.objects.get(username=request.session['user'])
     a_all = Assignment.objects.all()
     a = a_all.filter(short_name=a_name)
+
+    if s.usertype == "student":
+        messages.info(request, 'You are not allowed to use the Admin section.')
+        return HttpResponseRedirect(reverse('assignment:home', args=[a_name]))
 
     tas_stats = {}
     tas = Student.objects.filter(usertype="ta")
@@ -228,6 +289,10 @@ def admin_reviews(request, a_name, action, order_by):
     s = Student.objects.get(username=request.session['user'])
     a_all = Assignment.objects.all()
     a = a_all.filter(short_name=a_name)
+
+    if s.usertype == "student":
+        messages.info(request, 'You are not allowed to use the Admin section.')
+        return HttpResponseRedirect(reverse('assignment:home', args=[a_name]))
 
     ob = order_by
     if order_by == "submission":

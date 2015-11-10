@@ -24,6 +24,9 @@
                 {% endif %}
                 {% endfor %}
                 <li class="disabled"><a href="#"><b>Actions</b></a></li>
+                {% if student.usertype == "superta" %}
+                <li><a href="{% url 'assignment:admin' a_name %}" data-ajax="true" data-success="load_content">Admin: SuperActions</a></li>
+                {% endif %}
                 {% if student.usertype == "ta" or student.usertype == "superta" %}
                 <li><a href="{% url 'assignment:admin_stats' a_name %}" data-ajax="true" data-success="load_content">Admin: Stats</a></li>
                 <li><a href="{% url 'assignment:admin_reviews' a_name 'simple' 'assigned' %}" data-ajax="true" data-success="load_content">Admin: Reviews</a></li>

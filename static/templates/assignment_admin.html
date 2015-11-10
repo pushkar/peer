@@ -1,0 +1,23 @@
+{% autoescape off %}
+<h4>Admin: Actions</h4>
+
+<p>With great powers, comes great responsibility!</p>
+<ul>
+  <li><a href="{% url 'assignment:admin' a_name %}?assign=tas" data-ajax="true" data-success="load_content">Assign TAs</a></li>
+</ul>
+
+<code>
+  {{message}}
+</code>
+
+
+<script type="text/javascript">
+  (function(window,undefined){
+      History.Adapter.bind(window,'statechange',function(){
+          var State = History.getState();
+      });
+      History.pushState({page:"admin"}, "Admin Page", "?page=admin&action=superman");
+  })(window);
+
+
+{% endautoescape %}

@@ -1,6 +1,7 @@
 from student.models import *
 from assignment.models import *
 import json
+import random
 
 class submissions_info():
     submissions = None
@@ -11,6 +12,10 @@ class submissions_info():
 
     def get_all_submissions(self):
         self.submissions = Submission.objects.all()
+        return self.submissions
+
+    def get_submissions_by_assignment(self, a):
+        self.submissions = Submission.objects.filter(assignment=a)
         return self.submissions
 
     def filter_by_student(self, s, submissions=None):
@@ -30,3 +35,12 @@ class submissions_info():
             submissions = self.submissions
         submissions = submissions.filter(assignment=a)
         return submissions
+
+    def shuffle(self, submissions=None):
+        if submissions == None:
+            submissions = self.submissions
+        submissions_list = []
+        for s in submissions:
+            submissions_list.append(s)
+        random.shuffle(submissions_list)
+        return submissions_list

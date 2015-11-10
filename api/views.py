@@ -7,6 +7,8 @@ from student.models import *
 from assignment.models import *
 from api.models import *
 from student.log import *
+from assignment.reviews_info  import *
+from assignment.review_convos_info import *
 
 import json
 
@@ -193,5 +195,20 @@ def update_review(request):
                 else:
                     response['message'] = "Failed to find review for " + submission_username
 
+
+    return JsonResponse(response)
+
+def get_reviews(request, a_name, username):
+    response = {}
+    response['message'] = ""
+    if request.method == "GET":
+        check_key(response, request.GET.get('apikey', ''))
+        if not response['error']:
+            ri = reviews_info()
+            ri.get_reviews_by_assignment(a_name)
+            reviews = r.filter_by_student(Student.objects.get(username=username))
+            for r in reviews:
+                rci = review_convos_info()
+                rci.get_convos_by_reviews(r)
 
     return JsonResponse(response)

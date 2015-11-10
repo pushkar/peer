@@ -69,19 +69,33 @@ class reviews_info():
             reviews = self.reviews
 
         scores = []
+        len_scores = 0
         for r in reviews:
             if r.score:
+                len_scores += 1
                 score = float(r.score)
                 if score > 0:
                     scores.append(score)
+
+
+        if len(reviews) == 0:
+            # Add a random value to avoid div by zero error
+            scores.append(0)
+            len_reviews = 1
+        else:
+            len_reviews = len(reviews)
+
+        if len(scores) == 0:
+            scores.append(0)
 
         stats = {}
         stats['mean'] = round(np.mean(scores), 2)
         stats['std'] = round(np.std(scores), 2)
         stats['median'] = np.median(scores)
-        stats['completed'] = float(len(scores))/float(len(reviews))*100.0
+        stats['completed'] = float(len_scores)/float(len_reviews)*100.0
         stats['completed'] = round(stats['completed'], 2)
         stats['scores'] = scores
+        stats['total_assigned'] = len_reviews
         return stats
 
 

@@ -8,6 +8,9 @@ class review_convos_info():
     def __init__(self):
         pass
 
+    def get_convos(self):
+        return self.convos
+
     def set_all_convos(self, convos):
         self.convos = convos
 

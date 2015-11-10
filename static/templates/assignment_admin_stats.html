@@ -9,6 +9,9 @@
     <div class="progress">
       <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: {{ta_stats.stats.completed}}%;">{{ta_stats.user.firstname}} {{ta_stats.user.lastname}}: {{ta_stats.stats.completed}}</div>
     </div>
+    {% if student.usertype == "superta" %}
+    <small>Reviews Assigned: {{ ta_stats.stats.total_assigned }}</small>
+    {% endif %}
   </div>
 
   <div class="col-md-4">
