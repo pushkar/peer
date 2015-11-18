@@ -13,9 +13,11 @@ class review_convo_info():
 
     def get_convo_by_id(self, id):
         self.convo = ReviewConvo.objects.get(pk=id)
+        return self.convo
 
     def get_by_submission_and_assigned(self, submission, student):
         self.convo = ReviewConvo.objects.get(submission=submission, assigned=student)
+        return self.convo
 
     def check_details(self):
         if self.convo.details == None or self.convo.details == "":

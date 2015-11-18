@@ -9,6 +9,7 @@ from api.models import *
 from student.log import *
 from assignment.reviews_info  import *
 from assignment.review_convos_info import *
+from student.students_info import *
 
 import json
 
@@ -198,17 +199,41 @@ def update_review(request):
 
     return JsonResponse(response)
 
-def get_reviews(request, a_name, username):
+def get_review(request):
     response = {}
     response['message'] = ""
     if request.method == "GET":
         check_key(response, request.GET.get('apikey', ''))
         if not response['error']:
+            username = request.GET.get('submission_username', '')
+            assignment_short_name = request.GET.get('assignment_short_name', '')
+
+            try:
+                student = Student.objects.get(username=username)
+                assignment = Assignment.objects.get(short_name=assignment_short_name)
+            except:
+                response['message'] = "Incorrect username:" + username + " or assignment name:" + assignment_short_name
+                return JsonResponse(response)
+
             ri = reviews_info()
-            ri.get_reviews_by_assignment(a_name)
-            reviews = r.filter_by_student(Student.objects.get(username=username))
+            rci = review_convos_info()
+
+            # reviews
+            if assignment_short_name != '':
+                reviews = ri.get_reviews_by_assignment(assignment)
+            else:
+                reviews = ri.get_all_reviews()
+
+            if username != '':
+                reviews = ri.filter_by_student(student, reviews)
+
+            response['reviews'] = ri.serialize(reviews)
+
+            #convos
+            response['convos'] = {}
             for r in reviews:
-                rci = review_convos_info()
-                rci.get_convos_by_reviews(r)
+                rci.get_convos_by_review(r)
+                response['convos'][r.pk] = rci.serialize()
+
 
     return JsonResponse(response)

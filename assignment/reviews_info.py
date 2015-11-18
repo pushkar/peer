@@ -2,6 +2,7 @@ from student.models import *
 from assignment.models import *
 from review_convo_info import *
 from review_convos_info import *
+from django.forms.models import model_to_dict
 import numpy as np
 import json
 
@@ -48,6 +49,17 @@ class reviews_info():
             reviews = self.reviews
         reviews = reviews.filter(assigned=s)
         return reviews
+
+    def serialize(self, reviews=None):
+        if reviews == None:
+            reviews = self.reviews
+        data = {}
+        for r in reviews:
+            rd = model_to_dict(r, fields=['score'])
+            rd['assigned_username'] = r.assigned.username
+            rd['assigned_usertype'] = r.assigned.usertype
+            data[r.pk] = rd
+        return data
 
     def get_data(self, reviews=None):
         if reviews == None:
