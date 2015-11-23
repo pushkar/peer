@@ -24,25 +24,27 @@
 </small>
 {% endif %}
 
-{% if allow_to_score or usertype == "superta" %}
-<p>Change score by:
-    <a href="{% url 'assignment:submit_add_reviewscore' a_name review.pk "-10" %}" data-ajax="true" data-success="load_content">-10</a>,
-    <a href="{% url 'assignment:submit_add_reviewscore' a_name review.pk "-5" %}" data-ajax="true" data-success="load_content">-5</a>,
-    <a href="{% url 'assignment:submit_add_reviewscore' a_name review.pk "-2" %}" data-ajax="true" data-success="load_content">-2</a>,
-    <a href="{% url 'assignment:submit_add_reviewscore' a_name review.pk "-1" %}" data-ajax="true" data-success="load_content">-1</a> or
-    <a href="{% url 'assignment:submit_add_reviewscore' a_name review.pk "1" %}" data-ajax="true" data-success="load_content">+1</a>,
-    <a href="{% url 'assignment:submit_add_reviewscore' a_name review.pk "2" %}" data-ajax="true" data-success="load_content">+2</a>,
-    <a href="{% url 'assignment:submit_add_reviewscore' a_name review.pk "5" %}" data-ajax="true" data-success="load_content">+5</a>,
-    <a href="{% url 'assignment:submit_add_reviewscore' a_name review.pk "10" %}" data-ajax="true" data-success="load_content">+10</a>,
-    <a href="{% url 'assignment:submit_add_reviewscore' a_name review.pk "20" %}" data-ajax="true" data-success="load_content">+20</a>,
-    </p>
-{% else %}
-<p>Change score to:
-    <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "1" %}" data-ajax="true" data-success="load_content">1 (bad)</a>,
-    <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "2" %}" data-ajax="true" data-success="load_content">2</a>,
-    <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "3" %}" data-ajax="true" data-success="load_content">3</a>,
-    <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "4" %}" data-ajax="true" data-success="load_content">4</a> or
-    <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "5" %}" data-ajax="true" data-success="load_content">5 (good)</a>.</p>
+{% if allow_to_score %}
+  {% if score_on_hundred %}
+  <p>Change score by:
+      <a href="{% url 'assignment:submit_add_reviewscore' a_name review.pk "-10" %}" data-ajax="true" data-success="load_content">-10</a>,
+      <a href="{% url 'assignment:submit_add_reviewscore' a_name review.pk "-5" %}" data-ajax="true" data-success="load_content">-5</a>,
+      <a href="{% url 'assignment:submit_add_reviewscore' a_name review.pk "-2" %}" data-ajax="true" data-success="load_content">-2</a>,
+      <a href="{% url 'assignment:submit_add_reviewscore' a_name review.pk "-1" %}" data-ajax="true" data-success="load_content">-1</a> or
+      <a href="{% url 'assignment:submit_add_reviewscore' a_name review.pk "1" %}" data-ajax="true" data-success="load_content">+1</a>,
+      <a href="{% url 'assignment:submit_add_reviewscore' a_name review.pk "2" %}" data-ajax="true" data-success="load_content">+2</a>,
+      <a href="{% url 'assignment:submit_add_reviewscore' a_name review.pk "5" %}" data-ajax="true" data-success="load_content">+5</a>,
+      <a href="{% url 'assignment:submit_add_reviewscore' a_name review.pk "10" %}" data-ajax="true" data-success="load_content">+10</a>,
+      <a href="{% url 'assignment:submit_add_reviewscore' a_name review.pk "20" %}" data-ajax="true" data-success="load_content">+20</a>,
+      </p>
+  {% else %}
+  <p>Change score to:
+      <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "1" %}" data-ajax="true" data-success="load_content">1 (bad)</a>,
+      <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "2" %}" data-ajax="true" data-success="load_content">2</a>,
+      <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "3" %}" data-ajax="true" data-success="load_content">3</a>,
+      <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "4" %}" data-ajax="true" data-success="load_content">4</a> or
+      <a href="{% url 'assignment:submit_reviewscore' a_name review.pk "5" %}" data-ajax="true" data-success="load_content">5 (good)</a>.</p>
+  {% endif %}
 {% endif %}
 <br />
 {{review.0.submission}}

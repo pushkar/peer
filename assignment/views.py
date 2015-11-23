@@ -333,6 +333,8 @@ def review(request, a_name, id="1"):
     if not check_session(request):
         return HttpResponseRedirect(reverse('student:index'))
 
+    allow_to_score = False
+    score_on_hundred = False
     username = request.session["user"]
     usertype = request.session["usertype"]
     review = Review.objects.get(pk=id)
@@ -342,7 +344,8 @@ def review(request, a_name, id="1"):
         allowed = True
 
     if usertype == "ta" or usertype == "superta":
-        allowed = True
+        allowed  = True
+        allow_to_score = True
 
     if not allowed:
         try:
@@ -362,14 +365,18 @@ def review(request, a_name, id="1"):
 
     log_review(username, review, True)
 
-    allow_to_score = False
     if username == review.assigned.username:
         allow_to_score = True
+
+    score_on_hundred = False
+    if review.assigned.usertype == "ta":
+        score_on_hundred = True
 
     return render(request, 'assignment_review.html', {
             'username': username,
             'usertype': usertype,
             'allow_to_score': allow_to_score,
+            'score_on_hundred': score_on_hundred,
             'review': review,
             'files': files,
             'convo': convo,
