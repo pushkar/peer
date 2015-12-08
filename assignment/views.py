@@ -372,6 +372,10 @@ def review(request, a_name, id="1"):
     if review.assigned.usertype == "ta":
         score_on_hundred = True
 
+    ## This allows Hamid to score of 100
+    if review.assigned.usertype == "superta" and review.assigned.username == username:
+        score_on_hundred = True
+
     return render(request, 'assignment_review.html', {
             'username': username,
             'usertype': usertype,
