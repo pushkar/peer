@@ -1,8 +1,8 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from api import views
 
-urlpatterns = patterns('',
+urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^student/get/(?P<name>\w+)$', views.student, name='student'),
     url(r'^student/add/$', views.add_student, name='add_student'),
@@ -10,4 +10,4 @@ urlpatterns = patterns('',
     url(r'^review/add/$', views.add_review, name='add_review'),
     url(r'^review/update/$', views.update_review, name='update_review'),
     url(r'^review/get/$', views.get_review, name='get_review'),
-)
+]

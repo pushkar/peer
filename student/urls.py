@@ -1,8 +1,8 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from student import views
 
-urlpatterns = patterns('',
+urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^messages$', views.messages_all, name='messages_all'),
     url(r'^optin$', views.optin, name='optin'),
@@ -19,4 +19,4 @@ urlpatterns = patterns('',
     url(r'^populate$', views.populate, name='populate'),
 
     url(r'^login/(?P<user>\w+)$', views.login_change, name='login_change'),
-)
+]

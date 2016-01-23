@@ -1,8 +1,8 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from assignment import views
 
-urlpatterns = patterns('',
+urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^(?P<a_name>\w+)/$', views.home, name='home'),
     url(r'^(?P<a_name>\w+)/(?P<p_name>\w+)/$', views.page, name='page'),
@@ -33,4 +33,4 @@ urlpatterns = patterns('',
 
     url(r'^(?P<a_name>\w+)/reviewscore/(?P<review_id>[0-9]+)/(?P<value>[0-9]+)$', views.submit_reviewscore, name='submit_reviewscore'),
     url(r'^(?P<a_name>\w+)/addreviewscore/(?P<review_id>-?[0-9]+)/(?P<value>[+,-]?[0-9]+)$', views.submit_add_reviewscore, name='submit_add_reviewscore'),
-)
+]

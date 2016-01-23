@@ -36,6 +36,7 @@ INSTALLED_APPS = (
     'assignment',
     'api',
     'record',
+    'codework',
     #'exam',
 )
 
@@ -70,7 +71,7 @@ GANALYTICS_TRACKING_CODE = 'UA-59742834-1'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": "peerfall2015",
+        "NAME": "rlspring2016",
         "USER": "",
         "PASSWORD": "",
         "HOST": "localhost",
