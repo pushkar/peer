@@ -166,6 +166,10 @@ def home(request, a_name):
             review_pk = request.GET['review']
             extra_scripts = "load_div(\'"+ reverse('assignment:review', args=[a_name, review_pk]) +"\', \'#assignment_content\'); \n"
 
+        if request.GET.has_key('code'):
+            a_name = request.GET['code']
+            extra_scripts = "load_div(\'"+ reverse('codework:work', args=[a_name]) +"\', \'#assignment_content\'); \n"
+
     s = Student.objects.get(username=request.session['user'])
     a_all = Assignment.objects.all()
     a = a_all.filter(short_name=a_name)

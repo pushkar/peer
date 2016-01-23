@@ -4,7 +4,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = [
-    #url(r'^$', 'student.views.index', name='index'),
+    url(r'^$', 'student.views.index', name='index'),
     url(r'^student/', include('student.urls', namespace="student")),
     url(r'^assignment/', include('assignment.urls', namespace="assignment")),
     url(r'^api/', include('api.urls', namespace="api")),

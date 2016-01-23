@@ -3,6 +3,14 @@ from codework.models import *
 from codework.iopairs_info import *
 
 import random
+import math
+
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
 
 def solution_get(s, a, n):
     solution_len = IOSolution.objects.filter(student=s, assignment=a).count()
@@ -16,8 +24,16 @@ def solution_get(s, a, n):
 
     return IOSolution.objects.filter(student=s, assignment=a)
 
-def solution_update(s, a, pair, output=None, comments=None):
-    pair = IOSolution.objects.get(student=s, assignment=a, pair=pair)
+def solution_update(pk, output=None, comments=None):
+    pair = IOSolution.objects.get(pk=pk)
     pair.output_submitted = output
     pair.comments = comments
     pair.save()
+
+    if is_number(output):
+        if math.fabs(float(output) - float(pair.pair.output)) < 0.01:
+            return "Answer is correct."
+        else:
+            return "Answer is wrong."
+    else:
+        return "Answer is not a number."

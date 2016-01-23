@@ -1,12 +1,59 @@
-{% for pair in pairs %}
-{{pair.pair}}
+<p>Solve the problem for the following inputs:</p>
+
+{% for sol in solutions %}
+<form id="code-{{sol.pk}}-form" class="form-group" action="" method="post">{% csrf_token %}
+  <div class="row">
+
+    <div class="col-md-6">
+      <div class="form-group">
+        <b>Input:</b> <br />{{ sol.pair.input }} <br />
+      </div>
+
+      <div class="form-group">
+        <label for="output-{{sol.pk}}">Output:</label>
+        <textarea class="form-control" rows="3" id="output-{{sol.pk}}">{{sol.output_submitted}}</textarea>
+      </div>
+      <div class="form-group">
+        <button type="button" name="submit-{{sol.pk}}" class="btn btn-default">Submit</button>
+      </div>
+    </div>
+  </div>
+</form>
+
+<script type="text/javascript">
+$('#code-{{sol.pk}}-form').on('change', function(event){
+    event.preventDefault();
+    $.ajax({
+        type: "POST",
+        dataType: "json",
+        url: "{% url 'codework:update' sol.pk %}",
+        data: {
+                output:$('#output-{{sol.pk}}').val(),
+              },
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        },
+        success: function(result) {
+            load_messages();
+        },
+        error : function(xhr, errmsg, err) {
+            $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+ errmsg +
+                " <a href='#' class='close'>&times;</a></div>");
+            console.log(xhr.status + ": " + xhr.responseText);
+        }
+    })
+});
+</script>
 {% endfor %}
+
 <script type="text/javascript">
     (function(window,undefined){
         History.Adapter.bind(window,'statechange',function(){
             var State = History.getState();
         });
-        History.pushState({page:"{{ ap_this.0.name }}"}, "Page {{ ap_this.0.title }}", "?page={{ ap_this.0.name }}");
+        History.pushState({code:"{{ a_name }}"}, "Code {{ a_name }}", "?code={{ a_name }}");
     })(window);
 
     load_messages();

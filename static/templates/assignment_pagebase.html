@@ -23,6 +23,7 @@
                     <li><a href="{% url 'assignment:page' a_name page.name %}" data-ajax="true" data-success="load_content">{{ page.title }}</a></li>
                 {% endif %}
                 {% endfor %}
+                <li><a href="{% url 'codework:work' a_name %}" data-ajax="true" data-success="load_content">Solve with Code</a></li>
                 <li class="disabled"><a href="#"><b>Actions</b></a></li>
                 {% if student.usertype == "superta" %}
                 <li><a href="{% url 'assignment:admin' a_name %}" data-ajax="true" data-success="load_content">Admin: SuperActions</a></li>
@@ -81,7 +82,7 @@
         $('#assignment_content').html(content);
     }
 
-    load_review_menu();
+    //load_review_menu();
 
     {{ extra_scripts }}
 </script>
