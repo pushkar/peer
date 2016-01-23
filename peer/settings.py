@@ -98,7 +98,7 @@ USE_TZ = True
 import dj_database_url
 import os
 if os.getcwd() == "/app":
-    DATABASES = {'default': dj_database_url.config(default=os.environ["DATABASE"])}
+    DATABASES = {'default': dj_database_url.config(default=os.environ["DATABASE_URL"])}
 
 # Static asset configuration
 TEMPLATE_DIRS = (
