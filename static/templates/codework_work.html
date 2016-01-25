@@ -1,34 +1,38 @@
 <p>Solve the problem for the following inputs:</p>
 
-{% for sol in solutions %}
-<form id="code-{{sol.pk}}-form" class="form-group" action="" method="post">{% csrf_token %}
+{{solution.items}}
+{% for sol_pk, sol_data in solutions.items %}
+<form id="code-{{sol_pk}}-form" class="form-group" action="" method="post">{% csrf_token %}
   <div class="row">
 
     <div class="col-md-6">
       <div class="form-group">
-        <b>Input:</b> <br />{{ sol.pair.input }} <br />
+        <b>Input:</b> <br />{{ sol_data.input }} <br />
       </div>
 
       <div class="form-group">
-        <label for="output-{{sol.pk}}">Output:</label>
-        <textarea class="form-control" rows="3" id="output-{{sol.pk}}">{{sol.output_submitted}}</textarea>
+        <label for="output-{{sol_pk}}">Output:</label>
+        <textarea class="form-control" rows="3" id="output-{{sol_pk}}">{{sol_data.output_submitted}}</textarea>
+        <small class="text-muted">
+          <b>{{ sol_data.check }}</b>
+        </small>
       </div>
       <div class="form-group">
-        <button type="button" name="submit-{{sol.pk}}" class="btn btn-default">Submit</button>
+        <button type="button" name="submit-{{sol_pk}}" class="btn btn-default">Check</button>
       </div>
     </div>
   </div>
 </form>
 
 <script type="text/javascript">
-$('#code-{{sol.pk}}-form').on('change', function(event){
+$('#code-{{sol_pk}}-form').on('change', function(event){
     event.preventDefault();
     $.ajax({
         type: "POST",
         dataType: "json",
-        url: "{% url 'codework:update' sol.pk %}",
+        url: "{% url 'codework:update' sol_pk %}",
         data: {
-                output:$('#output-{{sol.pk}}').val(),
+                output:$('#output-{{sol_pk}}').val(),
               },
         beforeSend: function(xhr, settings) {
             if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
@@ -36,7 +40,7 @@ $('#code-{{sol.pk}}-form').on('change', function(event){
             }
         },
         success: function(result) {
-            load_messages();
+            load_div("{% url 'codework:work' a_name %}", '#assignment_content');
         },
         error : function(xhr, errmsg, err) {
             $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+ errmsg +

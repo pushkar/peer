@@ -24,6 +24,23 @@ def solution_get(s, a, n):
 
     return IOSolution.objects.filter(student=s, assignment=a)
 
+def solution_check(s, a):
+    solutions = IOSolution.objects.filter(student=s, assignment=a)
+    solution_check_ = {}
+    for s in solutions:
+        if s.output_submitted:
+            if is_number(s.output_submitted):
+                if math.fabs(float(s.output_submitted) - float(s.pair.output)) < 0.01:
+                    solution_check_[s.pk] = "Answer is correct."
+                else:
+                    solution_check_[s.pk] = "Answer is wrong."
+            else:
+                solution_check_[s.pk] = "Answer is not a number."
+        else:
+            solution_check_[s.pk] = "No solution yet."
+    return solution_check_
+
+
 def solution_update(pk, output=None, comments=None):
     pair = IOSolution.objects.get(pk=pk)
     pair.output_submitted = output

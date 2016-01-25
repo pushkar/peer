@@ -67,6 +67,7 @@
 <script type="text/javascript">
 
     function load_div(url, div) {
+      console.log("- load_div(,)")
         ajaxGet(url, function(content) {
             $(div).html(content)
         });

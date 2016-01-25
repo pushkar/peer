@@ -55,11 +55,21 @@ def work(request, a_name):
         solutions = IOSolution.objects.none()
         messages.info(request, "No coding excercises exist for this assignment.")
 
+    check = solution_check(s, a)
+
+    solutions_dict = {}
+    for s in solutions:
+        data = {}
+        data['input'] = s.pair.input
+        data['output_submitted'] = s.output_submitted
+        data['check'] = check[s.pk]
+        solutions_dict[s.pk] = data
+
     return render(request, 'codework_work.html', {
             'student': s,
             'a': a,
             'a_name': a_name,
-            'solutions': solutions,
+            'solutions': solutions_dict,
         })
 
 @ajax
