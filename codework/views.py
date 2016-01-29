@@ -58,6 +58,16 @@ def work(request, a_name):
         solutions = IOSolution.objects.none()
         messages.info(request, "No coding excercises exist for this assignment.")
 
+    deadline = a.due_date
+    if deadline > timezone.now():
+        tl = deadline - timezone.now()
+        time_left = "(" + str(tl.days) + " days, "
+        time_left += str(tl.seconds/3600) + ":"
+        time_left += str((tl.seconds%3600)/60) + " hours "
+        time_left += " left)"
+    else:
+        time_left = "(Deadline Passed)"
+        
     check = solution_check(s, a)
 
     solutions_dict = {}
@@ -67,16 +77,6 @@ def work(request, a_name):
         data['output_submitted'] = s.output_submitted
         data['check'] = check[s.pk]
         solutions_dict[s.pk] = data
-
-        deadline = a.due_date
-        if deadline > timezone.now():
-            tl = deadline - timezone.now()
-            time_left = "(" + str(tl.days) + " days, "
-            time_left += str(tl.seconds/3600) + ":"
-            time_left += str((tl.seconds%3600)/60) + " hours "
-            time_left += " left)"
-        else:
-            time_left = "(Deadline Passed)"
 
     return render(request, 'codework_work.html', {
             'student': s,
