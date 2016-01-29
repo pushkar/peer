@@ -4,6 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django_ajax.decorators import ajax
 from django.contrib import messages
+from django.utils import timezone, dateformat
+from datetime import timedelta
 
 from codework.models import *
 from student.models import *
@@ -14,6 +16,7 @@ from codework.iosource_info import *
 
 import urllib2
 import random
+import datetime
 
 def check_session(request):
     if not 'user' in request.session:
@@ -65,11 +68,23 @@ def work(request, a_name):
         data['check'] = check[s.pk]
         solutions_dict[s.pk] = data
 
+        deadline = a.due_date
+        if deadline > timezone.now():
+            tl = deadline - timezone.now()
+            time_left = "(" + str(tl.days) + " days, "
+            time_left += str(tl.seconds/3600) + ":"
+            time_left += str((tl.seconds%3600)/60) + " hours "
+            time_left += " left)"
+        else:
+            time_left = "(Deadline Passed)"
+
     return render(request, 'codework_work.html', {
             'student': s,
             'a': a,
             'a_name': a_name,
             'solutions': solutions_dict,
+            'deadline': deadline,
+            'time_left': time_left,
         })
 
 @ajax

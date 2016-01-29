@@ -1,6 +1,7 @@
+<p>Deadline: {{deadline}} {{time_left}}</p>
+<br />
 <p>Solve the problem for the following inputs:</p>
 
-{{solution.items}}
 {% for sol_pk, sol_data in solutions.items %}
 <form id="code-{{sol_pk}}-form" class="form-group" action="" method="post">{% csrf_token %}
   <div class="row">

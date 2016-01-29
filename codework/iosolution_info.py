@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.utils import timezone
 from codework.models import *
 from codework.iopairs_info import *
 
@@ -10,6 +11,14 @@ def is_number(s):
         float(s)
         return True
     except ValueError:
+        return False
+
+# returns True if deadline is not passed
+def check_deadline(a):
+    now = timezone.now()
+    if a.due_date > now:
+        return True
+    else:
         return False
 
 def solution_get(s, a, n):
@@ -42,15 +51,21 @@ def solution_check(s, a):
 
 
 def solution_update(pk, output=None, comments=None):
+    ret = ""
     pair = IOSolution.objects.get(pk=pk)
-    pair.output_submitted = output
-    pair.comments = comments
-    pair.save()
+    if check_deadline(pair.assignment):
+        pair.output_submitted = output
+        pair.comments = comments
+        pair.save()
+    else:
+        ret += "Deadline has passed. Answer will not be recorded. "
+
 
     if is_number(output):
         if math.fabs(float(output) - float(pair.pair.output)) < 0.01:
-            return "Answer is correct."
+            ret += "Answer is correct."
         else:
-            return "Answer is wrong."
+            ret += "Answer is wrong."
     else:
-        return "Answer is not a number."
+        ret += "Answer is not a number."
+    return ret
