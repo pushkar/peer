@@ -52,10 +52,10 @@ def work(request, a_name):
     s = Student.objects.get(username=request.session['user'])
     a = Assignment.objects.get(short_name=a_name)
 
+    io_solution = iosolution_info()
     if iosource_ifexists(a):
-        solutions = solution_get(s, a, 3)
+        io_solution.generate(s, a, 3)
     else:
-        solutions = IOSolution.objects.none()
         messages.info(request, "No coding excercises exist for this assignment.")
 
     deadline = a.due_date
@@ -67,15 +67,16 @@ def work(request, a_name):
         time_left += " left)"
     else:
         time_left = "(Deadline Passed)"
-        
-    check = solution_check(s, a)
+
+    solutions = io_solution.get_solutions()
+    solutions_check = io_solution.check()
 
     solutions_dict = {}
-    for s in solutions:
+    for s in io_solution.get_solutions():
         data = {}
         data['input'] = s.pair.input
         data['output_submitted'] = s.output_submitted
-        data['check'] = check[s.pk]
+        data['check'] = solutions_check[s.pk]
         solutions_dict[s.pk] = data
 
     return render(request, 'codework_work.html', {

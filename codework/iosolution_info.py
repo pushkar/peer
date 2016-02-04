@@ -5,6 +5,7 @@ from codework.iopairs_info import *
 
 import random
 import math
+import re
 
 def is_number(s):
     try:
@@ -12,6 +13,38 @@ def is_number(s):
         return True
     except ValueError:
         return False
+
+def check_hw1(output, output_submitted):
+    if output_submitted:
+        if is_number(output_submitted):
+            if math.fabs(float(output_submitted) - float(output)) < 0.01:
+                return "Answer is correct."
+            else:
+                return "Answer is wrong."
+        else:
+            return "Answer is not a number."
+    else:
+        return "No solution yet."
+
+def check_hw2(output, output_submitted):
+    return check_hw1(output, output_submitted)
+
+def check_hw3(output, output_submitted):
+    if output_submitted:
+        nums = re.compile(r"[+-]?\d+(?:\.\d+)?")
+        o = re.findall(nums, output)
+        o_s = re.findall(nums, output_submitted)
+        if len(o) != 3:
+            return "Input is wrong. Send the input to TA."
+        if len(o_s) != 3:
+            return "You need to give atleast 3 numbers: bestX=1,bestY=2,LInfinityDistance=3."
+
+        if int(o[2]) == int(o_s[2]):
+            return "LInfinityDistance Value is correct."
+        else:
+            return "LInfinityDistance of " + str(o_s[2]) + " is wrong. Try again."
+    else:
+        return "No solution yet."
 
 # returns True if deadline is not passed
 def check_deadline(a):
@@ -21,51 +54,55 @@ def check_deadline(a):
     else:
         return False
 
-def solution_get(s, a, n):
-    solution_len = IOSolution.objects.filter(student=s, assignment=a).count()
-    pairs_needed = 0
-    if solution_len < n:
-        pairs_needed = n-solution_len
+class iosolution_info():
+    solutions = IOPair.objects.none()
 
-    for i in range(0, pairs_needed):
-        pair = pair_get_random(a)
-        IOSolution.objects.get_or_create(student=s, assignment=a, pair=pair)
+    def generate(self, s, a, n):
+        solution_len = IOSolution.objects.filter(student=s, assignment=a).count()
+        pairs_needed = 0
+        if solution_len < n:
+            pairs_needed = n-solution_len
 
-    return IOSolution.objects.filter(student=s, assignment=a)
+        for i in range(0, pairs_needed):
+            pair = pair_get_random(a)
+            IOSolution.objects.get_or_create(student=s, assignment=a, pair=pair)
+        self.solutions = IOSolution.objects.filter(student=s, assignment=a)
 
-def solution_check(s, a):
-    solutions = IOSolution.objects.filter(student=s, assignment=a)
-    solution_check_ = {}
-    for s in solutions:
-        if s.output_submitted:
-            if is_number(s.output_submitted):
-                if math.fabs(float(s.output_submitted) - float(s.pair.output)) < 0.01:
-                    solution_check_[s.pk] = "Answer is correct."
-                else:
-                    solution_check_[s.pk] = "Answer is wrong."
-            else:
-                solution_check_[s.pk] = "Answer is not a number."
-        else:
-            solution_check_[s.pk] = "No solution yet."
-    return solution_check_
+    def get(self, s, a):
+        self.solutions = IOSolution.objects.filter(student=s, assignment=a)
+        return self.solutions
+
+    def get_solutions(self):
+        return self.solutions
+
+    def check(self):
+        ret = {}
+        for s in self.solutions:
+            a_name = s.assignment.short_name
+            if a_name == "hw1":
+                ret[s.pk] = check_hw1(s.pair.output, s.output_submitted)
+            elif a_name == "hw2":
+                ret[s.pk] = check_hw2(s.pair.output, s.output_submitted)
+            elif a_name == "hw3":
+                ret[s.pk] = check_hw3(s.pair.output, s.output_submitted)
+        return ret
 
 
 def solution_update(pk, output=None, comments=None):
     ret = ""
-    pair = IOSolution.objects.get(pk=pk)
-    if check_deadline(pair.assignment):
-        pair.output_submitted = output
-        pair.comments = comments
-        pair.save()
+    solution = IOSolution.objects.get(pk=pk)
+    if check_deadline(solution.assignment):
+        solution.output_submitted = output
+        solution.comments = comments
+        solution.save()
     else:
         ret += "Deadline has passed. Answer will not be recorded. "
 
-
-    if is_number(output):
-        if math.fabs(float(output) - float(pair.pair.output)) < 0.01:
-            ret += "Answer is correct."
-        else:
-            ret += "Answer is wrong."
-    else:
-        ret += "Answer is not a number."
+    a_name = solution.assignment.short_name
+    if a_name == "hw1":
+        ret += check_hw1(solution.pair.output, solution.output_submitted)
+    elif a_name == "hw2":
+        ret += check_hw2(solution.pair.output, solution.output_submitted)
+    elif a_name == "hw3":
+        ret += check_hw3(solution.pair.output, solution.output_submitted)
     return ret
