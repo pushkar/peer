@@ -118,4 +118,6 @@ def solution_update(pk, output=None, comments=None):
         ret += check_hw2(solution.pair.output, solution.output_submitted)
     elif a_name == "hw3":
         ret += check_hw3(solution.pair.output, solution.output_submitted)
+    elif a_name == "hw4":
+        ret += check_hw4(solution.pair.output, solution.output_submitted)
     return ret
