@@ -9,8 +9,8 @@ class IOSource(models.Model):
 
 class IOPair(models.Model):
     assignment = models.ForeignKey(Assignment)
-    input = models.CharField(max_length=500)
-    output = models.CharField(max_length=2000)
+    input = models.CharField(max_length=1000)
+    output = models.CharField(max_length=50000)
 
     def __unicode__(self):
         return unicode(self.input + " -> " + self.output)
@@ -19,7 +19,7 @@ class IOSolution(models.Model):
     student = models.ForeignKey(Student)
     assignment = models.ForeignKey(Assignment)
     pair = models.ForeignKey(IOPair)
-    output_submitted = models.CharField(max_length=2000, null=True, blank=True)
+    output_submitted = models.CharField(max_length=50000, null=True, blank=True)
     comments = models.CharField(max_length=2000, null=True, blank=True)
 
 class IOSubmission(models.Model):

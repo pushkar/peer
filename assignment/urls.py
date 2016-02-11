@@ -14,7 +14,6 @@ urlpatterns = [
     url(r'^(?P<a_name>\w+)/page/rdebug/$', views.review_debug, name='rdebug'),
 
     url(r'^(?P<a_name>\w+)/submission$', views.submission, name='submission'),
-    url(r'^(?P<a_name>\w+)/submission/(?P<username>\w+)/files$', views.submission_files, name='submission_files'),
     url(r'^(?P<a_name>\w+)/submission/add$', views.submission_add, name='submission_add'),
     url(r'^(?P<a_name>\w+)/submission/(?P<id>[0-9]+)/delete$', views.submission_delete, name='submission_delete'),
 

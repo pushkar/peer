@@ -578,80 +578,62 @@ def review_debug(request, a_name):
         'reviews_dict': reviews_dict,
     })
 
-
 @ajax
 def submission(request, a_name):
-    username = request.session["user"]
-    ap = AssignmentPage.objects.filter(assignment__short_name=a_name)
+    if not check_session(request):
+        return HttpResponseRedirect(reverse('student:index'))
 
-    form = ReportForm()
+    s = Student.objects.get(username=request.session['user'])
+    a_all = Assignment.objects.all()
+    a = a_all.filter(short_name=a_name)
 
-    try:
-        submission = Submission.objects.get(student__username=username, assignment__short_name=a_name)
-        files = SubmissionFile.objects.filter(submission=submission)
-    except:
-        submission = Submission.objects.none()
-        files = SubmissionFile.objects.none()
+    sub_info = submission_info()
+    submission = sub_info.get_by_student_and_assignment(s, a)
+    files = sub_info.get_files(submission)
 
     return render(request, 'assignment_submitreport.html', {
-            'ap': ap,
+            'student': s,
+            'a': a,
             'a_name': a_name,
-            'username': username,
+            'assignments': a_all,
             'submission': submission,
             'files': files,
-            'form': form,
         })
 
 @ajax
-def submission_files(request, a_name, username):
-    files = SubmissionFile.objects.filter(submission__student__username=username, submission__assignment__short_name=a_name)
-
-    return render(request, 'assignment_submission_files.html', {
-            'a_name': a_name,
-            'username': username,
-            'files': files,
-    })
-
-@ajax
 def submission_add(request, a_name):
-    username = request.session["user"]
-    try:
-        submission = Submission.objects.get(student__username=username, assignment__short_name=a_name)
-    except:
-        s = Student.objects.get(username=username)
-        a = Assignment.objects.get(short_name=a_name)
-        submission = Submission()
-        submission.student = s
-        submission.assignment = a
-        submission.save()
+    if not check_session(request):
+        return HttpResponseRedirect(reverse('student:index'))
+
+    s = Student.objects.get(username=request.session['user'])
+    a_all = Assignment.objects.all()
+    a = a_all.filter(short_name=a_name)
+
+    sub_info = submission_info()
+    submission = sub_info.get_by_student_and_assignment(s, a)
 
     if request.method == "POST":
-        form = ReportForm(request.POST)
-        if form.is_valid():
-            file = SubmissionFile()
-            file.name = form.cleaned_data['file_name']
-            file.link = form.cleaned_data['file_link']
-            print file.name
-            print file.link
-            file.submission = submission
-            file.save()
+        fname = request.POST.get("filename", "")
+        flink = request.POST.get("filelink", "")
+        if len(fname) > 0 and len(flink) > 0:
+            print "Adding " + fname + ": " + flink
+            print submission
+            sub_info.add_file(submission, fname, flink)
             messages.success(request, "File was added successfully.")
-        else:
-            messages.warning(request, "Failed to add file.")
 
 @ajax
 def submission_delete(request, a_name, id):
-    response = {}
-    username = request.session["user"]
-    file = SubmissionFile.objects.get(pk=id)
-    if file.submission.student.username == username:
-        file.delete()
-        messages.success(request, "File was deleted successfully.")
-        response['result'] = "success"
-    else:
-        messages.warning(request, "Login to delete file.")
-        response['result'] = "fail"
-    return HttpResponse(json.dumps(response), content_type="application/json")
+    if not check_session(request):
+        return HttpResponseRedirect(reverse('student:index'))
+
+    s = Student.objects.get(username=request.session['user'])
+    a_all = Assignment.objects.all()
+    a = a_all.filter(short_name=a_name)
+
+    sub_info = submission_info()
+    submission = sub_info.get_by_id(id)
+
+    message.success("No functionality to delete files")
 
 def submit_reviewscore(request, a_name, review_id, value):
     try:

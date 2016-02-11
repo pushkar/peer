@@ -7,10 +7,7 @@ class submission_info():
     message = ""
 
     def get_by_student_and_assignment(self, s, a):
-        try:
-            self.submission = Submission.objects.get(student=s, assignment=a)
-        except Submission.DoesNotExist:
-            self.submission = None
+        self.submission = Submission.objects.get_or_create(student=s, assignment=a[0])[0]
         return self.submission
 
     def get_by_id(self, id):
@@ -21,13 +18,21 @@ class submission_info():
         return self.message
 
     def add_file(self, submission, f_name, f_link):
+        if submission:
+            if not submission.files:
+                submission.files = json.loads("{}")
+                submission.save()
+                
         files = json.loads(submission.files)
         files[f_link] = f_name
         submission.files = json.dumps(files)
         submission.save()
 
     def get_files(self, submission):
-        return json.loads(submission.files)
+        if submission:
+            if submission.files:
+                return json.loads(submission.files)
+        return json.loads("{}")
 
     def assign_reviewers(self, submission=None):
         if submission == None:

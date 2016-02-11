@@ -12,6 +12,10 @@ class Assignment(models.Model):
     short_name = models.CharField(max_length=50)
     name = models.CharField(max_length=200)
     due_date = models.DateTimeField(null=True)
+    enable_submission = models.BooleanField(default=False)
+    enable_codework = models.BooleanField(default=False)
+    enable_peer_review = models.BooleanField(default=False)
+    enable_stats = models.BooleanField(default=False)
 
     def __unicode__(self):
         return unicode(self.name)
@@ -29,7 +33,7 @@ class AssignmentPage(models.Model):
 class Submission(models.Model):
     student = models.ForeignKey(Student)
     assignment = models.ForeignKey(Assignment)
-    files = models.CharField(max_length=15000)
+    files = models.CharField(max_length=15000, null=True, blank=True)
 
     def __unicode__(self):
         return unicode(unicode(self.student) + ", " + unicode(self.assignment))
@@ -67,7 +71,7 @@ class ReviewConvo(models.Model):
 
 # Admin Views
 class AssignmentAdmin(admin.ModelAdmin):
-    list_display = ('short_name', 'name', 'due_date')
+    list_display = ('short_name', 'name', 'due_date', 'enable_submission', 'enable_peer_review', 'enable_codework', 'enable_stats')
 
 class AssignmentPageAdmin(admin.ModelAdmin):
     list_display = ('assignment', 'name', 'title')
