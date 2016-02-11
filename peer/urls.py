@@ -10,6 +10,6 @@ urlpatterns = [
     url(r'^api/', include('api.urls', namespace="api")),
     url(r'^record/', include('record.urls', namespace="record")),
     url(r'^code/', include('codework.urls', namespace="codework")),
-    #url(r'^exam/', include('exam.urls', namespace="exam")),
+    url(r'^exam/', include('exam.urls', namespace="exam")),
     url(r'^admin/', include(admin.site.urls)),
 ]

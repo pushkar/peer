@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% block assignment_content %}
+
+    <h2>Exams</h2>
+    <h4>{{ exam.name }}</h4>
+    <br />
+
+    <div class="row">
+      <div class="col-md-6">
+
+      {% for i,d in data.iteritems %}
+          <div class="panel panel-default">
+          <div class="panel-heading">{{ d.question.text }}</div>
+          <div class="panel-body">
+            <p>Hardness: {{ d.question.hardness }}</p>
+          </div>
+
+          <ul class="list-group">
+            {% for j, a in d.answers.iteritems %}
+              <li class="list-group-item">{{ a.label }}. {{ a.text }} (<a href="{% url 'exam:graders' a.id %}" data-ajax="true" data-success="load_graders">{{a.correctness}}</a>)</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endfor %}
+
+      </div>
+      <div class="col-md-6">
+        <div id="load_graders">
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+        function load_graders(content) {
+            $('#load_graders').html(content);
+        }
+    </script>
+    {% endblock %}
+{% endblock %}

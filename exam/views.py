@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django import template
 from django_ajax.decorators import ajax
+from django.forms.models import model_to_dict
 
 from student.models import *
 from exam_info import *
@@ -52,3 +53,30 @@ def submit_exam(request, exam_name):
         messages.success(request, "Your exam was submitted successfully.")
         tempexam.delete_exam()
     return HttpResponseRedirect(reverse('exam:index'))
+
+def admin_exam(request, exam_name):
+    e = exam_info(exam_name)
+    data = {}
+    q_set = question_set_info(e.get_exam())
+    for q in q_set.get_questions():
+        data_q = {}
+        data_q['question'] = model_to_dict(q, ['text', 'hardness'])
+        data_q['answers'] = {}
+        a_set = answer_set_info(q)
+        for a in a_set.get_answers():
+            data_q['answers'][a.id] = model_to_dict(a, ['id', 'label', 'text', 'correctness'])
+        data[q.id] = data_q
+
+    return render(request, 'exam_admin.html', {
+        'exam': e.get_exam(),
+        'data': data,
+        })
+
+@ajax
+def graders(request, id):
+    a = answer_info()
+    a.get_answer_by_id(id)
+    details = a.get_answer().details
+    return render(request, 'exam_graders.html', {
+        'data': details,
+    })

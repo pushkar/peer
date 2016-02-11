@@ -90,6 +90,9 @@ class answer_info():
     def __init__(self):
         pass
 
+    def get_answer(self):
+        return self.answer
+
     def get_answer_by_student_and_question(self, s, q):
         # what if a returns more than one answers?
         a = Answer.objects.get_or_create(student=s, question=q)
@@ -162,12 +165,12 @@ class tempexam_info():
             self.create_exam()
         return json.loads(self.tempexam.details)
 
-    def has_finished(self, exam_name):
+    def has_finished(self):
         if self.tempexam.finished == None or self.tempexam.details == "":
-            self.tempexam.finished = json.dumps({})
+            self.tempexam.finished = "0"
             self.tempexam.save()
-        finished = json.loads(self.tempexam.finished)
-        if finished.has_key(exam_name):
+        finished = self.tempexam.finished
+        if finished == "1":
             return True
         return False
 
@@ -254,11 +257,15 @@ class tempexam_info():
                         a = answer_info()
                         a.get_answer_by_id(aid)
                         a.add_grade(s, 0)
-        finished = json.loads(self.tempexam.finished)
-        finished[e.short_name] = 1
-        self.tempexam.finished = json.dumps(finished)
-        self.tempexam.save()
+
+        if not self.has_finished():
+            self.tempexam.finished = "1"
+            self.tempexam.save()
         return True
 
     def delete_exam(self):
-        self.tempexam.delete()
+        if not self.has_finished():
+            self.tempexam.finished = "1"
+            self.tempexam.save()
+        # Never delete the tempexam
+        # self.tempexam.delete()

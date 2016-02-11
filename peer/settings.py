@@ -37,7 +37,7 @@ INSTALLED_APPS = (
     'api',
     'record',
     'codework',
-    #'exam',
+    'exam',
 )
 
 MIDDLEWARE_CLASSES = (

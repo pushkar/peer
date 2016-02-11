@@ -9,5 +9,15 @@
         <li><a href="{% url 'exam:get_or_create_exam' e.short_name %}">{{ e.name }}</a> (Due on {{ e.end_time }})</li>
         {% endfor %}
     </ul>
+
+    {% if student.usertype == "superta" %}
+    <h3>Admin</h3>
+    <ul>
+        {% for e in exams %}
+        <li><a href="{% url 'exam:admin_exam' e.short_name %}">{{ e.name }}</a></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
     {% endblock %}
 {% endblock %}

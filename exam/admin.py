@@ -19,7 +19,7 @@ class AnswerAdmin(admin.ModelAdmin):
     list_filter = ('question',)
 
 class TempExamAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'updated', 'student', 'exam', 'details')
+    list_display = ('pk', 'updated', 'student', 'exam', 'finished', 'details')
     list_filter = ('exam',)
 
 admin.site.register(Exam, ExamAdmin)
