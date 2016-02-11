@@ -6,6 +6,7 @@ from codework.iopairs_info import *
 import random
 import math
 import re
+import json
 
 def is_number(s):
     try:
@@ -43,6 +44,16 @@ def check_hw3(output, output_submitted):
             return "LInfinityDistance Value is correct."
         else:
             return "LInfinityDistance of " + str(o_s[2]) + " is wrong. Try again."
+    else:
+        return "No solution yet."
+
+def check_hw4(output, output_submitted):
+    if output_submitted:
+        try:
+          json_object = json.loads(output_submitted)
+        except ValueError, e:
+          return "String is not a valid JSON."
+        return "String is a valid JSON. We will validate the answer soon."
     else:
         return "No solution yet."
 
@@ -85,6 +96,8 @@ class iosolution_info():
                 ret[s.pk] = check_hw2(s.pair.output, s.output_submitted)
             elif a_name == "hw3":
                 ret[s.pk] = check_hw3(s.pair.output, s.output_submitted)
+            elif a_name == "hw4":
+                ret[s.pk] = check_hw4(s.pair.output, s.output_submitted)
         return ret
 
 

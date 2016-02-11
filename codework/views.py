@@ -43,7 +43,6 @@ def import_pairs(request, a_name):
 
     return HttpResponse("Imported for " + a.name)
 
-
 @ajax
 def work(request, a_name):
     if not check_session(request):
@@ -51,12 +50,6 @@ def work(request, a_name):
 
     s = Student.objects.get(username=request.session['user'])
     a = Assignment.objects.get(short_name=a_name)
-
-    io_solution = iosolution_info()
-    if iosource_ifexists(a):
-        io_solution.generate(s, a, 3)
-    else:
-        messages.info(request, "No coding excercises exist for this assignment.")
 
     deadline = a.due_date
     if deadline > timezone.now():
@@ -67,6 +60,15 @@ def work(request, a_name):
         time_left += " left)"
     else:
         time_left = "(Deadline Passed)"
+
+    io_solution = iosolution_info()
+    if iosource_ifexists(a):
+        if a.short_name == "hw4":
+            io_solution.generate(s, a, 1)
+        else:
+            io_solution.generate(s, a, 3)
+    else:
+        messages.info(request, "No coding excercises exist for this assignment.")
 
     solutions = io_solution.get_solutions()
     solutions_check = io_solution.check()
