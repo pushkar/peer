@@ -130,8 +130,7 @@ def add_submission(request):
             files = request.GET.get('files', '')
             if student and assignment and len(files) > 0:
                 sub, created = Submission.objects.get_or_create(student=student, assignment=assignment)
-                if len(sub.files) != len(files):
-                    sub.files = files
+                sub.files = files
                 sub.save()
                 if created == True:
                     response['message'] = 'Created submission for ' + username
