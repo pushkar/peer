@@ -12,6 +12,7 @@ class Assignment(models.Model):
     short_name = models.CharField(max_length=50)
     name = models.CharField(max_length=200)
     due_date = models.DateTimeField(null=True)
+    end_date = models.DateTimeField(null=True)
     enable_submission = models.BooleanField(default=False)
     enable_codework = models.BooleanField(default=False)
     enable_peer_review = models.BooleanField(default=False)

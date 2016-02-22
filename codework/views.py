@@ -52,12 +52,23 @@ def work(request, a_name):
     a = Assignment.objects.get(short_name=a_name)
 
     deadline = a.due_date
+    endline = deadline
+    submit_late = False
+    if a.end_date:
+        endline = a.end_date
     if deadline > timezone.now():
         tl = deadline - timezone.now()
         time_left = "(" + str(tl.days) + " days, "
         time_left += str(tl.seconds/3600) + ":"
         time_left += str((tl.seconds%3600)/60) + " hours "
         time_left += " left)"
+    elif timezone.now() < endline:
+        tl = endline - timezone.now()
+        time_left = "(" + str(tl.days) + " days, "
+        time_left += str(tl.seconds/3600) + ":"
+        time_left += str((tl.seconds%3600)/60) + " hours "
+        time_left += " left to submit late)"
+        submit_late = True
     else:
         time_left = "(Deadline Passed)"
 
@@ -88,6 +99,7 @@ def work(request, a_name):
             'solutions': solutions_dict,
             'deadline': deadline,
             'time_left': time_left,
+            'submit_late': submit_late,
         })
 
 @ajax
@@ -98,5 +110,6 @@ def update(request, id):
     output_submitted = ""
     if request.method == "POST":
         output_submitted = request.POST.get("output", "")
-        ans = solution_update(id, output_submitted)
+        submit_late = request.POST.get("submit_late", "")
+        ans = solution_update(id, output_submitted, submit_late)
         messages.success(request, ans)

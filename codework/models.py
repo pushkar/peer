@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.utils import timezone
 from assignment.models import *
 
 class IOSource(models.Model):
@@ -16,6 +17,8 @@ class IOPair(models.Model):
         return unicode(self.input + " -> " + self.output)
 
 class IOSolution(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
     student = models.ForeignKey(Student)
     assignment = models.ForeignKey(Assignment)
     pair = models.ForeignKey(IOPair)
@@ -35,7 +38,7 @@ class IOPairAdmin(admin.ModelAdmin):
     list_display = ('assignment', 'input', 'output')
 
 class IOSolutionAdmin(admin.ModelAdmin):
-    list_display = ('student', 'assignment', 'pair', 'output_submitted')
+    list_display = ('student', 'assignment', 'created', 'updated', 'pair', 'output_submitted')
     search_fields = ('stduent__lastname', 'student__firstname', 'student__username')
     list_filter = ('assignment__name',)
 

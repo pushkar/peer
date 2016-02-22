@@ -20,21 +20,29 @@
           <b>{{ sol_data.check }}</b>
         </small>
       </div>
+      {% if submit_late %}
       <div class="form-group">
-        <button type="button" name="submit-{{sol_pk}}" class="btn btn-default">Check</button>
+        <div class="checkbox">
+          <label><input type="checkbox" id="submit_late-{{sol_pk}}" value="late">Submit Late</label>
+        </div>
+      </div>
+      {% endif %}
+      <div class="form-group">
+        <button type="submit" name="submit-{{sol_pk}}" class="btn btn-default">Check</button>
       </div>
     </div>
   </div>
 </form>
 
 <script type="text/javascript">
-$('#code-{{sol_pk}}-form').on('change', function(event){
+$('#code-{{sol_pk}}-form').submit(function(event){
     event.preventDefault();
     $.ajax({
         type: "POST",
         dataType: "json",
         url: "{% url 'codework:update' sol_pk %}",
         data: {
+                submit_late:$('#submit_late-{{sol_pk}}').is(":checked"),
                 output:$('#output-{{sol_pk}}').val(),
               },
         beforeSend: function(xhr, settings) {

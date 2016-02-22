@@ -21,7 +21,7 @@ def check_hw1(output, output_submitted):
             if math.fabs(float(output_submitted) - float(output)) < 0.01:
                 return "Answer is correct."
             else:
-                return "Answer is wrong."
+                return "Answer is wrong. ("+ output_submitted +")"
         else:
             return "Answer is not a number."
     else:
@@ -101,10 +101,10 @@ class iosolution_info():
         return ret
 
 
-def solution_update(pk, output=None, comments=None):
+def solution_update(pk, output=None, submit_late="false", comments=None):
     ret = ""
     solution = IOSolution.objects.get(pk=pk)
-    if check_deadline(solution.assignment):
+    if check_deadline(solution.assignment) or submit_late=="true":
         solution.output_submitted = output
         solution.comments = comments
         solution.save()
