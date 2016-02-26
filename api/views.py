@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.contrib import messages
 from django.http import JsonResponse
 from student.models import *
@@ -114,6 +115,39 @@ def add_student(request):
                     response['message'] = "No username and GTID given"
 
     return JsonResponse(response)
+
+def update_student(request, name):
+    response = {}
+    if request.method == 'GET':
+        check_key(response, request.GET.get('apikey', ''))
+
+        if not response['error']:
+            try:
+                s = Student.objects.get(username=name)
+                if 'gtid' in request.GET:
+                    gtid = request.GET['gtid']
+                    s.gtid = gtid
+                if 'firstname' in request.GET:
+                    firstname = request.GET['firstname']
+                    s.firstname = firstname
+                if 'lastname' in request.GET:
+                    lastname = request.GET['lastname']
+                    s.lastname = lastname
+                if 'usertype' in request.GET:
+                    usertype = request.GET['usertype']
+                    s.usertype = usertype
+                if 'email' in request.GET:
+                    email = request.GET['email']
+                    s.email = email
+                s.save()
+                response['message'] = "Student Information updated"
+            except ObjectDoesNotExist:
+                response['message'] = "No student found"
+            except MultipleObjectsReturned:
+                response['message'] = "Mutliple students found with username"
+
+    return JsonResponse(response)
+
 
 def add_submission(request):
     response = {}
