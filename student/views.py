@@ -8,6 +8,7 @@ from django_ajax.decorators import ajax
 
 from student.models import *
 from student.log import *
+from student.common import *
 from assignment.models import *
 from assignment.reviews_info import *
 
@@ -18,14 +19,10 @@ import urllib2
 import sendgrid
 
 # Create your views here.
-def check_session(request):
-    if not 'user' in request.session:
-        request.session['user'] = ""
-        request.session['usertype'] = ""
-
-    if not request.session['user']:
-        return False
-    return True
+from django.template.defaulttags import register
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)
 
 def send_email(email, gtid):
     sendgrid_user = ""
@@ -62,11 +59,13 @@ def index(request):
             'student': s,
             'assignments': assignments,
             'opt': opt_str,
+            'global': get_global(),
         })
     else:
         form = LoginForm()
         return render(request, 'index.html', {
             'form': form,
+            'global': get_global(),
         })
 
 def login(request):
@@ -113,6 +112,7 @@ def pass_request(request):
     else:
         passform = ForgotPasswordForm()
         return render(request, 'index.html', {
+            'global': get_global(),
             'passform': passform,
         })
 
@@ -150,6 +150,7 @@ def profile(request):
         opt = OptIn.objects.get(student=s)
 
         return render(request, 'profile.html', {
+            'global': get_global(),
             'student': s,
             'assignments': assignments,
             'opt': opt,
@@ -198,6 +199,7 @@ def updates(request):
                 data[r] = count
 
         return render(request, 'updates.html', {
+            'global': get_global(),
             'student': s,
             'assignments': assignments,
             'data': data,
@@ -221,6 +223,7 @@ def admin(request):
         a = Assignment.objects.all()
         s_all = Student.objects.all()
         return render(request, 'admin.html', {
+            'global': get_global(),
             'student': s,
             'assignments': a,
             'student_all': s_all,
@@ -279,6 +282,7 @@ def admin_review_assignments(request):
         return render(request, 'admin_review_assignments.html', {
             'student': s,
             'reviews_data': reviews_data,
+            'global': get_global(),
         })
 
     except Exception as e:

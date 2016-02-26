@@ -8,6 +8,7 @@ from django.db.models import Q
 from assignment.models import *
 from student.models import *
 from student.log import *
+from student.common import *
 
 from django.contrib.auth.forms import AuthenticationForm
 from django_ajax.decorators import ajax
@@ -25,15 +26,6 @@ import numpy as np
 import csv
 import json
 import random
-
-def check_session(request):
-    if not 'user' in request.session:
-        request.session['user'] = ""
-        request.session['usertype'] = ""
-
-    if not request.session['user']:
-        return False
-    return True
 
 # Displays all Assignments
 def index(request):
@@ -67,6 +59,7 @@ def page(request, a_name, p_name):
             'ap': ap,
             'ap_this': ap_this,
             'a_name': a_name,
+            'global': get_global(),
         })
 
 def find_reviewers(request, a_name, submission_id):
@@ -135,6 +128,7 @@ def stats(request, a_name):
             'convos_count': convos_count,
             'stats': stats,
             'display': display,
+            'global': get_global(),
         })
 
 # Default view for assignments
@@ -188,6 +182,7 @@ def home(request, a_name):
         'a_name': a_name,
         'submission': submission,
         'extra_scripts': extra_scripts,
+        'global': get_global(),
     })
 
 @ajax
@@ -245,6 +240,7 @@ def admin(request, a_name):
         'assignments': a_all,
         'a_name': a_name,
         'message': message,
+        'global': get_global(),
     })
 
 @ajax
@@ -283,6 +279,7 @@ def admin_stats(request, a_name):
         'assignments': a_all,
         'a_name': a_name,
         'tas_stats': tas_stats,
+        'global': get_global(),
     })
 
 @ajax
@@ -330,6 +327,7 @@ def admin_reviews(request, a_name, action, order_by):
         'reviews': reviews,
         'action': action,
         'order_by': ob,
+        'global': get_global(),
     })
 
 @ajax
@@ -391,6 +389,7 @@ def review(request, a_name, id="1"):
             'files': files,
             'a_name': a_name,
             'form': form,
+            'global': get_global(),
         })
 
 @ajax
@@ -444,6 +443,7 @@ def review_convo(request, a_name, id="1"):
             'convo': convo,
             'a_name': a_name,
             'form': form,
+            'global': get_global(),
         })
 
 @ajax
