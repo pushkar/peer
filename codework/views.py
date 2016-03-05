@@ -76,6 +76,8 @@ def work(request, a_name):
     if iosource_ifexists(a):
         if a.short_name == "hw4":
             io_solution.generate(s, a, 1)
+        elif a.short_name == "hw5":
+            io_solution.generate(s, a, 1)
         else:
             io_solution.generate(s, a, 3)
     else:

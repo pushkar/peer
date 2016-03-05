@@ -10,7 +10,7 @@ class IOSource(models.Model):
 
 class IOPair(models.Model):
     assignment = models.ForeignKey(Assignment)
-    input = models.CharField(max_length=1000)
+    input = models.CharField(max_length=50000)
     output = models.CharField(max_length=50000)
 
     def __unicode__(self):

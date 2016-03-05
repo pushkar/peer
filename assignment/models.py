@@ -21,6 +21,9 @@ class Assignment(models.Model):
     def __unicode__(self):
         return unicode(self.name)
 
+    class Meta:
+        ordering = ['due_date']
+
 class AssignmentPage(models.Model):
     assignment = models.ForeignKey(Assignment)
     name = models.CharField(max_length=200)

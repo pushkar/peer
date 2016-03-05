@@ -10,7 +10,9 @@
 
     <div class="col-md-6">
       <div class="form-group">
-        <b>Input:</b> <br />{{ sol_data.input }} <br />
+        <b>Input:</b> <br />
+        {% autoescape off %}{{ sol_data.input }}{% endautoescape %}
+        <br />
       </div>
 
       <div class="form-group">

@@ -57,6 +57,29 @@ def check_hw4(output, output_submitted):
     else:
         return "No solution yet."
 
+def check_hw5(output, output_submitted):
+    if output_submitted:
+        output = output.strip().split(',')
+        output_submitted = output_submitted.strip().split(',')
+        if len(output) == len(output_submitted):
+            i = 1
+            err = []
+            for (o, os) in zip(output, output_submitted):
+                if math.fabs(float(o) - float(os)) > 0.01:
+                    err.append(i)
+                i = i + 1
+            if len(err) == 0:
+                return "Solution is correct."
+            else:
+                if len(err) == 1:
+                    return "Value at state " + str(err[-1]) + " is wrong. You are close!"
+                return "Values at states " + " ".join(str(x)+", " for x in err[:-1]) + str(err[-1]) + " are wrong."
+
+        else:
+            return "The problem has " + str(len(output)) + " states, but your submission has " + str(len(output_submitted)) + " states."
+    else:
+        return "No solution yet."
+
 # returns True if deadline is not passed
 def check_deadline(a):
     now = timezone.now()
@@ -98,6 +121,8 @@ class iosolution_info():
                 ret[s.pk] = check_hw3(s.pair.output, s.output_submitted)
             elif a_name == "hw4":
                 ret[s.pk] = check_hw4(s.pair.output, s.output_submitted)
+            elif a_name == "hw5":
+                ret[s.pk] = check_hw5(s.pair.output, s.output_submitted)
         return ret
 
 
@@ -120,4 +145,6 @@ def solution_update(pk, output=None, submit_late="false", comments=None):
         ret += check_hw3(solution.pair.output, solution.output_submitted)
     elif a_name == "hw4":
         ret += check_hw4(solution.pair.output, solution.output_submitted)
+    elif a_name == "hw5":
+        ret += check_hw5(solution.pair.output, solution.output_submitted)
     return ret
