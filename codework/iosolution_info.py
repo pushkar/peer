@@ -58,27 +58,32 @@ def check_hw4(output, output_submitted):
         return "No solution yet."
 
 def check_hw5(output, output_submitted):
-    if output_submitted:
-        output = output.strip().split(',')
-        output_submitted = output_submitted.strip().split(',')
-        if len(output) == len(output_submitted):
-            i = 1
-            err = []
-            for (o, os) in zip(output, output_submitted):
-                if math.fabs(float(o) - float(os)) > 0.01:
-                    err.append(i)
-                i = i + 1
-            if len(err) == 0:
-                return "Solution is correct."
-            else:
-                if len(err) == 1:
-                    return "Value at state " + str(err[-1]) + " is wrong. You are close!"
-                return "Values at states " + " ".join(str(x)+", " for x in err[:-1]) + str(err[-1]) + " are wrong."
+    try:
+        if output_submitted:
+            output = output.strip('{}()[]')
+            output_submitted = output_submitted.strip('{}()[]')
+            output = output.strip().split(',')
+            output_submitted = output_submitted.strip().split(',')
+            if len(output) == len(output_submitted):
+                i = 1
+                err = []
+                for (o, os) in zip(output, output_submitted):
+                    if math.fabs(float(o) - float(os)) > 0.01:
+                        err.append(i)
+                    i = i + 1
+                if len(err) == 0:
+                    return "Solution is correct."
+                else:
+                    if len(err) == 1:
+                        return "Value at state " + str(err[-1]) + " is wrong. You are close!"
+                    return "Values at states " + " ".join(str(x)+", " for x in err[:-1]) + str(err[-1]) + " are wrong."
 
+            else:
+                return "The problem has " + str(len(output)) + " states, but your submission has " + str(len(output_submitted)) + " states."
         else:
-            return "The problem has " + str(len(output)) + " states, but your submission has " + str(len(output_submitted)) + " states."
-    else:
-        return "No solution yet."
+            return "No solution yet."
+    except Exception as e:
+        return '%s (%s)' % (e.message, type(e))
 
 # returns True if deadline is not passed
 def check_deadline(a):
