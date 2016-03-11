@@ -1,51 +1,52 @@
 <p>Deadline: {{deadline}} {{time_left}}</p>
-<br />
 {% if solutions %}
+<p>Total Score: {{ stats.total }}</p>
+<br />
 <p>Solve the problem for the following inputs:</p>
 {% endif %}
 
-{% for sol_pk, sol_data in solutions.items %}
-<form id="code-{{sol_pk}}-form" class="form-group" action="" method="post">{% csrf_token %}
+{% for sol in solutions %}
+<form id="code-{{sol.pk}}-form" class="form-group" action="" method="post">{% csrf_token %}
   <div class="row">
 
     <div class="col-md-6">
       <div class="form-group">
         <b>Input:</b> <br />
-        {% autoescape off %}{{ sol_data.input }}{% endautoescape %}
+        {% autoescape off %}{{ sol.pair.input }}{% endautoescape %}
         <br />
       </div>
 
       <div class="form-group">
-        <label for="output-{{sol_pk}}">Output:</label>
-        <textarea class="form-control" rows="3" id="output-{{sol_pk}}">{{sol_data.output_submitted}}</textarea>
+        <label for="output-{{sol.pk}}">Output:</label>
+        <textarea class="form-control" rows="3" id="output-{{sol.pk}}">{{sol.output_submitted}}</textarea>
         <small class="text-muted">
-          <b>{{ sol_data.check }}</b>
+          <b>{{ sol.comments }} ({{ sol.score }})</b>
         </small>
       </div>
       {% if submit_late %}
       <div class="form-group">
         <div class="checkbox">
-          <label><input type="checkbox" id="submit_late-{{sol_pk}}" value="late">Submit Late</label>
+          <label><input type="checkbox" id="submit_late-{{sol.pk}}" value="late">Submit Late</label>
         </div>
       </div>
       {% endif %}
       <div class="form-group">
-        <button type="submit" name="submit-{{sol_pk}}" class="btn btn-default">Check</button>
+        <button type="submit" name="submit-{{sol.pk}}" class="btn btn-default">Check</button>
       </div>
     </div>
   </div>
 </form>
 
 <script type="text/javascript">
-$('#code-{{sol_pk}}-form').submit(function(event){
+$('#code-{{sol.pk}}-form').submit(function(event){
     event.preventDefault();
     $.ajax({
         type: "POST",
         dataType: "json",
-        url: "{% url 'codework:update' sol_pk %}",
+        url: "{% url 'codework:update' sol.pk %}",
         data: {
-                submit_late:$('#submit_late-{{sol_pk}}').is(":checked"),
-                output:$('#output-{{sol_pk}}').val(),
+                submit_late:$('#submit_late-{{sol.pk}}').is(":checked"),
+                output:$('#output-{{sol.pk}}').val(),
               },
         beforeSend: function(xhr, settings) {
             if (!csrfSafeMethod(settings.type) && !this.crossDomain) {

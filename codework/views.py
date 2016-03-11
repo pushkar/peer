@@ -30,6 +30,12 @@ def check_session(request):
 def index(request):
     return HttpResponse("codework")
 
+def grade(request):
+    io_solution = iosolution_info()
+    io_solution.get()
+    io_solution.grade()
+    return HttpResponse("Grades done")
+
 @login_required
 def import_pairs(request, a_name):
     if not check_session(request):
@@ -84,24 +90,17 @@ def work(request, a_name):
         messages.info(request, "No coding excercises exist for this assignment.")
 
     solutions = io_solution.get_solutions()
-    solutions_check = io_solution.check()
-
-    solutions_dict = {}
-    for s in io_solution.get_solutions():
-        data = {}
-        data['input'] = s.pair.input
-        data['output_submitted'] = s.output_submitted
-        data['check'] = solutions_check[s.pk]
-        solutions_dict[s.pk] = data
+    stats = io_solution.get_stats()
 
     return render(request, 'codework_work.html', {
             'student': s,
             'a': a,
             'a_name': a_name,
-            'solutions': solutions_dict,
+            'solutions': solutions,
             'deadline': deadline,
             'time_left': time_left,
             'submit_late': submit_late,
+            'stats': stats,
         })
 
 @ajax
@@ -113,5 +112,7 @@ def update(request, id):
     if request.method == "POST":
         output_submitted = request.POST.get("output", "")
         submit_late = request.POST.get("submit_late", "")
-        ans = solution_update(id, output_submitted, submit_late)
-        messages.success(request, ans)
+        io_solution = iosolution_info()
+        ret = io_solution.update(id, output_submitted, submit_late)
+        io_solution.check()
+        messages.success(request, ret)

@@ -8,9 +8,10 @@ from student.models import *
 class ApiKey(models.Model):
     student = models.ForeignKey(Student)
     key = models.CharField(max_length=200)
+    permission = models.CharField(max_length=10, default="r")
 
     def __unicode__(self):
         return unicode("Key for " + unicode(self.student))
 
 class ApiKeyAdmin(admin.ModelAdmin):
-    list_display = ('student', 'key')
+    list_display = ('student', 'key', 'permission')
