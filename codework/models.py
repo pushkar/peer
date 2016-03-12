@@ -12,11 +12,31 @@ class IOSource(models.Model):
 class IOPair(models.Model):
     ''' Contains Input/Output pairs for each Assignment '''
     assignment = models.ForeignKey(Assignment)
-    input = models.CharField(max_length=50000)
+    input = models.CharField(max_length=550000)
     output = models.CharField(max_length=50000)
 
     def __unicode__(self):
         return unicode(self.input + " -> " + self.output)
+
+    def input_av(self):
+        if not self.input:
+            return "-"
+        ret = str(self.input)
+        ret_len = len(ret)
+        ret = ret[:30]
+        if ret_len > 30:
+            ret += "..."
+        return ret
+
+    def output_av(self):
+        if not self.output:
+            return "-"
+        ret = str(self.output)
+        ret_len = len(ret)
+        ret = ret[:30]
+        if ret_len > 30:
+            ret += "..."
+        return ret
 
 class IOSolution(models.Model):
     ''' Contains Input/Output pairs submited by students '''
@@ -67,7 +87,8 @@ class IOSourceAdmin(admin.ModelAdmin):
     list_display = ('assignment', 'url')
 
 class IOPairAdmin(admin.ModelAdmin):
-    list_display = ('assignment', 'input', 'output')
+    list_display = ('assignment', 'input_av', 'output_av')
+    list_filter = ('assignment__name', )
 
 class IOSolutionAdmin(admin.ModelAdmin):
     list_display = ('student', 'assignment', 'created', 'updated', 'late_av', 'output_submitted_av', 'score')

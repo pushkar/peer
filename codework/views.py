@@ -45,9 +45,9 @@ def import_pairs(request, a_name):
     a = Assignment.objects.get(short_name=a_name)
 
     if s.usertype == "ta" or s.usertype == "superta":
-        iosource_import_pairs(a)
+        ret = iosource_import_pairs(a)
 
-    return HttpResponse("Imported for " + a.name)
+    return HttpResponse("Imported for " + a.name + "<br />" + str(ret))
 
 @ajax
 def work(request, a_name):
@@ -83,6 +83,8 @@ def work(request, a_name):
         if a.short_name == "hw4":
             io_solution.generate(s, a, 1)
         elif a.short_name == "hw5":
+            io_solution.generate(s, a, 1)
+        elif a.short_name == "hw6":
             io_solution.generate(s, a, 1)
         else:
             io_solution.generate(s, a, 3)

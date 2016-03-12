@@ -111,6 +111,43 @@ def check_hw5(s):
     finally:
         s.save()
 
+def check_hw6(s):
+    output = s.pair.output
+    try:
+        if s.output_submitted:
+            output = output.strip('{}()[]')
+            output_submitted = s.output_submitted.strip('{}()[]')
+            output = output.lower()
+            output_submitted = output_submitted.lower()
+            output = output.strip().split(',')
+            output_submitted = output_submitted.strip().split(',')
+            if len(output) == len(output_submitted):
+                i = 1
+                err = []
+                for (o, os) in zip(output, output_submitted):
+                    if not o == os:
+                        err.append(i)
+                    i = i + 1
+                if len(err) == 0:
+                    s.comments = "Solution is correct."
+                    if s.updated < s.assignment.due_date:
+                        s.score = "30.0"
+                    else:
+                        s.score = "15.0"
+                else:
+                    if len(err) == 1:
+                        s.comments = "Value at " + str(err[-1]) + " is wrong. You are close!"
+                    s.comments = "Values at " + " ".join(str(x)+", " for x in err[:-1]) + str(err[-1]) + " are wrong."
+
+            else:
+                s.comments = "The problem has " + str(len(output)) + " states, but your submission has " + str(len(output_submitted)) + " states."
+        else:
+            s.comments = "No solution yet."
+    except Exception as e:
+        s.comments = '%s (%s)' % (e.message, type(e))
+    finally:
+        s.save()
+
 def check_deadline(a):
     '''
     Checks if the deadline has passed or not
@@ -192,6 +229,8 @@ class iosolution_info():
                 check_hw4(s)
             elif a_name == "hw5":
                 check_hw5(s)
+            elif a_name == "hw6":
+                check_hw6(s)
 
     def grade(self):
         for s in self.solutions:
@@ -212,6 +251,8 @@ class iosolution_info():
                 check_hw4(s)
             elif a_name == "hw5":
                 check_hw5(s)
+            elif a_name == "hw6":
+                check_hw6(s)
 
             for field in s._meta.local_fields:
                 if field.name == "updated":
