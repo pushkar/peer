@@ -135,10 +135,12 @@ def check_hw6(s):
                     else:
                         s.score = "15.0"
                 else:
-                    if len(err) == 1:
-                        s.comments = "Value at " + str(err[-1]) + " is wrong. You are close!"
-                    s.comments = "Values at " + " ".join(str(x)+", " for x in err[:-1]) + str(err[-1]) + " are wrong."
-
+                    s.score = "5.0"
+                    s.comments = str(len(err)) + " values are wrong."
+                    # More detailed output
+                    #if len(err) == 1:
+                    #    s.comments = "Value at " + str(err[-1]) + " is wrong. You are close!"
+                    #s.comments = "Values at " + " ".join(str(x)+", " for x in err[:-1]) + str(err[-1]) + " are wrong."
             else:
                 s.comments = "The problem has " + str(len(output)) + " states, but your submission has " + str(len(output_submitted)) + " states."
         else:
