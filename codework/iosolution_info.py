@@ -111,6 +111,12 @@ def check_hw5(s):
     finally:
         s.save()
 
+def hw6_score(len_err):
+    len_correct = 100-len_err
+    percent_correct = len_correct/100.0
+    score = 5.0 + (30.0-5.0) * pow(percent_correct, 2.0)
+    return str(score)
+
 def check_hw6(s):
     output = s.pair.output
     try:
@@ -135,7 +141,10 @@ def check_hw6(s):
                     else:
                         s.score = "15.0"
                 else:
-                    s.score = "5.0"
+                    if len(err) > 100:
+                        s.score = "5.0"
+                    else:
+                        s.score = hw6_score(len(err))
                     s.comments = str(len(err)) + " values are wrong."
                     # More detailed output
                     #if len(err) == 1:

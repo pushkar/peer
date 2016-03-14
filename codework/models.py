@@ -13,7 +13,7 @@ class IOPair(models.Model):
     ''' Contains Input/Output pairs for each Assignment '''
     assignment = models.ForeignKey(Assignment)
     input = models.CharField(max_length=550000)
-    output = models.CharField(max_length=50000)
+    output = models.CharField(max_length=100000)
 
     def __unicode__(self):
         return unicode(self.input + " -> " + self.output)
