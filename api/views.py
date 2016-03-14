@@ -7,6 +7,7 @@ from django.http import JsonResponse
 from student.models import *
 from assignment.models import *
 from api.models import *
+from codework.models import *
 from student.log import *
 from assignment.reviews_info  import *
 from assignment.review_convos_info import *
@@ -281,8 +282,8 @@ def get_review(request):
 
     return JsonResponse(response)
 
-@check_permissions("r")
-def codework(request, name):
+@check_permissions("rw")
+def codework(request, name, username):
     response = {}
     if request.method == 'GET':
         if name == "all":
@@ -290,11 +291,24 @@ def codework(request, name):
         else:
             assignment = Assignment.objects.filter(short_name=name)
 
+        if username == "all":
+            students = Student.objects.all()
+        else:
+            students = Student.objects.filter(username=username)
+
         response_codework = {}
         for a in assignment:
             response_codework_info = {}
-            response_codework_info['username'] = s.username
-            response_codework_info['gtid'] = s.gtid
+            for s in students:
+                ios = IOSolution.objects.filter(student=s, assignment=a)
+                response_codework_info['username'] = s.username
+                for io in ios:
+                    response_codework_info[io.pk] = {}
+                    response_codework_info[io.pk]['output'] = io.output_submitted
+                    response_codework_info[io.pk]['pair'] = {}
+                    response_codework_info[io.pk]['pair']['input'] = io.pair.input
+                    response_codework_info[io.pk]['pair']['output'] = io.pair.output
+            response_codework[a.short_name] = response_codework_info
         response['data'] = response_codework
         response['message'] = ""
     return JsonResponse(response)

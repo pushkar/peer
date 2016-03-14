@@ -118,3 +118,18 @@ def update(request, id):
         ret = io_solution.update(id, output_submitted, submit_late)
         io_solution.check()
         messages.success(request, ret)
+
+@login_required
+def hw4_csv(request):
+    if not check_session(request):
+        return HttpResponseRedirect(reverse('student:index'))
+
+    solutions = IOSolution.objects.filter(assignment__short_name="hw4")
+
+    ret = ""
+    for s in solutions:
+        ret += s.student.username + ","
+        ret += str(s.output_submitted)
+        ret += '\n' + "<br />"
+
+    return HttpResponse(ret)
