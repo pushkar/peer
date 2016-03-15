@@ -12,6 +12,7 @@ from student.log import *
 from assignment.reviews_info  import *
 from assignment.review_convos_info import *
 from student.students_info import *
+from codework.iosolution_info import *
 
 import json
 
@@ -286,29 +287,23 @@ def get_review(request):
 def codework(request, name, username):
     response = {}
     if request.method == 'GET':
+        io_solution = iosolution_info()
+        if name == "all" and username == "all":
+            io_solution.get()
+
         if name == "all":
             assignment = Assignment.objects.all()
         else:
             assignment = Assignment.objects.filter(short_name=name)
+            io_solution.get_by_assignment(assignment)
 
         if username == "all":
-            students = Student.objects.all()
+            student = Student.objects.all()
         else:
-            students = Student.objects.filter(username=username)
+            student = Student.objects.filter(username=username)
+            io_solution.get_by_student(students)
 
-        response_codework = {}
-        for a in assignment:
-            response_codework_info = {}
-            for s in students:
-                ios = IOSolution.objects.filter(student=s, assignment=a)
-                response_codework_info['username'] = s.username
-                for io in ios:
-                    response_codework_info[io.pk] = {}
-                    response_codework_info[io.pk]['output'] = io.output_submitted
-                    response_codework_info[io.pk]['pair'] = {}
-                    response_codework_info[io.pk]['pair']['input'] = io.pair.input
-                    response_codework_info[io.pk]['pair']['output'] = io.pair.output
-            response_codework[a.short_name] = response_codework_info
+        response_codework = io_solution.get_data()
         response['data'] = response_codework
         response['message'] = ""
     return JsonResponse(response)

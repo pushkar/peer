@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.utils import timezone
 from codework.models import *
 from codework.iopairs_info import *
+from django.forms.models import model_to_dict
 
 import random
 import math
@@ -159,6 +160,45 @@ def check_hw6(s):
     finally:
         s.save()
 
+def check_hw7(s):
+    output = s.pair.output
+    try:
+        if s.output_submitted:
+            output = output.replace("bestActions=", "")
+            output = output.strip('{}()[]')
+            output_submitted = s.output_submitted.strip('{}()[]')
+            output = output.lower()
+            output_submitted = output_submitted.lower()
+            output = output.strip().split(',')
+            output_submitted = output_submitted.strip().split(',')
+            if len(output) == len(output_submitted):
+                i = 1
+                err = []
+                for (o, os) in zip(output, output_submitted):
+                    if not o == os:
+                        err.append(i)
+                    i = i + 1
+                if len(err) == 0:
+                    s.comments = "Solution is correct."
+                    if s.updated < s.assignment.due_date:
+                        s.score = "10.0"
+                    else:
+                        s.score = "5.0"
+                else:
+                    s.score = "0"
+                    s.comments = "Solution is wrong."
+            else:
+                s.comments = "The problem has " + str(len(output)) + " states, but your submission has " + str(len(output_submitted)) + " states."
+        else:
+            s.comments = "No solution yet."
+    except Exception as e:
+        s.comments = '%s (%s)' % (e.message, type(e))
+    finally:
+        s.save()
+
+def check_hw8(s):
+    pass
+
 def check_deadline(a):
     '''
     Checks if the deadline has passed or not
@@ -208,6 +248,34 @@ class iosolution_info():
             self.solutions = IOSolution.objects.filter(student=s, assignment=a)
         return self.solutions
 
+    def get_by_student(self, s, solutions=None):
+        ''' Filters IOSolution objects for student s
+        :param s: Student
+        :returns: List of IOSolutions generated
+        '''
+        if solutions:
+            return solutions.filter(student=s)
+
+        if not self.solutions:
+            self.solutions = IOSolution.objects.filter(student=s)
+        else:
+            self.solutions = self.solutions.filter(student=s)
+        return self.solutions
+
+    def get_by_assignment(self, a, solutions=None):
+        ''' Filters IOSolution objects for assignment a
+        :param s: Student
+        :returns: List of IOSolutions generated
+        '''
+        if solutions:
+            return solutions.filter(assignment=a)
+
+        if not self.solutions:
+            self.solutions = IOSolution.objects.filter(assignment=a)
+        else:
+            self.solutions = self.solutions.filter(assignment=a)
+        return self.solutions
+
     def update(self, pk, output=None, submit_late="false"):
         try:
             self.solutions = IOSolution.objects.filter(pk=pk)
@@ -242,6 +310,10 @@ class iosolution_info():
                 check_hw5(s)
             elif a_name == "hw6":
                 check_hw6(s)
+            elif a_name == "hw7":
+                check_hw7(s)
+            elif a_name == "hw8":
+                check_hw8(s)
 
     def grade(self):
         for s in self.solutions:
@@ -264,12 +336,26 @@ class iosolution_info():
                 check_hw5(s)
             elif a_name == "hw6":
                 check_hw6(s)
+            elif a_name == "hw7":
+                check_hw7(s)
+            elif a_name == "hw8":
+                check_hw8(s)
 
             for field in s._meta.local_fields:
                 if field.name == "updated":
                     field.auto_now = True
                 elif field.name == "created":
                     field.auto_now_add = True
+
+    def get_data(self):
+        data = {}
+        for sol in self.solutions:
+            sd = model_to_dict(sol, fields=['output_submitted', 'score', 'comments'])
+            sd['student'] = model_to_dict(sol.student, fields=['username'])
+            sd['assignment'] = model_to_dict(sol.assignment, fields=['short_name'])
+            sd['pair'] = model_to_dict(sol.pair, fields=['id','input', 'output'])
+            data[sol.pk] = sd
+        return data
 
     def get_stats(self):
         stats = {}
