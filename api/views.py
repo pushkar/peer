@@ -316,4 +316,6 @@ def update_codework(request, id):
         io_solution = iosolution_info()
         score = request.GET.get('score', '')
         comments = request.GET.get('comments', '')
-        io_solution.update_notime(id, score, comments)
+        response['message'] = io_solution.update_notime(id, score, comments)
+        response['error'] = ""
+    return JsonResponse(response)
