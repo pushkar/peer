@@ -281,13 +281,41 @@ class iosolution_info():
             self.solutions = IOSolution.objects.filter(pk=pk)
             if len(self.solutions) == 1:
                 if check_deadline(self.solutions[0].assignment) or submit_late=="true":
-                    self.solutions[0].output_submitted = output
+                    if output:
+                        self.solutions[0].output_submitted = output
+                    if comments:
+                        self.solutions[0].comments = comments
                     self.solutions[0].save()
                     return "Solution submitted."
                 else:
                     return "Deadline has passed. Answer will not be recorded."
             else:
                 return "Something went wrong. Only one submission allowed at a time."
+        except Exception as e:
+            return "%s (%s)" % (e.message, type(e))
+
+    def update_notime(self, pk, score, comments):
+        try:
+            s = IOSolution.objects.get(pk=pk)
+            if s:
+                for field in s._meta.local_fields:
+                    if field.name == "updated":
+                        field.auto_now = False
+                    elif field.name == "created":
+                        field.auto_now_add = False
+
+                s.score = score
+                s.comments = comments
+                s.save()
+
+                for field in s._meta.local_fields:
+                    if field.name == "updated":
+                        field.auto_now = True
+                    elif field.name == "created":
+                        field.auto_now_add = True
+
+                return "Updated"
+            return "Could not find IOSolution object"
         except Exception as e:
             return "%s (%s)" % (e.message, type(e))
 
@@ -315,7 +343,7 @@ class iosolution_info():
             elif a_name == "hw8":
                 check_hw8(s)
 
-    def grade(self):
+    def check_notime(self):
         for s in self.solutions:
             for field in s._meta.local_fields:
                 if field.name == "updated":

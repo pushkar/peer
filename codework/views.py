@@ -33,7 +33,7 @@ def index(request):
 def grade(request):
     io_solution = iosolution_info()
     io_solution.get()
-    io_solution.grade()
+    io_solution.check_notime()
     return HttpResponse("Grades done")
 
 @login_required

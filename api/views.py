@@ -301,9 +301,19 @@ def codework(request, name, username):
             student = Student.objects.all()
         else:
             student = Student.objects.filter(username=username)
-            io_solution.get_by_student(students)
+            io_solution.get_by_student(student)
 
         response_codework = io_solution.get_data()
         response['data'] = response_codework
-        response['message'] = ""
+        response['error'] = ""
+        response['message'] = "Found codework of " + username + " in " + name
     return JsonResponse(response)
+
+@check_permissions("rw")
+def update_codework(request, id):
+    response = {}
+    if request.method == 'GET':
+        io_solution = iosolution_info()
+        score = request.GET.get('score', '')
+        comments = request.GET.get('comments', '')
+        io_solution.update_notime(id, score, comments)

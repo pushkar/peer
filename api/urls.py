@@ -12,4 +12,6 @@ urlpatterns = [
     url(r'^review/update/$', views.update_review, name='update_review'),
     url(r'^review/get/$', views.get_review, name='get_review'),
     url(r'^codework/get/(?P<name>\w+)/(?P<username>\w+)$', views.codework, name='codework'),
+    url(r'^codework/update/(?P<id>[0-9]+)$', views.update_codework, name='update_codework'),
+
 ]
