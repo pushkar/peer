@@ -281,6 +281,9 @@ def get_review(request):
             rci.get_convos_by_review(r)
             response['convos'][r.pk] = rci.serialize()
 
+        response['error'] = ""
+        # Use in the future
+        
     return JsonResponse(response)
 
 @check_permissions("rw")

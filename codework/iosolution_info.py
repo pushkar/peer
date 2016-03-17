@@ -164,11 +164,12 @@ def check_hw7(s):
     output = s.pair.output
     try:
         if s.output_submitted:
-            output = output.replace("bestActions=", "")
             output = output.strip('{}()[]')
             output_submitted = s.output_submitted.strip('{}()[]')
             output = output.lower()
+            output = output.replace("bestactions=", "")
             output_submitted = output_submitted.lower()
+            output_submitted = output_submitted.replace("bestactions=", "")
             output = output.strip().split(',')
             output_submitted = output_submitted.strip().split(',')
             if len(output) == len(output_submitted):
@@ -197,7 +198,30 @@ def check_hw7(s):
         s.save()
 
 def check_hw8(s):
-    pass
+    output = s.pair.output
+    try:
+        if s.output_submitted:
+            output = output.strip('{}()[]')
+            output_submitted = s.output_submitted.strip('{}()[]')
+            output = output.lower()
+            output = output.replace("value=", "")
+            output_submitted = output_submitted.lower()
+            output_submitted = output_submitted.replace("value=", "")
+            if math.fabs(float(output) - float(output_submitted)) > 0.01:
+                s.score = "0"
+                s.comments = "Solution is wrong."
+            else:
+                s.comments = "Solution is correct."
+                if s.updated < s.assignment.due_date:
+                    s.score = "10.0"
+                else:
+                    s.score = "5.0"
+        else:
+            s.comments = "No solution yet."
+    except Exception as e:
+        s.comments = '%s (%s)' % (e.message, type(e))
+    finally:
+        s.save()
 
 def check_deadline(a):
     '''
@@ -283,8 +307,6 @@ class iosolution_info():
                 if check_deadline(self.solutions[0].assignment) or submit_late=="true":
                     if output:
                         self.solutions[0].output_submitted = output
-                    if comments:
-                        self.solutions[0].comments = comments
                     self.solutions[0].save()
                     return "Solution submitted."
                 else:

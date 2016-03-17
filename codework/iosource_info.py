@@ -21,8 +21,6 @@ def iosource_import_pairs(a, url=None):
         count = 0
         for row in reader:
             if len(row) == 2:
-                print len(row[0])
-                print len(row[1])
                 if pair_add(a, row[0], row[1]):
                     count = count + 1
         ret += str(count) + " examples added to " + a.name
