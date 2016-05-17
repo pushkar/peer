@@ -82,13 +82,13 @@ class AssignmentPageAdmin(admin.ModelAdmin):
 
 class SubmissionAdmin(admin.ModelAdmin):
     list_display = ('pk', 'student', 'assignment', 'files')
-    search_fields = ('student__lastname', 'student__firstname', 'student__username')
+    search_fields = ('student__username', 'student__firstname', 'student__lastname' , 'files')
     list_filter = ('assignment__name',)
 
 
 class ReviewAdmin(admin.ModelAdmin):
     list_display = ('pk', 'submission', 'assigned', 'score')
-    search_fields = ('submission__student__lastname', 'submission__student__firstname', 'submission__student__username', 'submission__student__group_id')
+    search_fields = ('submission__student__username', 'submission__student__firstname', 'submission__student__lastname', 'assigned__username', 'assigned__firstname', 'assigned__lastname')
     list_filter = ('submission__assignment__name', 'assigned__usertype', )
 
 
@@ -101,7 +101,7 @@ class PermissionAdmin(admin.ModelAdmin):
 class ReviewConvoAdmin(admin.ModelAdmin):
     list_display = ('created', 'student', 'text')
     search_fields = ('student__username', 'student__firstname', 'student__lastname', 'review__submission__student__username',
-                'review__submission__student__firstname', 'review__submission__student__lastname')
+                'review__submission__student__firstname', 'review__submission__student__lastname', 'text')
     list_filter = ('review',)
 
 

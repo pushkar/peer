@@ -87,7 +87,7 @@ def work(request, a_name):
         elif a.short_name == "hw6":
             io_solution.generate(s, a, 1)
         else:
-            io_solution.generate(s, a, 3)
+            io_solution.generate(s, a, 10)
     else:
         messages.info(request, "No coding excercises exist for this assignment.")
 
