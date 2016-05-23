@@ -56,9 +56,9 @@ def check_hw3(s):
         if int(o[2]) == int(o_s[2]):
             s.comments = "LInfinityDistance Value is correct."
             if s.updated < s.assignment.due_date:
-                s.score = "10.0"
+                s.score = "20.0"
             else:
-                s.score = "5.0"
+                s.score = "10.0"
         else:
             s.comments = "LInfinityDistance of " + str(o_s[2]) + " is wrong. Try again."
     else:
