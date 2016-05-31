@@ -307,6 +307,8 @@ class iosolution_info():
             if len(self.solutions) == 1:
                 if check_deadline(self.solutions[0].assignment) or submit_late=="true":
                     if output:
+                        if len(output) > 10000:
+                            return "Solution length should be less than 10,000 chars."
                         self.solutions[0].output_submitted = output
                     self.solutions[0].save()
                     return "Solution submitted."
@@ -401,10 +403,12 @@ class iosolution_info():
     def get_data(self):
         data = {}
         for sol in self.solutions:
-            sd = model_to_dict(sol, fields=['output_submitted', 'score', 'comments', 'created', 'updated'])
+            sd = model_to_dict(sol, fields=['output_submitted', 'score', 'comments'])
             sd['student'] = model_to_dict(sol.student, fields=['username'])
             sd['assignment'] = model_to_dict(sol.assignment, fields=['short_name'])
             sd['pair'] = model_to_dict(sol.pair, fields=['id','input', 'output'])
+            sd['updated'] = sol.updated
+            sd['created'] = sol.created
             data[sol.pk] = sd
         return data
 
