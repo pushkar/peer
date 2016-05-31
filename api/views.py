@@ -106,7 +106,7 @@ def student(request, name):
         response['message'] = str(len(students)) + " students found"
     return JsonResponse(response)
 
-@check_permissions("rw")
+@check_permissions("r")
 def add_student(request):
     response = {}
     if request.method == 'GET':
@@ -140,7 +140,7 @@ def add_student(request):
                 response['message'] = "No username and GTID given"
     return JsonResponse(response)
 
-@check_permissions("rw")
+@check_permissions("r")
 def update_student(request, name):
     response = {}
     if request.method == 'GET':
@@ -169,7 +169,7 @@ def update_student(request, name):
             response['message'] = "Mutliple students found with username"
     return JsonResponse(response)
 
-@check_permissions("rw")
+@check_permissions("r")
 def add_submission(request):
     response = {}
     response['message'] = ""
@@ -193,7 +193,7 @@ def add_submission(request):
             response['message'] += ". Adding this submission failed"
     return JsonResponse(response)
 
-@check_permissions("rw")
+@check_permissions("r")
 def add_review(request):
     response = {}
     response['message'] = ""
@@ -214,7 +214,7 @@ def add_review(request):
 
     return JsonResponse(response)
 
-@check_permissions("rw")
+@check_permissions("r")
 def update_review(request):
     response = {}
     response['message'] = ""
@@ -286,7 +286,7 @@ def get_review(request):
         
     return JsonResponse(response)
 
-@check_permissions("rw")
+@check_permissions("r")
 def codework(request, name, username):
     response = {}
     if request.method == 'GET':
@@ -312,7 +312,7 @@ def codework(request, name, username):
         response['message'] = "Found codework of " + username + " in " + name
     return JsonResponse(response)
 
-@check_permissions("rw")
+@check_permissions("r")
 def update_codework(request, id):
     response = {}
     if request.method == 'GET':
