@@ -401,7 +401,7 @@ class iosolution_info():
     def get_data(self):
         data = {}
         for sol in self.solutions:
-            sd = model_to_dict(sol, fields=['output_submitted', 'score', 'comments'])
+            sd = model_to_dict(sol, fields=['output_submitted', 'score', 'comments', 'created', 'updated'])
             sd['student'] = model_to_dict(sol.student, fields=['username'])
             sd['assignment'] = model_to_dict(sol.assignment, fields=['short_name'])
             sd['pair'] = model_to_dict(sol.pair, fields=['id','input', 'output'])
