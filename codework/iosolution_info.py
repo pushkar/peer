@@ -39,8 +39,8 @@ def check_hw1(s):
     s.save()
 
 def check_hw2(s):
+    check_hw1(s)
     s.score = float(s.score) * 2
-    return check_hw1(s)
 
 def check_hw3(s):
     output = s.pair.output
