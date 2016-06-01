@@ -30,9 +30,10 @@ def check_session(request):
 def index(request):
     return HttpResponse("codework")
 
-def grade(request):
+def grade(request, a_name):
     io_solution = iosolution_info()
-    io_solution.get()
+    a = Assignment.objects.get(short_name=a_name)
+    io_solution.get_by_assignment(a)
     io_solution.check_notime()
     return HttpResponse("Grades done")
 
