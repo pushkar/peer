@@ -39,8 +39,21 @@ def check_hw1(s):
     s.save()
 
 def check_hw2(s):
-    check_hw1(s)
-    s.score = '%.1f' % (float(s.score) * 2)
+    output = s.pair.output
+    if s.output_submitted:
+        if is_number(s.output_submitted):
+            if math.fabs(float(s.output_submitted) - float(output)) < 0.01:
+                s.comments = "Answer is correct."
+                if s.updated < s.assignment.due_date:
+                    s.score = "20.0"
+                else:
+                    s.score = "10.0"
+            else:
+                s.comments = "Answer is wrong. ("+ s.output_submitted +")"
+        else:
+            s.comments = "Answer is not a number."
+    else:
+        s.comments = "No solution yet."
     s.save()
 
 def check_hw3(s):
