@@ -40,7 +40,7 @@ def check_hw1(s):
 
 def check_hw2(s):
     check_hw1(s)
-    s.score = float(s.score) * 2
+    s.score = str(float(s.score) * 2)
     s.save()
 
 def check_hw3(s):
