@@ -327,7 +327,7 @@ class iosolution_info():
             if len(self.solutions) == 1:
                 if check_deadline(self.solutions[0].assignment) or submit_late=="true":
                     if output:
-                        if len(output) > 10000:
+                        if len(output) > 100000:
                             return "Solution length should be less than 10,000 chars."
                         self.solutions[0].output_submitted = output
                     self.solutions[0].save()

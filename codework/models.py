@@ -45,7 +45,7 @@ class IOSolution(models.Model):
     student = models.ForeignKey(Student)
     assignment = models.ForeignKey(Assignment)
     pair = models.ForeignKey(IOPair)
-    output_submitted = models.CharField(max_length=50000, null=True, blank=True)
+    output_submitted = models.CharField(max_length=100000, null=True, blank=True)
     score = models.CharField(max_length=10, default="0.0")
     comments = models.CharField(max_length=2000, null=True, blank=True)
 
