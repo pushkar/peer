@@ -50,8 +50,14 @@ def check_hw3(s):
         o_s = re.findall(nums, s.output_submitted)
         if len(o) != 3:
             s.comments = "Input is wrong. Send the input to TA."
+            s.score = "0.0"
+            s.save()
+            return
         if len(o_s) != 3:
             s.comments = "You need to give atleast 3 numbers: bestX=1,bestY=2,LInfinityDistance=3."
+            s.score = "0.0"
+            s.save()
+            return
 
         if int(o[2]) == int(o_s[2]):
             s.comments = "LInfinityDistance Value is correct."
