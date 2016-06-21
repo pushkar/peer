@@ -159,12 +159,12 @@ def check_hw6(s):
                 if len(err) == 0:
                     s.comments = "Solution is correct."
                     if s.updated < s.assignment.due_date:
-                        s.score = "30.0"
+                        s.score = "100.0"
                     else:
-                        s.score = "15.0"
+                        s.score = "50.0"
                 else:
                     if len(err) > 100:
-                        s.score = "5.0"
+                        s.score = "10.0"
                     else:
                         s.score = hw6_score(len(err))
                     s.comments = str(len(err)) + " values are wrong."
