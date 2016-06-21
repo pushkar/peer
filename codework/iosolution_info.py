@@ -136,7 +136,7 @@ def check_hw5(s):
 def hw6_score(len_err):
     len_correct = 100-len_err
     percent_correct = len_correct/100.0
-    score = 5.0 + (30.0-5.0) * pow(percent_correct, 2.0)
+    score = 10.0 + (100.0-10.0) * pow(percent_correct, 2.0)
     return str(score)
 
 def check_hw6(s):
