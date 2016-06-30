@@ -203,9 +203,9 @@ def check_hw7(s):
                 if len(err) == 0:
                     s.comments = "Solution is correct."
                     if s.updated < s.assignment.due_date:
-                        s.score = "10.0"
+                        s.score = "20.0"
                     else:
-                        s.score = "5.0"
+                        s.score = "10.0"
                 else:
                     s.score = "0"
                     s.comments = "Solution is wrong."
@@ -234,9 +234,9 @@ def check_hw8(s):
             else:
                 s.comments = "Solution is correct."
                 if s.updated < s.assignment.due_date:
-                    s.score = "10.0"
+                    s.score = "20.0"
                 else:
-                    s.score = "5.0"
+                    s.score = "10.0"
         else:
             s.comments = "No solution yet."
     except Exception as e:
