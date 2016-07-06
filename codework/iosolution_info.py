@@ -98,7 +98,8 @@ def check_hw4(s):
         s.comments = "No solution yet."
     s.save()
 
-def check_hw5(s):
+# Messing with Rewards
+def check_hw7(s):
     output = s.pair.output
     try:
         if s.output_submitted:
@@ -181,7 +182,8 @@ def check_hw6(s):
     finally:
         s.save()
 
-def check_hw7(s):
+# Continuous MDP problem
+def check_hw7_old(s):
     output = s.pair.output
     try:
         if s.output_submitted:
@@ -218,6 +220,7 @@ def check_hw7(s):
     finally:
         s.save()
 
+# Two Armed Bandit
 def check_hw8(s):
     output = s.pair.output
     try:
@@ -228,7 +231,7 @@ def check_hw8(s):
             output = output.replace("value=", "")
             output_submitted = output_submitted.lower()
             output_submitted = output_submitted.replace("value=", "")
-            if math.fabs(float(output) - float(output_submitted)) > 0.01:
+            if math.fabs(float(output) - float(output_submitted)) > 1.00:
                 s.score = "0"
                 s.comments = "Solution is wrong."
             else:
