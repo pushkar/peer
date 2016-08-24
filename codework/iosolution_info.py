@@ -379,9 +379,9 @@ class iosolution_info():
             elif a_name == "hw2":
                 check_hw2(s)
             elif a_name == "hw3":
-                check_hw3(s)
-            elif a_name == "hw4":
                 check_hw4(s)
+            elif a_name == "hw4":
+                check_hw4(s) # Needs to change later
             elif a_name == "hw5":
                 check_hw7(s)
             elif a_name == "hw6":
