@@ -16,7 +16,6 @@ urlpatterns = [
     url(r'^admin/reviews$', views.admin_review_assignments, name='admin_review_assignments'),
 
     url(r'^pass$', views.pass_request, name='pass_request'),
-    url(r'^populate$', views.populate, name='populate'),
 
     url(r'^login/(?P<user>\w+)$', views.login_change, name='login_change'),
 ]

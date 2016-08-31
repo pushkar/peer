@@ -246,28 +246,6 @@ def login_change(request, user):
 
     return HttpResponseRedirect(reverse('student:admin'))
 
-@login_required
-def populate(request):
-    try:
-        g = Global.objects.get(key="roster")
-        roster_str = urllib2.urlopen(g.value).read()
-        reader = csv.reader(roster_str.split('\n'), delimiter=',')
-        total_count = 0
-        added_count = 0
-        for row in reader:
-            if len(row) == 6:
-                total_count += 1
-                s = Student.objects.get_or_create(username=row[0], email=row[1],
-                    gtid=row[2], usertype=row[3], lastname=row[4], firstname=row[5])
-                if s[1]:
-                    added_count += 1
-
-        messages.success(request, "%d of %d students were added." % (added_count, total_count))
-    except:
-        messages.info(request, "Could not find the roster.")
-
-
-    return HttpResponseRedirect(reverse('admin:index'))
 
 @login_required
 def admin_review_assignments(request):
