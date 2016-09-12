@@ -1,8 +1,8 @@
 import os
 import dj_database_url
 
-BASE_DIR = os.path.dirname(__file__)
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '2e4-osx759)6^jf^67l59s_r3j!ky9c0vg0ca(c2zma*js+uci'
@@ -97,10 +97,8 @@ AUTH_PASSWORD_VALIDATORS = [
 if os.getcwd() == "/app":
     DATABASES = {'default': dj_database_url.config(default=os.environ["DATABASE_URL"])}
 
-# Static asset configuration
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
 STATIC_URL = "/static/"
-# Extra places for collectstatic to find static files.
 STATICFILES_DIRS = (
-    os.path.join(PROJECT_ROOT, 'static'),
+    os.path.join(PROJECT_ROOT, "static"),
 )
