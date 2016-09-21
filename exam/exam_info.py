@@ -2,6 +2,8 @@ from django.core import serializers
 from django.forms.models import model_to_dict
 from student.models import *
 from exam.models import *
+from textstat.textstat import textstat
+
 import numpy as np
 import json
 
@@ -181,6 +183,8 @@ class tempexam_info():
         for q in questions.get_questions():
             details[q.pk] = {}
             details[q.pk]['question'] = model_to_dict(q, fields=['id', 'text'])
+            if q.strategy == "random":
+                pass
             if self.get_question_type(q) == "tf":
                 details[q.pk]['tf'] = {}
                 details[q.pk]['tf']['label'] = "unknown"
@@ -198,6 +202,51 @@ class tempexam_info():
         self.tempexam.details = json.dumps(details)
         self.tempexam.save()
         return details
+
+    def check_exam(self, request_data):
+        '''
+        Check explanations of the exam and find if they make sense or not.
+        '''
+        ret_bool = True
+        ret = {}
+        details = json.loads(self.tempexam.details)
+
+        for qid, qans in details.iteritems():
+            if qans.has_key('tf'):
+                q_label = "q" + str(qid) + "_label"
+                q_exp = "q" + str(qid) + "_exp"
+                if request_data.has_key(q_exp):
+                    if len(request_data[q_exp]) > 0:
+                        exp_ = request_data[q_exp][0]
+                        id_ = qid
+                        if len(exp_) == 0:
+                            ret_bool = False
+                            exp_ = "No explanation was provided."
+                            ret[id_] = exp_
+                        else:
+                            #print exp_
+                            #print "Flesch Reading Ease: " + str(textstat.flesch_reading_ease(exp_))
+                            #print "Smog Index: " + str(textstat.smog_index(exp_))
+                            #print "Kinacid Grade:" + str(textstat.flesch_kincaid_grade(exp_))
+                            #print "Coleman Liau Index: " + str(textstat.coleman_liau_index(exp_))
+                            #print "Automated Readbility: " + str(textstat.automated_readability_index(exp_))
+                            #print "Dale Chall Readbility: " + str(textstat.dale_chall_readability_score(exp_))
+                            #print "Difficult Words: " + str(textstat.difficult_words(exp_))
+                            #print "Linsear Write Formula: " + str(textstat.linsear_write_formula(exp_))
+                            #print "Gunning Fog: " + str(textstat.gunning_fog(exp_))
+                            #print textstat.readability_consensus(exp_)
+                            if textstat.flesch_reading_ease(exp_) < 30 or \
+                                textstat.flesch_reading_ease(exp_) > 100:
+                                ret_bool = False
+                                ret[id_] = "Please rewrite this explanation concisely and briefly."
+                            if textstat.difficult_words(exp_) > 10:
+                                ret_bool = False
+                                ret[id_] = "Try to simplify the explanation."
+                            if textstat.automated_readability_index(exp_) < 0:
+                                ret_bool = False
+                                ret[id_] = "Please make the explanation more readable."
+
+        return ret_bool, ret
 
     def save_exam(self, request_data):
         details = json.loads(self.tempexam.details)

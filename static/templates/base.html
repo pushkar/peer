@@ -95,6 +95,7 @@
         <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
             <ul class="nav navbar-nav">
                 <li><a href="{% url 'student:index' %}">Home</a></li>
+                {% if assignments %}
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Assignments<span class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
@@ -103,7 +104,8 @@
                         {% endfor %}
                     </ul>
                 </li>
-                <!--<li><a href="{% url 'exam:index' %}">Exam</a></li>-->
+                {% endif %}
+                <li><a href="{% url 'exam:index' %}">Quizzes</a></li>
                 {% block menu %}{% endblock %}
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Account <span class="caret"></span></a>

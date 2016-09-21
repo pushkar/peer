@@ -26,6 +26,7 @@ class Question(models.Model):
     text = models.CharField(max_length=1000)
     hardness = models.CharField(max_length=10, default="0.0")
     details = models.CharField(max_length=200, blank=True, null=True)
+    strategy = models.CharField(max_length=200, default="random")
 
     def __unicode__(self):
         return unicode(self.text)

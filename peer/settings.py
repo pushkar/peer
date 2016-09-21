@@ -62,7 +62,7 @@ WSGI_APPLICATION = 'peer.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": "rlspring2016",
+        "NAME": "rlfall2016",
         "USER": "",
         "PASSWORD": "",
         "HOST": "localhost",
