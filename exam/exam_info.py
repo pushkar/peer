@@ -6,8 +6,28 @@ from textstat.textstat import textstat
 
 import numpy as np
 import json
+import random
 
+# Helper Functions
+def get_or_set_json(str):
+    '''
+    Sets or gets a json based database input.
+    Sets it to an empty map.
+    '''
+    if str == None or str == "":
+        details = {}
+    else:
+        try:
+            details = json.loads(str)
+        except:
+            details = {}
+    return details
+
+# Classes to work with Model objects
 class exam_info():
+    '''
+    Works with the Model Exam
+    '''
     exam = Exam.objects.none()
     def __init__(self, short_name):
         exam = Exam.objects.get_or_create(short_name=short_name)
@@ -26,6 +46,9 @@ class exam_info():
         return self.exam
 
 class question_set_info():
+    '''
+    Works with a set of questions.
+    '''
     questions = Question.objects.none()
     def __init__(self, exam):
         self.questions = Question.objects.filter(exam=exam).order_by('pk')
@@ -34,6 +57,9 @@ class question_set_info():
         return self.questions
 
 class question_info():
+    '''
+    Works with one question
+    '''
     question = Question.objects.none()
     def __init__(self, id):
         self.question = Question.objects.get(pk=id)
@@ -41,15 +67,29 @@ class question_info():
     def get_question(self):
         return self.question
 
-    def set_hardness(self, hardness):
-        self.question.hardness = str(hardness)
+    def set_hardness(self, strategy, hardness):
+        hardness_details = get_or_set_json(self.question.hardness)
+        hardness_details[strategy] = hardness
+        self.question.hardness = json.dumps(hardness_details)
         self.question.save()
+
+    def get_hardness(self, strategy):
+        hardness_details = get_or_set_json(self.question.hardness)
+        if strategy not in hardness_details:
+            hardness_details[strategy] = "0.0"
+            self.question.hardness = json.dumps(hardness_details)
+            self.question.save()
+
+        return float(hardness_details[strategy])
 
     def set_text(self, text):
         self.question.text = text
         self.question.save()
 
 class answer_set_info():
+    '''
+    Works with a set of answers
+    '''
     answers = Answer.objects.none()
     def __init__(self, question):
         self.answers = Answer.objects.filter(question=question)
@@ -65,29 +105,26 @@ class answer_set_info():
         a.text = text
         a.save()
 
-    def set_score(self, a, student, score):
-        if a.details == None or a.details == "":
-            details = {}
-        else:
-            details = json.loads(a.details)
-        details[student.username] = score
-        a.details = json.dumps(details)
-        a.save()
+    def get_answers_sample_random(self, n):
+        if len(self.answers) < n:
+            return self.answers
+        return random.sample(self.answers, 2)
 
-    def get_answers_for_grading(self):
+    def get_answers_sample_correctness(self, n, inverted_correctness = False):
         answer = []
-        answer_correctness = []
-        answer_inv_correctness = []
         for a in self.answers:
             answer.append(a)
-            answer_correctness.append(float(a.correctness))
-            answer_inv_correctness.append(1.0-float(a.correctness))
+            if inverted_correctness:
+                answer_correctness.append(1.0 - float(a.correctness))
+            else:
+                answer_correctness.append(float(a.correctness))
 
-        answer_probably_correct = np.random.choice(answer, 1, answer_correctness)
-        answer_probably_incorrect = np.random.choice(answer, 1, answer_inv_correctness)
-        return [answer_probably_correct[0], answer_probably_incorrect[0]]
+        return np.random.choice(answer, n, answer_correctness)
 
 class answer_info():
+    '''
+    Works with an answer
+    '''
     answer = Answer.objects.none()
     def __init__(self):
         pass
@@ -110,38 +147,26 @@ class answer_info():
         self.answer.save()
 
     def calculate_correctness(self):
-        if self.answer.details == None or self.answer.details == "":
-            details = {}
-            self.answer.details = json.dumps(details)
-            self.answer.save()
-
-        details = json.loads(self.answer.details)
+        '''
+        TODO
+        '''
+        details = get_or_set_json(self.answer.details)
+        self.answer.details = json.dumps(details)
         self.answer.save()
 
     def add_grade(self, s, grade):
-        if self.answer.details == None or self.answer.details == "":
-            details = {}
-            self.answer.details = json.dumps(details)
-            self.answer.save()
-
-        details = json.loads(self.answer.details)
+        details = get_or_set_json(self.answer.details)
         details[s.username] = str(grade)
         self.answer.details = json.dumps(details)
         self.answer.save()
 
-def add_grade_to_answer(a, s, grade):
-    if a.details == None or a.details == "":
-        details = {}
-        a.details = json.dumps(details)
-        a.save()
-
-    details = json.loads(a.details)
-    details[s.username] = str(grade)
-    a.details = json.dumps(details)
-    a.save()
-
-
+# Most logic of how the exams work is in the TempExam object
 class tempexam_info():
+    '''
+    Works with TempExam model.
+    Students are answering into TempExam. They save the exam here.
+    After they submit, details go into Answers. MC answers are still in TempExam, that is why don't delete it.
+    '''
     exam = Exam.objects.none()
     tempexam = TempExam.objects.none()
     def __init__(self, s, e):
@@ -153,14 +178,22 @@ class tempexam_info():
             pass
 
     def get_question_type(self, q):
+        question_type = "tf"
+        args = []
+
         answers = answer_set_info(q)
         if answers.get_answers_count() < 2:
-            return "tf"
+            return question_type, args
 
-        if np.random.choice([0, 1], 1)[0] == 0:
-            return "tf"
-        else:
-            return "mc"
+        if q.strategy == "tf":
+            pass
+
+        if q.strategy == "random":
+            if random.uniform(0, 1) > 0.5:
+                question_type = "mc"
+                args = random.sample(answers.get_answers(), 2)
+
+        return question_type, args
 
     def get_exam(self):
         if self.tempexam.details == None or self.tempexam.details == "":
@@ -183,20 +216,17 @@ class tempexam_info():
         for q in questions.get_questions():
             details[q.pk] = {}
             details[q.pk]['question'] = model_to_dict(q, fields=['id', 'text'])
-            if q.strategy == "random":
-                pass
-            if self.get_question_type(q) == "tf":
+            type, answers = self.get_question_type(q)
+            if type == "tf":
                 details[q.pk]['tf'] = {}
                 details[q.pk]['tf']['label'] = "unknown"
                 details[q.pk]['tf']['exp'] = ""
-            else:
+            elif type == "mc":
                 details[q.pk]['mc'] = {}
                 details[q.pk]['mc']['answers'] = []
                 details[q.pk]['mc']['checked'] = []
-                answers = answer_set_info(q)
-                grade = answers.get_answers_for_grading()
-                for g in grade:
-                    ans_dict = model_to_dict(g, fields=['id', 'label', 'text'])
+                for a in answers:
+                    ans_dict = model_to_dict(a, fields=['id', 'label', 'text'])
                     details[q.pk]['mc']['answers'].append(ans_dict)
 
         self.tempexam.details = json.dumps(details)

@@ -11,4 +11,4 @@ django-mathjax==0.0.5
 sendgrid>=0.5.0
 pytz==2013.7
 djangoajax==2.3.3
-textstat=0.3.1
+textstat>=0.3
