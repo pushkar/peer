@@ -25,7 +25,7 @@ class Question(models.Model):
     exam = models.ForeignKey(Exam)
     text = models.CharField(max_length=1000)
     hardness = models.CharField(max_length=10, default="0.0")
-    details = models.CharField(max_length=200, blank=True, null=True)
+    details = models.CharField(max_length=10000, blank=True, null=True)
     strategy = models.CharField(max_length=200, default="random")
 
     def __unicode__(self):
@@ -37,8 +37,8 @@ class Answer(models.Model):
     question = models.ForeignKey(Question)
     label = models.CharField(max_length=10)
     text = models.CharField(max_length=1000)
-    correctness = models.CharField(max_length=10, default="0.5")
-    details = models.CharField(max_length=200, blank=True, null=True)
+    correctness = models.CharField(max_length=200, default="0.5")
+    details = models.CharField(max_length=10000, blank=True, null=True)
 
     def __unicode__(self):
         return unicode(self.text)
