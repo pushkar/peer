@@ -91,8 +91,8 @@ class IOPairAdmin(admin.ModelAdmin):
     list_filter = ('assignment__name', )
 
 class IOSolutionAdmin(admin.ModelAdmin):
-    list_display = ('student', 'assignment', 'created', 'updated', 'late_av', 'output_submitted_av', 'score')
-    search_fields = ('student__lastname', 'student__firstname', 'student__username')
+    list_display = ('id', 'student', 'assignment', 'created', 'updated', 'late_av', 'output_submitted_av', 'score')
+    search_fields = ('id', 'student__lastname', 'student__firstname', 'student__username')
     list_filter = ('assignment__name', )
 
 class IOSubmissionAdmin(admin.ModelAdmin):
