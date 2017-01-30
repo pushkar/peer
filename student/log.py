@@ -6,22 +6,19 @@ from django.contrib import admin, messages
 from student.models import *
 from assignment.models import *
 from datetime import datetime, tzinfo
-from pytz import timezone
 
-est = timezone('US/Eastern')
 
 def log_login(s, new=False):
     log = StudentLog.objects.get_or_create(student=s, details="login")
     if log[1] == False and new:
-        log[0].created = datetime.now()
+        log[0].created = timezone.now()
         log[0].save()
     return log[0].created
 
 def log_logout(s, new=False):
     log = StudentLog.objects.get_or_create(student=s, details="logout")
     if log[1] == False and new:
-        now = datetime.now()
-        now = now.replace(tzinfo=est)
+        now = timezone.now()
         log[0].created = now
         log[0].save()
     return log[0].created
@@ -31,8 +28,7 @@ def log_review(username, review, new=False):
     s = Student.objects.get(username=username)
     log = StudentLog.objects.get_or_create(student=s, details=review_details)
     if log[1] == False and new:
-        now = datetime.now()
-        now = now.replace(tzinfo=est)
+        now = timezone.now()
         log[0].created = now
         log[0].save()
     return log[0].created

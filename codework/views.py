@@ -13,6 +13,7 @@ from assignment.models import *
 
 from codework.iosolution_info import *
 from codework.iosource_info import *
+from student.banish import *
 
 import urllib2
 import random
@@ -26,6 +27,10 @@ def check_session(request):
     if not request.session['user']:
         return False
     return True
+
+def force_logout(request):
+    request.session.flush()
+    return HttpResponseRedirect(reverse('student:index'))
 
 def index(request):
     return HttpResponse("codework")
@@ -108,7 +113,11 @@ def work(request, a_name):
 def update(request, id):
     if not check_session(request):
         return HttpResponseRedirect(reverse('student:index'))
-
+    
+    s = Student.objects.get(username=request.session['user'])
+    if banish_check(request, s):
+        force_logout(request)
+        
     output_submitted = ""
     if request.method == "POST":
         output_submitted = request.POST.get("output", "")

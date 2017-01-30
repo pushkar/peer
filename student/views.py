@@ -8,6 +8,7 @@ from django_ajax.decorators import ajax
 
 from student.models import *
 from student.log import *
+from student.banish import *
 from student.common import *
 from assignment.models import *
 from assignment.reviews_info import *
@@ -80,6 +81,10 @@ def login(request):
                 request.session['user'] = s.username
                 request.session['usertype'] = s.usertype
                 log_login(s, True)
+                if banish_check(request, s):
+                    messages.info(request, "You have been banned. Contact the TA.")
+                    request.session.flush()
+                    return HttpResponseRedirect(reverse('student:index'))
                 messages.success(request, 'You are logged in.')
                 return HttpResponseRedirect(reverse('student:index'))
             except Student.DoesNotExist:

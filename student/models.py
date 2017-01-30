@@ -94,3 +94,17 @@ class LoginForm(forms.Form):
 class ForgotPasswordForm(forms.Form):
     username = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder': 'pkolhe3'}))
     fields = ('username')
+
+class Banish(models.Model):
+    ''' Contains the number of times a student accesses something
+    '''
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    student = models.ForeignKey(Student)
+    ip = models.CharField(max_length=20, default="")
+    count = models.CharField(max_length=10, default="1")
+    violations = models.CharField(max_length=10, default="0")
+
+class BanishAdmin(admin.ModelAdmin):
+    list_display = ('id', 'student', 'created', 'updated', 'ip', 'count', 'violations')
+    search_fields = ('id', 'student', 'created', 'updated', 'ip', 'count', 'violations')
