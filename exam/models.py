@@ -16,17 +16,24 @@ class Exam(models.Model):
 
 class StudentInfo(models.Model):
     student = models.ForeignKey(Student)
-    proficiency = models.CharField(max_length=10, default="0.0")
+    proficiency = models.CharField(max_length=10, blank=True, null=True)
 
     def __unicode__(self):
         return unicode(self.student)
 
+class Strategy(models.Model):
+    name = models.CharField(max_length=100)
+    params = models.CharField(max_length=1000, blank=True, null=True)
+
+    def __unicode__(self):
+        return unicode(self.name)
+
 class Question(models.Model):
     exam = models.ForeignKey(Exam)
     text = models.CharField(max_length=1000)
-    hardness = models.CharField(max_length=10, default="0.0")
+    hardness = models.CharField(max_length=10, blank=True, null=True)
     details = models.CharField(max_length=10000, blank=True, null=True)
-    strategy = models.CharField(max_length=200, default="random")
+    strategy = models.ForeignKey(Strategy)
 
     def __unicode__(self):
         return unicode(self.text)
@@ -37,16 +44,37 @@ class Answer(models.Model):
     question = models.ForeignKey(Question)
     label = models.CharField(max_length=10)
     text = models.CharField(max_length=1000)
-    correctness = models.CharField(max_length=200, default="0.5")
+    correctness = models.CharField(max_length=200, blank=True, null=True)
+    finished = models.BooleanField(default=False)
+    feedback = models.CharField(max_length=1000, blank=True, null=True)
     details = models.CharField(max_length=10000, blank=True, null=True)
 
     def __unicode__(self):
         return unicode(self.text)
 
+class MC(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    student = models.CharField(Student)
+    question = models.ForeignKey(Exam)
+    answers = models.ManyToManyField(Answer)
+    finished = models.BooleanField(default=False)
+    details = models.CharField(max_length=10000, blank=True, null=True)
+
+    def __unicode__(self):
+        return unicode(self.answers)
+
+class Grading(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    student = models.CharField(Student)
+    mc = models.ForeignKey(MC)
+    grade = models.CharField(max_length=100, blank=True, null=True)
+
 class TempExam(models.Model):
     started = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    exam = models.ForeignKey(Exam)
-    finished = models.CharField(max_length=100, blank=True, null=True)
     student = models.ForeignKey(Student)
+    exam = models.ForeignKey(Exam)
+    finished = models.BooleanField(default=False)
     details = models.CharField(max_length=50000, blank=True, null=True)
