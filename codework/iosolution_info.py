@@ -98,6 +98,25 @@ def check_hw4(s):
         s.comments = "No solution yet."
     s.save()
 
+# HW4 of 2017
+def check_hw5(s):
+    output = s.pair.output
+    if s.output_submitted:
+        if is_number(s.output_submitted):
+            if math.fabs(float(s.output_submitted) - float(output)) < 0.01:
+                s.comments = "Answer is correct."
+                if s.updated < s.assignment.due_date:
+                    s.score = "10.0"
+                else:
+                    s.score = "5.0"
+            else:
+                s.comments = "Answer is wrong. ("+ s.output_submitted +")"
+        else:
+            s.comments = "Answer is not a number."
+    else:
+        s.comments = "No solution yet."
+    s.save()
+
 # Messing with Rewards
 def check_hw7(s):
     output = s.pair.output
@@ -381,7 +400,7 @@ class iosolution_info():
             elif a_name == "hw3":
                 check_hw4(s)
             elif a_name == "hw4":
-                check_hw4(s) # Needs to change later
+                check_hw5(s) # HW4 of 2017
             elif a_name == "hw5":
                 check_hw7(s)
             elif a_name == "hw6":
@@ -405,9 +424,9 @@ class iosolution_info():
             elif a_name == "hw2":
                 check_hw2(s)
             elif a_name == "hw3":
-                check_hw3(s)
-            elif a_name == "hw4":
                 check_hw4(s)
+            elif a_name == "hw4":
+                check_hw5(s)
             elif a_name == "hw5":
                 check_hw7(s)
             elif a_name == "hw6":

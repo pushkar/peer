@@ -89,7 +89,7 @@ def work(request, a_name):
         if a.short_name == "hw1":
             io_solution.generate(s, a, 10)
         elif a.short_name == "hw4":
-            io_solution.generate(s, a, 1)
+            io_solution.generate(s, a, 10)
         else:
             io_solution.generate(s, a, 5)
     else:
