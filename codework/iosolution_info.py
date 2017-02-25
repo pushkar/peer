@@ -100,10 +100,11 @@ def check_hw4(s):
 
 # HW4 of 2017
 def check_hw5(s):
+    max_attempts = 15
     output = s.pair.output
     if s.output_submitted:
         s.comments = ""
-        if int(s.count) <= 3:
+        if int(s.count) <= max_attempts:
             if is_number(s.output_submitted):
                 if math.fabs(float(s.output_submitted) - float(output)) < 0.01:
                     s.comments = "Answer is correct."
@@ -120,8 +121,8 @@ def check_hw5(s):
     else:
         s.comments = "No solution yet."
 
-    if int(s.count) <= 3:
-        s.comments += " Attempt " + str(s.count) + " out of 3."
+    if int(s.count) <= max_attempts:
+        s.comments += " Attempt " + str(s.count) + " out of " + str(max_attempts) + "."
     else:
         s.comments += " " + str(s.count) + " attempts. Maximum number of attempts excedded."
     s.save()
