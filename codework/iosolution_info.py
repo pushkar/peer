@@ -102,19 +102,28 @@ def check_hw4(s):
 def check_hw5(s):
     output = s.pair.output
     if s.output_submitted:
-        if is_number(s.output_submitted):
-            if math.fabs(float(s.output_submitted) - float(output)) < 0.01:
-                s.comments = "Answer is correct."
-                if s.updated < s.assignment.due_date:
-                    s.score = "10.0"
+        s.comments = ""
+        if int(s.count) <= 3:
+            if is_number(s.output_submitted):
+                if math.fabs(float(s.output_submitted) - float(output)) < 0.01:
+                    s.comments = "Answer is correct."
+                    if s.updated < s.assignment.due_date:
+                        s.score = "10.0"
+                    else:
+                        s.score = "5.0"
                 else:
-                    s.score = "5.0"
+                    s.comments = "Answer is wrong. ("+ s.output_submitted +")."
             else:
-                s.comments = "Answer is wrong. ("+ s.output_submitted +")"
+                s.comments = "Answer is not a number."
         else:
-            s.comments = "Answer is not a number."
+            s.comments = "Will not grade."
     else:
         s.comments = "No solution yet."
+
+    if int(s.count) <= 3:
+        s.comments += " Attempt " + str(s.count) + " out of 3."
+    else:
+        s.comments += " " + str(s.count) + " attempts. Maximum number of attempts excedded."
     s.save()
 
 # Messing with Rewards
@@ -393,6 +402,7 @@ class iosolution_info():
     def check(self):
         for s in self.solutions:
             a_name = s.assignment.short_name
+            s.count = int(s.count) + 1
             if a_name == "hw1":
                 check_hw1(s)
             elif a_name == "hw2":

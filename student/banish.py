@@ -24,10 +24,10 @@ def banish_check(request, s):
     violations = int(banish.violations)
  
     current_time = timezone.now()
-    print "U " + str(updated_time)
-    print "C " + str(current_time)
+    # print "U " + str(updated_time)
+    # print "C " + str(current_time)
     delta_time = current_time - updated_time
-    print "Delta is " + str(delta_time.seconds)
+    # print "Delta is " + str(delta_time.seconds)
     if delta_time.seconds < MIN_TIME_BETWEEN_REQUESTS:
         banish.violations = int(banish.violations) + 1
     banish.save()

@@ -48,6 +48,7 @@ class IOSolution(models.Model):
     output_submitted = models.CharField(max_length=100000, null=True, blank=True)
     score = models.CharField(max_length=10, default="0.0")
     comments = models.CharField(max_length=2000, null=True, blank=True)
+    count = models.CharField(max_length=10, default="0")
 
     def pair_av(self):
         return self.pair.input[:10]
@@ -91,7 +92,7 @@ class IOPairAdmin(admin.ModelAdmin):
     list_filter = ('assignment__name', )
 
 class IOSolutionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'student', 'assignment', 'created', 'updated', 'late_av', 'output_submitted_av', 'score')
+    list_display = ('id', 'student', 'assignment', 'created', 'updated', 'late_av', 'output_submitted_av', 'score', 'count')
     search_fields = ('id', 'student__lastname', 'student__firstname', 'student__username')
     list_filter = ('assignment__name', )
 

@@ -107,4 +107,4 @@ class Banish(models.Model):
 
 class BanishAdmin(admin.ModelAdmin):
     list_display = ('id', 'student', 'created', 'updated', 'ip', 'count', 'violations')
-    search_fields = ('id', 'student', 'created', 'updated', 'ip', 'count', 'violations')
+    search_fields = ('id', 'student__username', 'student__firstname', 'student__lastname', 'ip', 'count', 'violations')
