@@ -90,6 +90,8 @@ def work(request, a_name):
             io_solution.generate(s, a, 10)
         elif a.short_name == "hw4":
             io_solution.generate(s, a, 10)
+        elif a.short_name == "hw6":
+            io_solution.generate(s, a, 1)
         else:
             io_solution.generate(s, a, 5)
     else:
