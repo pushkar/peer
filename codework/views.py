@@ -101,33 +101,42 @@ def work(request, a_name):
     stats = io_solution.get_stats()
 
     return render(request, 'codework_work.html', {
-            'student': s,
-            'a': a,
-            'a_name': a_name,
-            'solutions': solutions,
-            'deadline': deadline,
-            'time_left': time_left,
-            'submit_late': submit_late,
-            'stats': stats,
+        'student': s,
+        'a': a,
+        'a_name': a_name,
+        'solutions': solutions,
+        'deadline': deadline,
+        'time_left': time_left,
+        'submit_late': submit_late,
+        'stats': stats,
         })
+
+def is_ascii(s):
+    return all(ord(c) < 128 for c in s)
 
 @ajax
 def update(request, id):
     if not check_session(request):
         return HttpResponseRedirect(reverse('student:index'))
-    
+
     s = Student.objects.get(username=request.session['user'])
     if banish_check(request, s):
         force_logout(request)
-        
+
     output_submitted = ""
     if request.method == "POST":
         output_submitted = request.POST.get("output", "")
         submit_late = request.POST.get("submit_late", "")
-        io_solution = iosolution_info()
-        ret = io_solution.update(id, output_submitted, submit_late)
-        io_solution.check()
-        messages.success(request, ret)
+        all_ascii = True
+        for ch in output_submitted:
+            if is_ascii(ch) is False:
+                all_ascii = False
+                messages.error(request, "Some characters in your solution are ASCII. Remove any formatting.")
+        if all_ascii:
+            io_solution = iosolution_info()
+            ret = io_solution.update(id, output_submitted, submit_late)
+            io_solution.check()
+            messages.success(request, ret)
 
 @login_required
 def hw4_csv(request):
