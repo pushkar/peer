@@ -131,7 +131,7 @@ def update(request, id):
         for ch in output_submitted:
             if is_ascii(ch) is False:
                 all_ascii = False
-                messages.error(request, "Some characters in your solution are ASCII. Remove any formatting.")
+                messages.info(request, "Some characters in your solution are ASCII. Remove any formatting.")
         if all_ascii:
             io_solution = iosolution_info()
             ret = io_solution.update(id, output_submitted, submit_late)
