@@ -58,12 +58,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_ajax',
-    'django_mathjax',
     'student',
     'assignment',
     'api',
-    'record',
-    'codework',
     'exam',
 ]
 

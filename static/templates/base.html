@@ -32,12 +32,9 @@
     <script type="text/javascript" src="{% static "style/django_ajax/js/jquery.ajax-plugin.min.js" %}"></script>
     <script type="text/javascript" src="{% static "style/jquery.cookie.js" %}"></script>
     <script type="text/javascript" src="{% static "style/jquery.history.js" %}"></script>
-    <!-- <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-    TODO: https://developers.google.com/loader/
-    -->
+
     <script type="text/javascript">
         var csrftoken = $.cookie('csrftoken');
-        google.load("visualization", "1.1", {packages:["corechart"]});
 
         function csrfSafeMethod(method) {
             // these HTTP methods do not require CSRF protection
@@ -145,7 +142,7 @@
         </div>
 
         {% block content %}{% endblock %}
-        <script type="text/javascript" src="{% static "style/jquery/1.11.1/jquery.min.js" %}"></script>
+        <script type="text/javascript" src="{% static "style/jquery/2.1.3/jquery.min.js" %}"></script>
         <script type="text/javascript" src="{% static "style/dist/js/bootstrap.min.js" %}"></script>
         <script type="text/javascript" src="{% static "style/eldarion-ajax.min.js" %}"></script>
     </div>

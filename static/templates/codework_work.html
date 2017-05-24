@@ -39,10 +39,12 @@
 <script type="text/javascript">
 $('#code-{{sol.pk}}-form').submit(function(event){
     event.preventDefault();
+    console.log("Late:" + $('#submit_late-{{sol.pk}}').is(":checked") + "\tVal: " + $('#output-{{sol.pk}}').val());
+    console.log("Submitting to {% url 'assignment:update' sol.pk %}")
     $.ajax({
         type: "POST",
         dataType: "json",
-        url: "{% url 'codework:update' sol.pk %}",
+        url: "{% url 'assignment:update' sol.pk %}",
         data: {
                 submit_late:$('#submit_late-{{sol.pk}}').is(":checked"),
                 output:$('#output-{{sol.pk}}').val(),
@@ -53,7 +55,7 @@ $('#code-{{sol.pk}}-form').submit(function(event){
             }
         },
         success: function(result) {
-            load_div("{% url 'codework:work' a_name %}", '#assignment_content');
+            load_div("{% url 'assignment:code' a_name %}", '#assignment_content');
         },
         error : function(xhr, errmsg, err) {
             $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+ errmsg +

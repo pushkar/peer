@@ -23,7 +23,7 @@
                 {% endif %}
                 {% endfor %}
                 {% if a.0.enable_codework %}
-                <li><a href="{% url 'codework:work' a_name %}" data-ajax="true" data-success="load_content">Solve with Code</a></li>
+                <li><a href="{% url 'assignment:code' a_name %}" data-ajax="true" data-success="load_content">Solve with Code</a></li>
                 {% endif %}
             </ul>
         </div>

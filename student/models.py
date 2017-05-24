@@ -3,6 +3,12 @@ from django import forms
 from django.contrib import admin
 from django.forms.widgets import RadioSelect
 
+USER_TYPES = (
+    ('student', 'Student'),
+    ('ta', 'TA'),
+    ('superta', 'Admin'),
+)
+
 class Global(models.Model):
     key = models.CharField(max_length=50)
     value = models.CharField(max_length=1000)
@@ -16,8 +22,9 @@ class GlobalAdmin(admin.ModelAdmin):
 
 class Student(models.Model):
     username = models.CharField(max_length=50)
-    usertype = models.CharField(max_length=50)
+    usertype = models.CharField(max_length=10, choices=USER_TYPES)
     email = models.CharField(max_length=50)
+    email_tsq = models.CharField(max_length=50, null=True)
     gtid = models.CharField(max_length=12)
     lastname = models.CharField(max_length=50)
     firstname = models.CharField(max_length=50)
@@ -29,7 +36,7 @@ class Student(models.Model):
         return str(self.lastname + ", " + self.firstname + " (" + self.username + ")")
 
 class StudentAdmin(admin.ModelAdmin):
-    list_display = ('id', 'username', 'gtid', 'firstname', 'lastname', 'email', 'usertype')
+    list_display = ('id', 'username', 'gtid', 'firstname', 'lastname', 'email', 'email_tsq', 'usertype')
     search_fields = ('username', 'gtid', 'firstname', 'lastname')
     list_filter = ('usertype', )
 
