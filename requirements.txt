@@ -9,3 +9,4 @@ django-mathjax>=0.0.8
 sendgrid>=0.5.0
 pytz==2013.7
 djangoajax==2.3.3
+urllib3
