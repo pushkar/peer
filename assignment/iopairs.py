@@ -13,8 +13,14 @@ def add(a, i, o):
         log.error("Failed to add IOPair")
     return ret[1]
 
+def get_none():
+    return IOPair.objects.none()
+
 def get(a):
     return IOPair.objects.filter(assignment=a)
+
+def get_by_id(id):
+    return IOPair.objects.filter(pk=id)
 
 def get_random(a, count=1):
     pairs = IOPair.objects.filter(assignment=a)

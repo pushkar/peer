@@ -64,6 +64,12 @@ def get_by_assignment(a, solutions=None):
 
     return IOSolution.objects.filter(assignment=a)
 
+def get_none():
+    return IOSolution.objects.none()
+
+def get_by(s, a):
+    return IOSolution.objects.filter(student=s, assignment=a)
+
 def get_by_id(pk):
     solution = IOSolution.objects.filter(pk=pk)
     if len(solution) > 1:

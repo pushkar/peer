@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 from django.contrib import admin, messages
-from student.models import *
+from student.models import Student
 
 
 class ApiKey(models.Model):

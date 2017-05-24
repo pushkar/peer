@@ -1,3 +1,5 @@
+import json
+import logging
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
@@ -5,14 +7,12 @@ from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.contrib import messages
 from django.http import JsonResponse
 from django.core import serializers
-from student.models import *
-from assignment.models import *
-from api.models import *
-from student.log import *
-from student.students_info import *
+from student.models import Student
+from assignment.models import Assignment
+import assignment.iosolutions as iosolutions
+import assignment.iopairs as iopairs
+from api.models import ApiKey
 
-import json
-import logging
 
 log = logging.getLogger(__name__)
 
@@ -48,68 +48,102 @@ def check_permissions(perms):
 # Views
 def index(request):
     response = {}
-    if request.method == 'GET':
-        check_key(response, request.GET.get('apikey', ''))
-
+    response['message'] = "Call valid endpoints!"
     return JsonResponse(response)
 
-def student(request, username):
+def students(request):
     students = Student.objects.none()
-    if request.method == 'GET':
-        if name == "all":
-            students = Student.objects.all()
-        else:
+    try:
+        students = Student.objects.all()
+    except Exception as e:
+        log.error(e)
+
+    data = serializers.serialize('json', students)
+    return HttpResponse(data, content_type='application/json')
+
+def student_by_id(request, id):
+    students = Student.objects.none()
+    try:
+        if request.method == 'GET':
+            students = Student.objects.filter(pk=id)
+    except Exception as e:
+        log.error(e)
+
+    data = serializers.serialize('json', students)
+    return HttpResponse(data, content_type='application/json')
+
+def student_by_user(request, username):
+    students = Student.objects.none()
+    try:
+        if request.method == 'GET':
             students = Student.objects.filter(username=username)
+    except Exception as e:
+        log.error(e)
 
     data = serializers.serialize('json', students)
     return HttpResponse(data, content_type='application/json')
 
 def assignment(request, a_name):
     a = Assignment.objects.none()
-    if request.method == 'GET':
-        if name == "all":
-            a = Assignment.objects.all()
-        else:
-            a = Assignment.objects.filter(short_name=a_name)
+    try:
+        if request.method == 'GET':
+            if name == "all":
+                a = Assignment.objects.all()
+            else:
+                a = Assignment.objects.filter(short_name=a_name)
 
-        for _a in a:
-            _a.url = "..." + _a.url[-25:]
+            for _a in a:
+                _a.url = "..." + _a.url[-25:]
+    except Exception as e:
+        log.error(e)
 
     data = serializers.serialize('json', a)
     return HttpResponse(data, content_type='application/json')
 
 def codework(request, a_name, username):
-    response = {}
-    if request.method == 'GET':
-        io_solution = iosolution_info()
-        if name == "all" and username == "all":
-            io_solution.get()
+    solutions = iosolutions.get_none()
+    try:
+        if request.method == 'GET':
+            s = Student.objects.get(username=username)
+            a = Assignment.objects.get(short_name=a_name)
+            solutions = iosolutions.get_by(s, a)
+    except Exception as e:
+        log.error(e)
 
-        if name == "all":
-            assignment = Assignment.objects.all()
-        else:
-            assignment = Assignment.objects.filter(short_name=name)
-            io_solution.get_by_assignment(assignment)
+    data = serializers.serialize('json', solutions)
+    return HttpResponse(data, content_type='application/json')
 
-        if username == "all":
-            student = Student.objects.all()
-        else:
-            student = Student.objects.filter(username=username)
-            io_solution.get_by_student(student)
+def codework_by_username(request, username):
+    solutions = iosolutions.get_none()
+    try:
+        if request.method == 'GET':
+            s = Student.objects.get(username=username)
+            solutions = iosolutions.get_by_student(s)
+    except Exception as e:
+        log.error(e)
 
-        response_codework = io_solution.get_data()
-        response['data'] = response_codework
-        response['error'] = ""
-        response['message'] = "Found codework of " + username + " in " + name
-    return JsonResponse(response)
+    data = serializers.serialize('json', solutions)
+    return HttpResponse(data, content_type='application/json')
 
-@check_permissions("r")
-def update_codework(request, id):
-    response = {}
-    if request.method == 'GET':
-        io_solution = iosolution_info()
-        score = request.GET.get('score', '')
-        comments = request.GET.get('comments', '')
-        response['message'] = io_solution.update_notime(id, score, comments)
-        response['error'] = ""
-    return JsonResponse(response)
+def codework_by_assignment(request, a_name):
+    solutions = iosolutions.get_none()
+    try:
+        if request.method == 'GET':
+            a = Assignment.objects.get(short_name=a_name)
+            solutions = iosolutions.get_by_assignment(a)
+    except Exception as e:
+        log.error(e)
+
+    data = serializers.serialize('json', solutions)
+    return HttpResponse(data, content_type='application/json')
+
+def codepair(request, id):
+    pair = iopairs.get_none()
+    try:
+        if request.method == 'GET':
+            pair = iopairs.get_by_id(id)
+    except Exception as e:
+        log.error(e)
+
+    data = serializers.serialize('json', pair)
+    return HttpResponse(data, content_type='application/json')
