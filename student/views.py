@@ -161,6 +161,7 @@ def profile(request):
         })
 
     except Exception as e:
+        log.error(e)
         messages.warning(request, "Something went wrong. Let your TA know.")
 
     return HttpResponseRedirect(reverse('student:index'))
