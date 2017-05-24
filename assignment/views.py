@@ -1,58 +1,46 @@
 import logging
 from django.shortcuts import render
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.utils import timezone
 from assignment.models import Assignment, AssignmentPage
 from assignment.utils import localize_timedelta, force_logout
 import assignment.iosolutions as iosolutions
-import assignment.iopairs as iopairs
 from student.models import Student
 import student.banish as banish
-from student.common import check_session, get_global
+import student.utils as utils
 from django_ajax.decorators import ajax
 
 log = logging.getLogger(__name__)
 
+def get_assignments_data(username, a_name=None, p_name=None):
+    data = {}
+    student = Student.objects.get(username=username)
+    assignments = Assignment.objects.all()
+    data['student'] = student
+    data['assignments'] = assignments
+    if a_name:
+        assignment = assignments.filter(short_name=a_name)
+        pages = AssignmentPage.objects.filter(assignment__short_name=a_name)
+        data['a'] = assignment
+        data['pages'] = pages
+        if p_name:
+            data['page_this'] = pages.filter(name=p_name)
+    return data
+
 # Displays all Assignments
 def index(request):
-    if not check_session(request):
+    if not utils.check_session(request):
         return HttpResponseRedirect(reverse('student:index'))
-
-    s = Student.objects.get(username=request.session['user'])
-    a = Assignment.objects.all()
 
     return render(request, 'assignment_index.html', {
-        'student': s,
-        'assignments': a,
-        })
-
-# Displays a page from the database
-@ajax
-def page(request, a_name, p_name):
-    if not check_session(request):
-        return HttpResponseRedirect(reverse('student:index'))
-
-    s = Student.objects.get(username=request.session['user'])
-    a_all = Assignment.objects.all()
-    a = a_all.filter(short_name=a_name)
-    ap = AssignmentPage.objects.filter(assignment=a)
-    ap_this = ap.filter(name=p_name)
-
-    return render(request, 'assignment_pageview.html', {
-        'student': s,
-        'a': a,
-        'assignments': a_all,
-        'ap': ap,
-        'ap_this': ap_this,
-        'a_name': a_name,
-        'global': get_global(),
+        **get_assignments_data(request.session['user']),
         })
 
 # Default view for assignments
 def home(request, a_name):
-    if not check_session(request):
+    if not utils.check_session(request):
         return HttpResponseRedirect(reverse('student:index'))
 
     extra_scripts = ""
@@ -65,28 +53,29 @@ def home(request, a_name):
             a_name = request.GET['code']
             extra_scripts = "load_div(\'"+ reverse('assignment:code', args=[a_name]) +"\', \'#assignment_content\'); \n"
 
-    s = Student.objects.get(username=request.session['user'])
-    a_all = Assignment.objects.all()
-    a = a_all.filter(short_name=a_name)
-    ap = AssignmentPage.objects.filter(assignment__short_name=a_name)
-
     return render(request, 'assignment_pagebase.html', {
-        'student': s,
-        'a': a,
-        'assignments': a_all,
-        'ap': ap,
-        'a_name': a_name,
+        **get_assignments_data(request.session['user'], a_name),
         'extra_scripts': extra_scripts,
-        'global': get_global(),
     })
+
+# Displays a page from the database
+@ajax
+def page(request, a_name, p_name):
+    if not utils.check_session(request):
+        return HttpResponseRedirect(reverse('student:index'))
+
+    return render(request, 'assignment_pageview.html', {
+        **get_assignments_data(request.session['user'], a_name, p_name),
+        })
 
 @ajax
 def code(request, a_name):
-    if not check_session(request):
+    if not utils.check_session(request):
         return HttpResponseRedirect(reverse('student:index'))
 
-    s = Student.objects.get(username=request.session['user'])
-    a = Assignment.objects.get(short_name=a_name)
+    data = get_assignments_data(request.session['user'], a_name)
+    s = data['student']
+    a = data['a'][0]
 
     deadline = a.due_date
     endline = deadline
@@ -108,9 +97,7 @@ def code(request, a_name):
     stats = iosolutions.get_stats(solutions)
 
     return render(request, 'codework_work.html', {
-        'student': s,
-        'a': a,
-        'a_name': a_name,
+        **data,
         'solutions': solutions,
         'deadline': deadline,
         'time_left': time_left,
@@ -120,7 +107,7 @@ def code(request, a_name):
 
 @ajax
 def update(request, id):
-    if not check_session(request):
+    if not utils.check_session(request):
         return HttpResponseRedirect(reverse('student:index'))
 
     s = Student.objects.get(username=request.session['user'])

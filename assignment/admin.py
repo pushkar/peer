@@ -2,9 +2,9 @@ import sys
 import csv
 import logging
 import urllib3
-import assignment.iopairs
-from django.contrib import admin
 from assignment.models import Assignment, AssignmentPage, IOPair, IOSolution
+import assignment.iopairs as iopairs
+from django.contrib import admin
 
 log = logging.getLogger(__name__)
 

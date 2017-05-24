@@ -18,8 +18,11 @@
 <p>T-sq Email: {{ student.email_tsq }}</p>
 
 {% if student.usertype == "student" %}
-<p>Opted in Peer Review? {{ opt.value }}</p>
-
+    {% if student.optin %}
+    <p>Thank you for opting in the peer review program. - Pushkar</p>
+    {% else %}
+    <p>Sign up for the peer review program by clicking <a href="{% url 'student:optin' %}">here</a>.</p>
+    {% endif %}
 {% elif student.usertype == "superta" %}
 <p>You are a Super TA. Respect!</p>
 

@@ -5,7 +5,7 @@
 
 {% block breadcrumb %}
 <li><a href="{% url 'assignment:index' %}">Assignments</a></li>
-<li class="active">{{ ap.0.assignment }}</li>
+<li class="active">{{ a.0.name }}</li>
 {% endblock %}
 
 {% block content %}
@@ -14,16 +14,16 @@
     <div class="col-sm-3 col-md-2 sidebar">
         <div id="assignment_menu">
             <ul class="nav nav-bar">
-                <li><a href="{% url 'assignment:home' a_name %}">Home</a></li>
-                {% for page in ap %}
+                <li><a href="{% url 'assignment:home' a.0.short_name %}">Home</a></li>
+                {% for page in pages %}
                 {% if page.link|length > 0 %}
                     <li><a href="{{ page.link }}" data-ajax="true" data-success="load_content">{{ page.title }}</a></li>
                 {% else %}
-                    <li><a href="{% url 'assignment:page' a_name page.name %}" data-ajax="true" data-success="load_content">{{ page.title }}</a></li>
+                    <li><a href="{% url 'assignment:page' a.0.short_name page.name %}" data-ajax="true" data-success="load_content">{{ page.title }}</a></li>
                 {% endif %}
                 {% endfor %}
                 {% if a.0.enable_codework %}
-                <li><a href="{% url 'assignment:code' a_name %}" data-ajax="true" data-success="load_content">Solve with Code</a></li>
+                <li><a href="{% url 'assignment:code' a.0.short_name %}" data-ajax="true" data-success="load_content">Solve with Code</a></li>
                 {% endif %}
             </ul>
         </div>
@@ -31,7 +31,7 @@
     </div>
 
     <div class="col-sm-9 main">
-        <h2>{{ ap.0.assignment.name }}</h2>
+        <h2>{{ pages.0.assignment.name }}</h2>
         <div id="assignment_content"> </div>
     </div>
 </div>

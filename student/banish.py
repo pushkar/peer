@@ -1,5 +1,4 @@
 import logging
-import pytz
 from django.contrib import messages
 from django.utils import timezone
 from student.models import Banish
@@ -34,6 +33,7 @@ def banish_check(request, s):
     banish.save()
 
     if violations > MAX_VIOLATIONS:
+        log.critical("Max violations reached for %s (max violations is %s)" % (s, MAX_VIOLATIONS))
         messages.info(request, "You have been banned for sending too many requests. Contact the TA.")
         return True
     return False

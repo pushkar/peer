@@ -55,7 +55,7 @@ $('#code-{{sol.pk}}-form').submit(function(event){
             }
         },
         success: function(result) {
-            load_div("{% url 'assignment:code' a_name %}", '#assignment_content');
+            load_div("{% url 'assignment:code' a.0.short_name %}", '#assignment_content');
         },
         error : function(xhr, errmsg, err) {
             $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+ errmsg +
@@ -72,7 +72,7 @@ $('#code-{{sol.pk}}-form').submit(function(event){
         History.Adapter.bind(window,'statechange',function(){
             var State = History.getState();
         });
-        History.pushState({code:"{{ a_name }}"}, "Code {{ a_name }}", "?code={{ a_name }}");
+        History.pushState({code:"{{ a.0.short_name }}"}, "Code {{ a.0.short_name }}", "?code={{ a.0.short_name }}");
     })(window);
 
     load_messages();

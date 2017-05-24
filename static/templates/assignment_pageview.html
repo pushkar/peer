@@ -1,14 +1,14 @@
 {% autoescape off %}
-<h4>{{ ap_this.0.title }}</h4>
+<h4>{{ page_this.0.title }}</h4>
 
-{{ ap_this.0.content }}
+{{ page_this.0.content }}
 
 <script type="text/javascript">
     (function(window,undefined){
         History.Adapter.bind(window,'statechange',function(){
             var State = History.getState();
         });
-        History.pushState({page:"{{ ap_this.0.name }}"}, "Page {{ ap_this.0.title }}", "?page={{ ap_this.0.name }}");
+        History.pushState({page:"{{ page_this.0.name }}"}, "Page {{ page_this.0.title }}", "?page={{ page_this.0.name }}");
     })(window);
 
     load_messages();

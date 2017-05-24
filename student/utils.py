@@ -1,5 +1,3 @@
-from student.models import Global
-
 def check_session(request):
     if not 'user' in request.session:
         request.session['user'] = ""
@@ -8,10 +6,4 @@ def check_session(request):
     if not request.session['user']:
         return False
     return True
-
-def get_global():
-    globals = Global.objects.all()
-    data = {}
-    for g in globals:
-        data[g.key] = g.value
-    return data
+    

@@ -1,41 +1,34 @@
+import os
+import logging
 from django.shortcuts import render
-from django.utils import timezone
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
-from django.contrib import admin, messages
+from django.contrib import messages
 from django_ajax.decorators import ajax
-from django.template.defaulttags import register
 
-from student.models import *
-from student.log import *
-from student.banish import *
-from student.common import *
-from assignment.models import *
+import student.utils as utils
+import student.log as log_entry
+import student.banish as banish
+from student.models import Student, LoginForm, ForgotPasswordForm
+from assignment.models import Assignment
 
-import csv
-import datetime
-import urllib3
 import sendgrid
 
 log = logging.getLogger(__name__)
 
 # Create your views here.
-@register.filter
-def get_item(dictionary, key):
-    return dictionary.get(key)
 
 def send_email(email, gtid):
-    sendgrid_user = ""
-    sendgrid_pass = ""
-    g = Global.objects.all()
-    for g_entry in g:
-        if g_entry.key == "sendgrid_user":
-            sendgrid_user = g_entry.value
-        if g_entry.key == "sendgrid_pass":
-            sendgrid_pass = g_entry.value
-
-    sg = sendgrid.SendGridClient(sendgrid_user, sendgrid_pass)
+    env_sendgrid_user = os.environ.get('ENV_SENDGRID_USER')
+    env_sendgrid_pass = os.environ.get('ENV_SENDGRID_PASS')
+    if env_sendgrid_user is None:
+        log.error('Sendgrid username not set. Set enviornment variable ENV_SENDGRID_USER.!')
+        return False
+    if env_sendgrid_pass is None:
+        log.error('Sendgrid password not set. Set enviornment variable ENV_SENDGRID_PASS')
+        return False
+    sg = sendgrid.SendGridClient(env_sendgrid_user, env_sendgrid_pass)
     message = sendgrid.Mail()
     message.add_to(email)
     message.set_subject('Password Reset')
@@ -49,24 +42,17 @@ def messages_all(request):
     return render(request, 'messages.html', {})
 
 def index(request):
-    if check_session(request):
+    if utils.check_session(request):
         s = Student.objects.get(username=request.session['user'])
         assignments = Assignment.objects.all()
-        opt = OptIn.objects.get_or_create(student=s)
-        opt_str = "opted out"
-        if opt[0].value is True:
-            opt_str = "opted in"
         return render(request, 'index.html', {
             'student': s,
             'assignments': assignments,
-            'opt': opt_str,
-            'global': get_global(),
         })
     else:
         form = LoginForm()
         return render(request, 'index.html', {
             'form': form,
-            'global': get_global(),
         })
 
 def login(request):
@@ -80,8 +66,8 @@ def login(request):
                 s = Student.objects.get(username=username, gtid=gtid)
                 request.session['user'] = s.username
                 request.session['usertype'] = s.usertype
-                log_login(s, True)
-                if banish_check(request, s):
+                log_entry.log_login(s, True)
+                if banish.banish_check(request, s):
                     messages.info(request, "You have been banned. Contact the TA.")
                     request.session.flush()
                     return HttpResponseRedirect(reverse('student:index'))
@@ -118,7 +104,6 @@ def pass_request(request):
     else:
         passform = ForgotPasswordForm()
         return render(request, 'index.html', {
-            'global': get_global(),
             'passform': passform,
         })
 
@@ -131,83 +116,59 @@ def logout(request):
     return HttpResponseRedirect(reverse('student:index'))
 
 def optin(request):
-    if check_session(request):
-        s = Student.objects.get(username=request.session['user'])
+    if not utils.check_session(request):
+        return HttpResponseRedirect(reverse('student:index'))
 
-    try:
-        opt = OptIn.objects.get(student=s)
-        opt.value = True
-        opt.save()
-        messages.success(request, "Your status was changed in the peer review program..")
-    except Exception as e:
-        messages.warning(request, "Something went wrong. Let your TA know.")
-
+    s = Student.objects.get(username=request.session['user'])
+    s.optin = True
+    s.save()
+    log.info("%s changed to opt-in" % s)
     return HttpResponseRedirect(reverse('student:index'))
 
 def profile(request):
-    if not check_session(request):
+    if not utils.check_session(request):
         return HttpResponseRedirect(reverse('student:index'))
 
-    try:
-        s = Student.objects.get(username=request.session['user'])
-        assignments = Assignment.objects.all()
-        opt = OptIn.objects.get(student=s)
+    s = Student.objects.get(username=request.session['user'])
+    assignments = Assignment.objects.all()
 
-        return render(request, 'profile.html', {
-            'global': get_global(),
-            'student': s,
-            'assignments': assignments,
-            'opt': opt,
-        })
-
-    except Exception as e:
-        log.error(e)
-        messages.warning(request, "Something went wrong. Let your TA know.")
-
-    return HttpResponseRedirect(reverse('student:index'))
+    return render(request, 'profile.html', {
+        'student': s,
+        'assignments': assignments,
+    })
 
 def about(request):
-    try:
-        assignments = Assignment.objects.all()
+    assignments = Assignment.objects.all()
 
-        return render(request, 'about.html', {
-            'assignments': assignments,
-        })
-
-    except Exception as e:
-        messages.warning(request, "Something went wrong. Let your TA know.")
-
-    return HttpResponseRedirect(reverse('student:index'))
-
+    return render(request, 'about.html', {
+        'assignments': assignments,
+    })
 
 @login_required
 def admin(request):
-    if not check_session(request):
+    if not utils.check_session(request):
         return HttpResponseRedirect(reverse('student:index'))
 
-    try:
-        s = Student.objects.get(username=request.session['user'])
-        a = Assignment.objects.all()
-        s_all = Student.objects.all()
-        return render(request, 'admin.html', {
-            'global': get_global(),
-            'student': s,
-            'assignments': a,
-            'student_all': s_all,
-        })
+    s = Student.objects.get(username=request.session['user'])
+    a = Assignment.objects.all()
+    s_all = Student.objects.all()
+    return render(request, 'admin.html', {
+        'student': s,
+        'assignments': a,
+        'student_all': s_all,
+    })
 
-    except Exception as e:
-        messages.warning(request, "Something went wrong.")
-
-    return HttpResponseRedirect(reverse('student:index'))
 
 @login_required
 def login_change(request, user):
-    if not check_session(request):
+    if not utils.check_session(request):
         return HttpResponseRedirect(reverse('student:index'))
 
     s = Student.objects.get(username=user)
+    request.session['user_original'] = request.session['user']
     request.session['user'] = s.username
     request.session['usertype'] = s.usertype
+    log.critical("%s changed login to %s" % (request.session['user_original'], s))
+    messages.success(request, 'You are now logged in as %s' % s)
 
-    return HttpResponseRedirect(reverse('student:admin'))
+    return HttpResponseRedirect(reverse('student:index'))

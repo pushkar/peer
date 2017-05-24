@@ -13,13 +13,12 @@
 {% autoescape off %}
 <p>Welcome {{ student.firstname }} {{ student.lastname }}!</p>
 
-<h4>Tasks</h4>
-Notice!
-
 {% if student.usertype == "student" %}
 <h4>Consent for Peer Grading research</h4>
 <ul>
-    {% if opt == "opted out" %}
+    {% if student.optin %}
+    <li>Thank you for signing up for the peer review program.</li>
+    {% else %}
     <li style="width:500px">What the study is about: You are invited to take part in a research study for evaluating peer grading methods for online education. The study creates exams which are graded by peers. The study will consist of analyzing peer grading to determine the feasibility of machine learning techniques to evaluate students. The study will lead to creation of almost real time evaluation systems that will help students in online classes learn faster and better.</li>
     <li style="width:500px">What you will be asked to do: You will be asked to solve quizzes. Each of them will take less than an hour. You will also be asked to fill out a survey providing us feedback on this quiz.</li>
     <li style="width:500px">Risks and benefits: The risks involved are no greater than those involved in regular school activities. If you choose to be in the study you can withdraw at any time without consequences of any kind. You are not likely to personally benefit from participation in this study. However, your participation will help contribute to a greater understanding of feasibility of peer evaluation systems in online courses.</li>
@@ -27,8 +26,6 @@ Notice!
     <li style="width:500px">If you have questions or summary of the study results, contact me at pushkar@cc.gatech.edu.</li>
     <li style="width:500px">By signing up, you agree that you have read the above information. I affirm that I am 18 years of age or older. I consent to take part in the research study of evaluating peer grading methods for online education.</li>
     <li><a href="{% url 'student:optin' %}">Ok, sign me up.</a></li>
-    {% else %}
-    <li>You have {{opt}} in the peer review program.</li>
     {% endif %}
 </ul>
 {% endif %}

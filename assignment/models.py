@@ -29,6 +29,9 @@ class AssignmentPage(models.Model):
     class Meta(object):
         ordering = ['pk']
 
+    def __str__(self):
+        return "%s's page: %s" % (self.assignment, self.name)
+
 class IOPair(models.Model):
     ''' Contains Input/Output pairs for each Assignment '''
     assignment = models.ForeignKey(Assignment)
