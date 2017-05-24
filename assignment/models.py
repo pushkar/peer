@@ -1,27 +1,22 @@
 from django.db import models
 from django import forms
-from django.contrib import admin, messages
-from django.forms.widgets import RadioSelect
-from student.models import *
-
-import csv
-import random
-import urllib2
+from django.contrib import admin
+from django.contrib import messages
+from student.models import Student
 
 class Assignment(models.Model):
     short_name = models.CharField(max_length=50)
     name = models.CharField(max_length=200)
     due_date = models.DateTimeField(null=True)
     end_date = models.DateTimeField(null=True)
-    enable_submission = models.BooleanField(default=False)
+    released = models.BooleanField(default=False)
     enable_codework = models.BooleanField(default=False)
-    enable_peer_review = models.BooleanField(default=False)
-    enable_stats = models.BooleanField(default=False)
+    url = models.CharField(max_length=200, null=True)
 
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
 
-    class Meta:
+    class Meta(object):
         ordering = ['due_date']
 
 class AssignmentPage(models.Model):
@@ -31,90 +26,73 @@ class AssignmentPage(models.Model):
     link = models.CharField(max_length=200, null=True, blank=True)
     content = models.TextField(max_length=15000)
 
-    class Meta:
+    class Meta(object):
         ordering = ['pk']
 
-class Submission(models.Model):
+class IOPair(models.Model):
+    ''' Contains Input/Output pairs for each Assignment '''
+    assignment = models.ForeignKey(Assignment)
+    input = models.CharField(max_length=550000)
+    output = models.CharField(max_length=100000)
+
+    def __str__(self):
+        return str(self.input_av() + " -> " + self.output_av())
+
+    def input_av(self):
+        if not self.input:
+            return "-"
+        ret = str(self.input)
+        ret_len = len(ret)
+        ret = ret[:30]
+        if ret_len > 30:
+            ret += "..."
+        return ret
+
+    def output_av(self):
+        if not self.output:
+            return "-"
+        ret = str(self.output)
+        ret_len = len(ret)
+        ret = ret[:30]
+        if ret_len > 30:
+            ret += "..."
+        return ret
+
+class IOSolution(models.Model):
+    ''' Contains Input/Output pairs submited by students '''
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
     student = models.ForeignKey(Student)
     assignment = models.ForeignKey(Assignment)
-    files = models.CharField(max_length=15000, null=True, blank=True)
+    pair = models.ForeignKey(IOPair)
+    output_submitted = models.CharField(max_length=100000, null=True, blank=True)
+    score = models.CharField(max_length=10, default="0.0")
+    comments = models.CharField(max_length=2000, null=True, blank=True)
 
-    def __unicode__(self):
-        return unicode(unicode(self.student) + ", " + unicode(self.assignment))
+    def __str__(self):
+        return str(self.pair_av() + " -> " + self.output_submitted_av())
 
-# Each Review is assigned to someone and has a score
-class Review(models.Model):
-    submission = models.ForeignKey(Submission)
-    assigned = models.ForeignKey(Student)
-    score = models.CharField(max_length=10, null=True, blank=True)
-    details = models.CharField(default=None, max_length=1000, null=True, blank=True)
+    def pair_av(self):
+        return self.pair.input[:10]
 
-    def __unicode__(self):
-        return unicode(unicode(self.submission.student) + " - R" + unicode(self.pk) + ", " + unicode(self.submission.assignment))
+    def output_submitted_av(self):
+        if not self.output_submitted:
+            return "-"
+        ret = str(self.output_submitted)
+        ret_len = len(ret)
+        ret = ret[:30]
+        if ret_len > 30:
+            ret += "..."
+        return ret
 
-# Who can access the review other than the one who it was assigned to?
-class Permission(models.Model):
-    student = models.ForeignKey(Student)
-    review = models.ManyToManyField(Review)
+    def is_late(self):
+        if self.updated > self.assignment.due_date:
+            return True
+        else:
+            return False
 
-    def __unicode__(self):
-        return unicode(unicode(self.student) + " Permissions ")
-
-class ReviewConvo(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    review = models.ForeignKey(Review)
-    student = models.ForeignKey(Student)
-    text =  models.CharField(max_length=10000, null=True, blank=True)
-    score = models.CharField(max_length=10, null=True, blank=True)
-    details = models.CharField(default=None, max_length=1000, null=True, blank=True)
-
-    class Meta:
-        ordering = ['created']
-        get_latest_by = ['created']
-
-
-# Admin Views
-class AssignmentAdmin(admin.ModelAdmin):
-    list_display = ('short_name', 'name', 'due_date', 'enable_submission', 'enable_peer_review', 'enable_codework', 'enable_stats')
-
-class AssignmentPageAdmin(admin.ModelAdmin):
-    list_display = ('assignment', 'name', 'title')
-
-class SubmissionAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'student', 'assignment', 'files')
-    search_fields = ('student__username', 'student__firstname', 'student__lastname' , 'files')
-    list_filter = ('assignment__name',)
-
-
-class ReviewAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'submission', 'assigned', 'score')
-    search_fields = ('submission__student__username', 'submission__student__firstname', 'submission__student__lastname', 'assigned__username', 'assigned__firstname', 'assigned__lastname')
-    list_filter = ('submission__assignment__name', 'assigned__usertype', )
-
-
-class PermissionAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'student',)
-    list_filter = ('review',)
-    filter_horizontal = ('review',)
-
-
-class ReviewConvoAdmin(admin.ModelAdmin):
-    list_display = ('created', 'student', 'text')
-    search_fields = ('student__username', 'student__firstname', 'student__lastname', 'review__submission__student__username',
-                'review__submission__student__firstname', 'review__submission__student__lastname', 'text')
-    list_filter = ('review',)
-
-
-# Form Views
-class ReviewConvoForm(forms.Form):
-    text = forms.CharField(widget=forms.Textarea(attrs={'rows': 10, 'style': 'width:90%'}))
-    field = ('text')
-
-class ScoreForm(forms.Form):
-    review_score = forms.ChoiceField(choices=[(x, x) for x in range(1, 6)])
-    field = ('score')
-
-class ReportForm(forms.Form):
-    file_name = forms.CharField(max_length=100)
-    file_link = forms.CharField(max_length=1000)
-    fields = ('file_name', 'file_link')
+    def late_av(self):
+        if self.is_late():
+            return "Late"
+        else:
+            return ""

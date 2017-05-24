@@ -9,12 +9,9 @@ urlpatterns = [
     url(r'^login$', views.login, name='login'),
     url(r'^logout$', views.logout, name='logout'),
     url(r'^profile$', views.profile, name='profile'),
-    url(r'^updates$', views.updates, name='updates'),
     url(r'^about$', views.about, name='about'),
 
     url(r'^admin$', views.admin, name='admin'),
-    url(r'^admin/reviews$', views.admin_review_assignments, name='admin_review_assignments'),
-
     url(r'^pass$', views.pass_request, name='pass_request'),
 
     url(r'^login/(?P<user>\w+)$', views.login_change, name='login_change'),

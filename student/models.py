@@ -3,12 +3,18 @@ from django import forms
 from django.contrib import admin
 from django.forms.widgets import RadioSelect
 
+USER_TYPES = (
+    ('student', 'Student'),
+    ('ta', 'TA'),
+    ('superta', 'Admin'),
+)
+
 class Global(models.Model):
     key = models.CharField(max_length=50)
     value = models.CharField(max_length=1000)
 
-    def __unicode__(self):
-        return unicode(self.key)
+    def __str__(self):
+        return str(self.key)
 
 class GlobalAdmin(admin.ModelAdmin):
     list_display = ('id', 'key', 'value')
@@ -16,20 +22,21 @@ class GlobalAdmin(admin.ModelAdmin):
 
 class Student(models.Model):
     username = models.CharField(max_length=50)
-    usertype = models.CharField(max_length=50)
+    usertype = models.CharField(max_length=10, choices=USER_TYPES)
     email = models.CharField(max_length=50)
+    email_tsq = models.CharField(max_length=50, null=True)
     gtid = models.CharField(max_length=12)
     lastname = models.CharField(max_length=50)
     firstname = models.CharField(max_length=50)
 
-    class Meta:
+    class Meta(object):
         ordering = ['lastname']
 
-    def __unicode__(self):
-        return unicode(self.lastname + ", " + self.firstname + " (" + self.username + ")")
+    def __str__(self):
+        return str(self.lastname + ", " + self.firstname + " (" + self.username + ")")
 
 class StudentAdmin(admin.ModelAdmin):
-    list_display = ('id', 'username', 'gtid', 'firstname', 'lastname', 'email', 'usertype')
+    list_display = ('id', 'username', 'gtid', 'firstname', 'lastname', 'email', 'email_tsq', 'usertype')
     search_fields = ('username', 'gtid', 'firstname', 'lastname')
     list_filter = ('usertype', )
 
@@ -41,7 +48,7 @@ class StudentAdmin(admin.ModelAdmin):
             if OptIn.objects.get_or_create(student=s, value=False)[1]:
                 opt_count += 1
 
-        self.message_user(request, "%d of %d students were put in the Opt In program." % (opt_count, len(queryset)) )
+        self.message_user(request, "%d of %d students were put in the Opt In program." % (opt_count, len(queryset)))
 
     optin_program.short_description = "Put in the Opt In program"
 
@@ -49,8 +56,8 @@ class OptIn(models.Model):
     student = models.ForeignKey(Student)
     value = models.BooleanField(default=False)
 
-    def __unicode__(self):
-        return unicode(self.student)
+    def __str__(self):
+        return str(self.student)
 
 class OptInAdmin(admin.ModelAdmin):
     list_display = ('student', 'value')

@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 from django.contrib import admin, messages
-from student.models import *
+from student.models import Student
 
 
 class ApiKey(models.Model):
@@ -10,8 +10,8 @@ class ApiKey(models.Model):
     key = models.CharField(max_length=200)
     permission = models.CharField(max_length=10, default="r")
 
-    def __unicode__(self):
-        return unicode("Key for " + unicode(self.student))
+    def __str__(self):
+        return str("Key for " + unicode(self.student))
 
 class ApiKeyAdmin(admin.ModelAdmin):
     list_display = ('student', 'key', 'permission')

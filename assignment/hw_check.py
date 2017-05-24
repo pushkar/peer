@@ -1,13 +1,6 @@
-from django.contrib import messages
-from django.utils import timezone
-from codework.models import *
-from codework.iopairs_info import *
-from django.forms.models import model_to_dict
-
-import random
-import math
 import re
-import json
+import math
+
 
 def is_number(s):
     '''
@@ -90,7 +83,7 @@ def check_hw4(s):
         try:
             json_object = json.loads(s.output_submitted)
             s.comments = "String is a valid JSON. We will validate the answer soon."
-        except ValueError, e:
+        except ValueError:
             s.comments = "String is not a valid JSON."
         finally:
             s.save()
@@ -274,6 +267,7 @@ def check_hw8(s):
     except Exception as e:
         s.comments = '%s (%s)' % (e.message, type(e))
     finally:
+<<<<<<< HEAD:codework/iosolution_info.py
         s.save()
 
 def check_deadline(a):
@@ -471,3 +465,6 @@ class iosolution_info():
         for s in self.solutions:
             stats['total'] += float(s.score)
         return stats
+=======
+        s.save()
+>>>>>>> new_exam:assignment/hw_check.py

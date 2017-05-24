@@ -1,5 +1,0 @@
-<ul>
-    {% for f in files %}
-    <li><a href="{{f.link}}">{{ f.name }}</a> (<a href="{% url 'assignment:submission_delete' a_name f.pk %}" data-ajax="true" data-success="load_submission_files">Delete</a>)</li>
-    {% endfor %}
-</ul>

@@ -1,4 +1,5 @@
 import os
+import logging
 import dj_database_url
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -12,6 +13,43 @@ DEBUG = True
 MATHJAX_ENABLED = True
 ALLOWED_HOSTS = []
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(levelname)s %(asctime)s %(message)s',
+)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'propagate': True,
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+        'django.request': {
+            'handlers': ['console'],
+            'propagate': True,
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+    },
+}
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -20,13 +58,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_ajax',
-    'django_mathjax',
     'student',
     'assignment',
     'api',
-    'record',
-    'codework',
-    'exam',
+    #'exam',
 ]
 
 MIDDLEWARE_CLASSES = [

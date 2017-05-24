@@ -1,4 +1,4 @@
-from student.models import *
+from student.models import Global
 
 def check_session(request):
     if not 'user' in request.session:
