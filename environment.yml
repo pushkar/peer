@@ -10,7 +10,6 @@ dependencies:
     - static3==0.6.1
     - wsgiref==0.1.2
     - requests>=2.13.0
-    - django-mathjax==0.0.5
     - sendgrid>=0.5.0
     - pytz==2013.7
     - djangoajax==2.3.3
