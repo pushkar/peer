@@ -10,7 +10,7 @@ urlpatterns = [
     url(r'^student/', include('student.urls', namespace="student")),
     url(r'^assignment/', include('assignment.urls', namespace="assignment")),
     url(r'^api/', include('api.urls', namespace="api")),
-    url(r'^exam/', include('exam.urls', namespace="exam")),
+    #url(r'^exam/', include('exam.urls', namespace="exam")),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^static/(?P<path>.*)$', static_views.serve),
 ]

@@ -61,7 +61,7 @@ INSTALLED_APPS = [
     'student',
     'assignment',
     'api',
-    'exam',
+    #'exam',
 ]
 
 MIDDLEWARE_CLASSES = [
