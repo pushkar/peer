@@ -93,7 +93,7 @@ def code(request, a_name):
     else:
         time_left = "(Deadline Passed)"
 
-    solutions = iosolutions.get(s, a, 10)
+    solutions = iosolutions.get(s, a, a.num_codeproblems)
     stats = iosolutions.get_stats(solutions)
 
     return render(request, 'codework_work.html', {

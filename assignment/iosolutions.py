@@ -84,6 +84,7 @@ def update(solution, output=None, submit_late="false"):
                 if len(output) > 100000:
                     return "Solution length should be less than 100,000 chars."
                 solution.output_submitted = output
+            solution.count = solution.count + 1
             solution.save()
             return "Solution submitted."
         else:
@@ -94,22 +95,10 @@ def update(solution, output=None, submit_late="false"):
 def check(solutions):
     for s in solutions:
         a_name = s.assignment.short_name
-        if a_name == "hw1":
-            hw_check.check_hw1(s)
-        elif a_name == "hw2":
-            hw_check.check_hw2(s)
-        elif a_name == "hw3":
-            hw_check.check_hw4(s)
-        elif a_name == "hw4":
-            hw_check.check_hw4(s) # Needs to change later
-        elif a_name == "hw5":
-            hw_check.check_hw7(s)
-        elif a_name == "hw6":
-            hw_check.check_hw6(s)
-        elif a_name == "hw7":
-            hw_check.check_hw7(s)
-        elif a_name == "hw8":
-            hw_check.check_hw8(s)
+        if a_name == "bandit":
+            hw_check.check_two_armed_bandit(s)
+        else:
+            hw_check.check_floating_point_answer(s)
 
 def get_stats(solutions):
     stats = {}

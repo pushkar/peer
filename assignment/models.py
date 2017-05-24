@@ -11,6 +11,7 @@ class Assignment(models.Model):
     end_date = models.DateTimeField(null=True)
     released = models.BooleanField(default=False)
     enable_codework = models.BooleanField(default=False)
+    num_codeproblems = models.PositiveIntegerField(default=10)
     url = models.CharField(max_length=200, null=True)
 
     def __str__(self):
@@ -65,11 +66,12 @@ class IOSolution(models.Model):
     ''' Contains Input/Output pairs submited by students '''
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    count = models.PositiveIntegerField(default=0)
     student = models.ForeignKey(Student)
     assignment = models.ForeignKey(Assignment)
     pair = models.ForeignKey(IOPair)
     output_submitted = models.CharField(max_length=100000, null=True, blank=True)
-    score = models.CharField(max_length=10, default="0.0")
+    score = models.FloatField(default=0.0)
     comments = models.CharField(max_length=2000, null=True, blank=True)
 
     def __str__(self):

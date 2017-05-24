@@ -13,7 +13,7 @@ def iosource_import_pairs(a):
     csv.field_size_limit(sys.maxsize)
     try:
         if a.url is None:
-            message = "Assignment %s does not have url for codework" % a
+            message = "Assignment %s does not have url for codework. " % a
             log.error(message)
             return message
         http = urllib3.PoolManager()
@@ -26,7 +26,7 @@ def iosource_import_pairs(a):
                 log.debug("Adding %s: %s" % (row[0], row[1]))
                 if iopairs.add(a, row[0], row[1]):
                     count = count + 1
-        message = "Added %s IOPairs to %s" % (count, a)
+        message = "Added %s IOPairs to %s. " % (count, a)
         return message
     except Exception as e:
         message = str(e)
@@ -39,9 +39,10 @@ class AssignmentAdmin(admin.ModelAdmin):
     actions = ['import_pairs']
 
     def import_pairs(self, request, queryset):
+        ret = ""
         for query in queryset:
             log.info("Importing IOPairs for %s from %s" % (query, query.url))
-            ret = iosource_import_pairs(query)
+            ret += iosource_import_pairs(query)
         self.message_user(request, "%s" % (ret))
     import_pairs.short_description = "Import IO pairs from selected source"
 

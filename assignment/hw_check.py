@@ -1,6 +1,6 @@
 import re
 import math
-
+import json
 
 def is_number(s):
     '''
@@ -13,16 +13,17 @@ def is_number(s):
     except ValueError:
         return False
 
-def check_hw1(s):
+def check_floating_point_answer(s):
+    max_score = 100./s.assignment.num_codeproblems
     output = s.pair.output
     if s.output_submitted:
         if is_number(s.output_submitted):
             if math.fabs(float(s.output_submitted) - float(output)) < 0.01:
                 s.comments = "Answer is correct."
                 if s.updated < s.assignment.due_date:
-                    s.score = "10.0"
+                    s.score = max_score
                 else:
-                    s.score = "5.0"
+                    s.score = max_score/2.0
             else:
                 s.comments = "Answer is wrong. ("+ s.output_submitted +")"
         else:
@@ -31,25 +32,38 @@ def check_hw1(s):
         s.comments = "No solution yet."
     s.save()
 
-def check_hw2(s):
-    output = s.pair.output
-    if s.output_submitted:
-        if is_number(s.output_submitted):
-            if math.fabs(float(s.output_submitted) - float(output)) < 0.01:
-                s.comments = "Answer is correct."
-                if s.updated < s.assignment.due_date:
-                    s.score = "20.0"
-                else:
-                    s.score = "10.0"
-            else:
-                s.comments = "Answer is wrong. ("+ s.output_submitted +")"
-        else:
-            s.comments = "Answer is not a number."
-    else:
-        s.comments = "No solution yet."
-    s.save()
 
+# Two Armed Bandit
+def check_two_armed_bandit(s):
+    max_score = 100./s.assignment.num_codeproblems
+    output = s.pair.output
+    try:
+        if s.output_submitted:
+            output = output.strip('{}()[]')
+            output_submitted = s.output_submitted.strip('{}()[]')
+            output = output.lower()
+            output = output.replace("value=", "")
+            output_submitted = output_submitted.lower()
+            output_submitted = output_submitted.replace("value=", "")
+            if math.fabs(float(output) - float(output_submitted)) > 1.00:
+                s.score = 0
+                s.comments = "Solution is wrong."
+            else:
+                s.comments = "Solution is correct."
+                if s.updated < s.assignment.due_date:
+                    s.score = max_score
+                else:
+                    s.score = max_score/2.0
+        else:
+            s.comments = "No solution yet."
+    except Exception as e:
+        s.comments = '%s (%s)' % (e.message, type(e))
+    finally:
+        s.save()
+
+# Old homeworks
 def check_hw3(s):
+    max_score = 100./s.assignment.num_codeproblems
     output = s.pair.output
     if s.output_submitted:
         nums = re.compile(r"[+-]?\d+(?:\.\d+)?")
@@ -57,42 +71,30 @@ def check_hw3(s):
         o_s = re.findall(nums, s.output_submitted)
         if len(o) != 3:
             s.comments = "Input is wrong. Send the input to TA."
-            s.score = "0.0"
+            s.score = 0.0
             s.save()
             return
         if len(o_s) != 3:
             s.comments = "You need to give atleast 3 numbers: bestX=1,bestY=2,LInfinityDistance=3."
-            s.score = "0.0"
+            s.score = 0.0
             s.save()
             return
 
         if int(o[2]) == int(o_s[2]):
             s.comments = "LInfinityDistance Value is correct."
             if s.updated < s.assignment.due_date:
-                s.score = "20.0"
+                s.score = max_score
             else:
-                s.score = "10.0"
+                s.score = max_score/2.0
         else:
             s.comments = "LInfinityDistance of " + str(o_s[2]) + " is wrong. Try again."
     else:
         s.comments = "No solution yet."
     s.save()
 
-def check_hw4(s):
-    if s.output_submitted:
-        try:
-            json_object = json.loads(s.output_submitted)
-            s.comments = "String is a valid JSON. We will validate the answer soon."
-        except ValueError:
-            s.comments = "String is not a valid JSON."
-        finally:
-            s.save()
-    else:
-        s.comments = "No solution yet."
-    s.save()
-
 # HW4 of 2017
 def check_hw5(s):
+    max_score = 100./s.assignment.num_codeproblems
     max_attempts = 15
     output = s.pair.output
     if s.output_submitted:
@@ -102,9 +104,9 @@ def check_hw5(s):
                 if math.fabs(float(s.output_submitted) - float(output)) < 0.01:
                     s.comments = "Answer is correct."
                     if s.updated < s.assignment.due_date:
-                        s.score = "10.0"
+                        s.score = max_score
                     else:
-                        s.score = "5.0"
+                        s.score = max_score/2.0
                 else:
                     s.comments = "Answer is wrong. ("+ s.output_submitted +")."
             else:
@@ -120,8 +122,10 @@ def check_hw5(s):
         s.comments += " " + str(s.count) + " attempts. Maximum number of attempts excedded."
     s.save()
 
+
 # Messing with Rewards
-def check_hw7(s):
+def check_messing_with_rewards(s):
+    max_score = 100./s.assignment.num_codeproblems
     output = s.pair.output
     try:
         if s.output_submitted:
@@ -139,9 +143,9 @@ def check_hw7(s):
                 if len(err) == 0:
                     s.comments = "Solution is correct."
                     if s.updated < s.assignment.due_date:
-                        s.score = "30.0"
+                        s.score = max_score
                     else:
-                        s.score = "15.0"
+                        s.score = max_score/2.0
                 else:
                     if len(err) == 1:
                         s.comments = "Value at state " + str(err[-1]) + " is wrong. You are close!"
@@ -182,12 +186,12 @@ def check_hw6(s):
                 if len(err) == 0:
                     s.comments = "Solution is correct."
                     if s.updated < s.assignment.due_date:
-                        s.score = "100.0"
+                        s.score = 100.0
                     else:
-                        s.score = "50.0"
+                        s.score = 100.0/2.0
                 else:
                     if len(err) > 100:
-                        s.score = "10.0"
+                        s.score = 10.0
                     else:
                         s.score = hw6_score(len(err))
                     s.comments = str(len(err)) + " values are wrong."
@@ -206,6 +210,7 @@ def check_hw6(s):
 
 # Continuous MDP problem
 def check_hw7_old(s):
+    max_score = 100./s.assignment.num_codeproblems
     output = s.pair.output
     try:
         if s.output_submitted:
@@ -227,41 +232,14 @@ def check_hw7_old(s):
                 if len(err) == 0:
                     s.comments = "Solution is correct."
                     if s.updated < s.assignment.due_date:
-                        s.score = "20.0"
+                        s.score = max_score
                     else:
-                        s.score = "10.0"
+                        s.score = max_score/2.0
                 else:
                     s.score = "0"
                     s.comments = "Solution is wrong."
             else:
                 s.comments = "The problem has " + str(len(output)) + " states, but your submission has " + str(len(output_submitted)) + " states."
-        else:
-            s.comments = "No solution yet."
-    except Exception as e:
-        s.comments = '%s (%s)' % (e.message, type(e))
-    finally:
-        s.save()
-
-# Two Armed Bandit
-def check_hw8(s):
-    output = s.pair.output
-    try:
-        if s.output_submitted:
-            output = output.strip('{}()[]')
-            output_submitted = s.output_submitted.strip('{}()[]')
-            output = output.lower()
-            output = output.replace("value=", "")
-            output_submitted = output_submitted.lower()
-            output_submitted = output_submitted.replace("value=", "")
-            if math.fabs(float(output) - float(output_submitted)) > 1.00:
-                s.score = "0"
-                s.comments = "Solution is wrong."
-            else:
-                s.comments = "Solution is correct."
-                if s.updated < s.assignment.due_date:
-                    s.score = "20.0"
-                else:
-                    s.score = "10.0"
         else:
             s.comments = "No solution yet."
     except Exception as e:
