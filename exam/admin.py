@@ -22,7 +22,7 @@ class AnswerAdmin(admin.ModelAdmin):
     list_filter = ('question', 'finished')
 
 class MCAdmin(admin.ModelAdmin):
-    list_display = ('student', 'question', 'answers')
+    list_display = ('student', 'question')
 
 class GradingAdmin(admin.ModelAdmin):
     list_display = ('student', 'grade', 'mc')

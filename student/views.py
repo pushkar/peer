@@ -5,22 +5,22 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib import admin, messages
 from django_ajax.decorators import ajax
+from django.template.defaulttags import register
 
 from student.models import *
 from student.log import *
 from student.banish import *
 from student.common import *
 from assignment.models import *
-from assignment.reviews_info import *
 
-import StringIO
 import csv
 import datetime
-import urllib2
+import urllib3
 import sendgrid
 
+log = logging.getLogger(__name__)
+
 # Create your views here.
-from django.template.defaulttags import register
 @register.filter
 def get_item(dictionary, key):
     return dictionary.get(key)
@@ -54,7 +54,7 @@ def index(request):
         assignments = Assignment.objects.all()
         opt = OptIn.objects.get_or_create(student=s)
         opt_str = "opted out"
-        if opt[0].value == True:
+        if opt[0].value is True:
             opt_str = "opted in"
         return render(request, 'index.html', {
             'student': s,
@@ -106,7 +106,8 @@ def pass_request(request):
                 else:
                     messages.warning(request, "Could not send an email. Contact your TA.")
                     return HttpResponseRedirect(reverse('student:pass_request'))
-            except:
+            except Exception as e:
+                log.error(e)
                 messages.warning(request, "Could not find user. Try again!")
                 return HttpResponseRedirect(reverse('student:pass_request'))
         else:
@@ -134,13 +135,11 @@ def optin(request):
         s = Student.objects.get(username=request.session['user'])
 
     try:
-        print s
         opt = OptIn.objects.get(student=s)
         opt.value = True
         opt.save()
         messages.success(request, "Your status was changed in the peer review program..")
     except Exception as e:
-        print e
         messages.warning(request, "Something went wrong. Let your TA know.")
 
     return HttpResponseRedirect(reverse('student:index'))
@@ -162,7 +161,6 @@ def profile(request):
         })
 
     except Exception as e:
-        print e
         messages.warning(request, "Something went wrong. Let your TA know.")
 
     return HttpResponseRedirect(reverse('student:index'))
@@ -176,43 +174,6 @@ def about(request):
         })
 
     except Exception as e:
-        print e
-        messages.warning(request, "Something went wrong. Let your TA know.")
-
-    return HttpResponseRedirect(reverse('student:index'))
-
-@ajax
-def updates(request):
-    if not check_session(request):
-        return HttpResponseRedirect(reverse('student:index'))
-
-    try:
-        s = Student.objects.get(username=request.session['user'])
-        assignments = Assignment.objects.all()
-
-        data = {}
-        reviews = Review.objects.filter(submission__student=s)
-        for r in reviews:
-            count = log_isread(s.username, r)
-            if count != 0:
-                data[r] = count
-
-        reviews_assigned = Review.objects.filter(assigned=s)
-        for r in reviews_assigned:
-            count = log_isread(s.username, r)
-            if count != 0:
-                data[r] = count
-
-        return render(request, 'updates.html', {
-            'global': get_global(),
-            'student': s,
-            'assignments': assignments,
-            'data': data,
-        })
-
-
-    except Exception as e:
-        print e
         messages.warning(request, "Something went wrong. Let your TA know.")
 
     return HttpResponseRedirect(reverse('student:index'))
@@ -235,7 +196,6 @@ def admin(request):
         })
 
     except Exception as e:
-        print e
         messages.warning(request, "Something went wrong.")
 
     return HttpResponseRedirect(reverse('student:index'))
@@ -250,26 +210,3 @@ def login_change(request, user):
     request.session['usertype'] = s.usertype
 
     return HttpResponseRedirect(reverse('student:admin'))
-
-
-@login_required
-def admin_review_assignments(request):
-    if not check_session(request):
-        return HttpResponseRedirect(reverse('student:index'))
-
-    try:
-        s = Student.objects.get(username=request.session['user'])
-        review_info = reviews_info()
-        review_info.get_all_reviews()
-        reviews_data = review_info.get_data()
-        return render(request, 'admin_review_assignments.html', {
-            'student': s,
-            'reviews_data': reviews_data,
-            'global': get_global(),
-        })
-
-    except Exception as e:
-        print e
-        messages.warning(request, "Something went wrong.")
-
-    return HttpResponseRedirect(reverse('student:index'))

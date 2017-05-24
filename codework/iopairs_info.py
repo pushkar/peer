@@ -1,5 +1,5 @@
 from django.contrib import messages
-from codework.models import *
+from codework.models import IOPair
 
 import random
 
@@ -11,4 +11,4 @@ def pair_get_all(a):
 
 def pair_get_random(a):
     pairs = IOPair.objects.filter(assignment=a)
-    return random.sample(pairs, 1)[0]
+    return random.sample(list(pairs), 1)[0]

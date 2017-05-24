@@ -11,22 +11,22 @@ class Exam(models.Model):
     start_time = models.DateTimeField(blank=True, null=True)
     end_time = models.DateTimeField(blank=True, null=True)
 
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
 
 class StudentInfo(models.Model):
     student = models.ForeignKey(Student)
     proficiency = models.CharField(max_length=10, blank=True, null=True)
 
-    def __unicode__(self):
-        return unicode(self.student)
+    def __str__(self):
+        return str(self.student)
 
 class Strategy(models.Model):
     name = models.CharField(max_length=100)
     params = models.CharField(max_length=1000, blank=True, null=True)
 
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
 
 class Question(models.Model):
     exam = models.ForeignKey(Exam)
@@ -35,8 +35,8 @@ class Question(models.Model):
     details = models.CharField(max_length=10000, blank=True, null=True)
     strategy = models.ForeignKey(Strategy)
 
-    def __unicode__(self):
-        return unicode(self.text)
+    def __str__(self):
+        return str(self.text)
 
 class Answer(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -49,25 +49,25 @@ class Answer(models.Model):
     feedback = models.CharField(max_length=1000, blank=True, null=True)
     details = models.CharField(max_length=10000, blank=True, null=True)
 
-    def __unicode__(self):
-        return unicode(self.text)
+    def __str__(self):
+        return str(self.text)
 
 class MC(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    student = models.CharField(Student)
+    student = models.CharField(Student, max_length=100)
     question = models.ForeignKey(Exam)
     answers = models.ManyToManyField(Answer)
     finished = models.BooleanField(default=False)
     details = models.CharField(max_length=10000, blank=True, null=True)
 
-    def __unicode__(self):
-        return unicode(self.answers)
+    def __str__(self):
+        return str(self.answers)
 
 class Grading(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    student = models.CharField(Student)
+    student = models.CharField(Student, max_length=100)
     mc = models.ForeignKey(MC)
     grade = models.CharField(max_length=100, blank=True, null=True)
 

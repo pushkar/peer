@@ -90,7 +90,7 @@ def check_hw4(s):
         try:
             json_object = json.loads(s.output_submitted)
             s.comments = "String is a valid JSON. We will validate the answer soon."
-        except ValueError, e:
+        except ValueError:
             s.comments = "String is not a valid JSON."
         finally:
             s.save()

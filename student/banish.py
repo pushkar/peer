@@ -1,7 +1,10 @@
+import logging
 import pytz
 from django.contrib import messages
 from django.utils import timezone
-from student.models import *
+from student.models import Banish
+
+log = logging.getLogger(__name__)
 
 MIN_TIME_BETWEEN_REQUESTS = 5 # in seconds
 MAX_VIOLATIONS = 10
@@ -22,12 +25,10 @@ def banish_check(request, s):
     banish.count = int(banish.count) + 1
     updated_time = banish.updated
     violations = int(banish.violations)
- 
+
     current_time = timezone.now()
-    print "U " + str(updated_time)
-    print "C " + str(current_time)
     delta_time = current_time - updated_time
-    print "Delta is " + str(delta_time.seconds)
+    log.info("Student: %s, re-request sent after %s (min time limit is %s)" % (s, str(delta_time.seconds), MIN_TIME_BETWEEN_REQUESTS))
     if delta_time.seconds < MIN_TIME_BETWEEN_REQUESTS:
         banish.violations = int(banish.violations) + 1
     banish.save()

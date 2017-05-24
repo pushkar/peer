@@ -1,6 +1,6 @@
-<p>Deadline: {{deadline}} {{time_left}}</p>
+<p><b>Deadline:</b> {{deadline}} {{time_left}}</p>
 {% if solutions %}
-<p>Total Score: {{ stats.total }}</p>
+<p><b>Total Score:</b> {{ stats.total }}</p>
 <br />
 <p>Solve the problem for the following inputs:</p>
 {% endif %}
@@ -12,8 +12,7 @@
     <div class="col-md-6">
       <div class="form-group">
         <b>Input:</b> <br />
-        {% autoescape off %}{{ sol.pair.input }}{% endautoescape %}
-        <br />
+        {% autoescape off %}<pre>{{ sol.pair.input }}</pre>{% endautoescape %}
       </div>
 
       <div class="form-group">

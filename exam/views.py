@@ -8,15 +8,15 @@ from django.forms.models import model_to_dict
 from django.utils import timezone
 
 from student.models import *
-from exam_info import *
+from exam.exam_info import *
 import json
 
 def index(request):
     s = Student.objects.get(username=request.session['user'])
     exams = Exam.objects.all()
     return render(request, 'exam_index.html', {
-            'student': s,
-            'exams': exams,
+        'student': s,
+        'exams': exams,
         })
 
 def get_or_create_exam(request, exam_name):
@@ -33,9 +33,9 @@ def get_or_create_exam(request, exam_name):
         messages.warning(request, "You submitted the exam.")
         return HttpResponseRedirect(reverse('exam:index'))
     return render(request, 'exam_get_or_create.html', {
-            'student': s,
-            'exam': e.get_exam(),
-            'tempexam': tempexam.get_exam(),
+        'student': s,
+        'exam': e.get_exam(),
+        'tempexam': tempexam.get_exam(),
         })
 
 def save_exam(request, exam_name):
@@ -45,7 +45,7 @@ def save_exam(request, exam_name):
     if request.POST:
         data = dict(request.POST.iterlists())
         check, errors = tempexam.check_exam(data)
-        if check == False:
+        if check is False:
             for id_, exp_ in errors.iteritems():
                 errors_str = str(id_) + ". " + str(exp_)
                 messages.warning(request, errors_str)
@@ -53,7 +53,7 @@ def save_exam(request, exam_name):
         if data.has_key('save_button'):
             tempexam.save_exam(data)
             messages.success(request, "Your exam was saved successfully.")
-        if check == True:
+        if check is True:
             if data.has_key('submit_button'):
                 tempexam.save_exam(data)
                 if tempexam.submit_exam():

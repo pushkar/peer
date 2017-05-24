@@ -1,8 +1,11 @@
-from __future__ import unicode_literals
-
+import logging
+from django.contrib import admin
 from django.db import models
 from django.utils import timezone
-from assignment.models import *
+from assignment.models import Assignment
+from student.models import Student
+
+log = logging.getLogger(__name__)
 
 class IOSource(models.Model):
     ''' Contains source url for grabbing Input/Output pairs for each Assignment '''
@@ -15,8 +18,8 @@ class IOPair(models.Model):
     input = models.CharField(max_length=550000)
     output = models.CharField(max_length=100000)
 
-    def __unicode__(self):
-        return unicode(self.input + " -> " + self.output)
+    def __str__(self):
+        return str(self.input + " -> " + self.output)
 
     def input_av(self):
         if not self.input:
@@ -82,19 +85,3 @@ class IOSubmission(models.Model):
     assignment = models.ForeignKey(Assignment)
     score = models.CharField(max_length=10)
     comments = models.CharField(max_length=2000, null=True, blank=True)
-
-class IOSourceAdmin(admin.ModelAdmin):
-    list_display = ('assignment', 'url')
-
-class IOPairAdmin(admin.ModelAdmin):
-    list_display = ('assignment', 'input_av', 'output_av')
-    list_filter = ('assignment__name', )
-
-class IOSolutionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'student', 'assignment', 'created', 'updated', 'late_av', 'output_submitted_av', 'score')
-    search_fields = ('id', 'student__lastname', 'student__firstname', 'student__username')
-    list_filter = ('assignment__name', )
-
-class IOSubmissionAdmin(admin.ModelAdmin):
-    list_display = ('student', 'assignment', 'score')
-    list_filter = ('assignment__name',)

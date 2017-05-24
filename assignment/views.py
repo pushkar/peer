@@ -5,27 +5,21 @@ from django.forms.models import model_to_dict
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.db.models import Q
-from assignment.models import *
-from student.models import *
+from assignment.models import Assignment, AssignmentPage
+from student.models import Student
 from student.log import *
 from student.common import *
 
-from django.contrib.auth.forms import AuthenticationForm
 from django_ajax.decorators import ajax
-
-from student.students_info import *
-from submission_info import *
-from submissions_info import *
-from review_info import *
-from reviews_info import *
-from review_convo_info import *
-from review_convos_info import *
 
 import re
 import numpy as np
 import csv
 import json
 import random
+import logging
+
+log = logging.getLogger(__name__)
 
 # Displays all Assignments
 def index(request):
@@ -36,8 +30,8 @@ def index(request):
     a = Assignment.objects.all()
 
     return render(request, 'assignment_index.html', {
-            'student': s,
-            'assignments': a,
+        'student': s,
+        'assignments': a,
         })
 
 # Displays a page from the database
@@ -53,82 +47,13 @@ def page(request, a_name, p_name):
     ap_this = ap.filter(name=p_name)
 
     return render(request, 'assignment_pageview.html', {
-            'student': s,
-            'a': a,
-            'assignments': a_all,
-            'ap': ap,
-            'ap_this': ap_this,
-            'a_name': a_name,
-            'global': get_global(),
-        })
-
-def find_reviewers(request, a_name, submission_id):
-    if not check_session(request):
-        return HttpResponseRedirect(reverse('student:index'))
-
-    s = Student.objects.get(username=request.session['user'])
-
-    sub_info = submission_info()
-    submission = sub_info.get_by_id(submission_id)
-
-    if s != submission.student:
-        messages.error(request, "You are not allowed to request reviewers")
-        return HttpResponseRedirect(reverse('assignment:home', args=[a_name]))
-
-
-    if sub_info.assign_reviewers(submission) == True:
-        messages.success(request, sub_info.get_message())
-    else:
-        messages.warning(request, sub_info.get_message())
-
-    return HttpResponseRedirect(reverse('assignment:home', args=[a_name]))
-
-def find_reviews(request, a_name, submission_id):
-    if not check_session(request):
-        return HttpResponseRedirect(reverse('student:index'))
-
-    s = Student.objects.get(username=request.session['user'])
-    a = Assignment.objects.get(short_name=a_name)
-
-    sub_info = submission_info()
-
-    if sub_info.assign_submissions(a, s) == True:
-        messages.success(request, sub_info.get_message())
-    else:
-        messages.warning(request, sub_info.get_message())
-
-    return HttpResponseRedirect(reverse('assignment:home', args=[a_name]))
-
-@ajax
-def stats(request, a_name):
-    if not check_session(request):
-        return HttpResponseRedirect(reverse('student:index'))
-
-    s = Student.objects.get(username=request.session['user'])
-    a_all = Assignment.objects.all()
-    a = a_all.filter(short_name=a_name)
-
-    convos = ReviewConvo.objects.filter(review__submission__assignment__short_name=a_name)
-    submission_count = Submission.objects.filter(assignment__short_name=a_name).count()
-    convos_count = len(convos)
-
-    r_info = reviews_info()
-    r_info.get_reviews_by_assignment_and_usertype(a, "ta")
-    stats = r_info.get_stats()
-
-    display = False
-    if stats['completed'] > 95:
-        display = True
-
-    return render(request, 'assignment_stats.html', {
-            'student': s,
-            'a_name': a_name,
-            'a': a,
-            'submission_count': submission_count,
-            'convos_count': convos_count,
-            'stats': stats,
-            'display': display,
-            'global': get_global(),
+        'student': s,
+        'a': a,
+        'assignments': a_all,
+        'ap': ap,
+        'ap_this': ap_this,
+        'a_name': a_name,
+        'global': get_global(),
         })
 
 # Default view for assignments
@@ -139,28 +64,11 @@ def home(request, a_name):
 
     extra_scripts = ""
     if request.method == "GET":
-        if request.GET.has_key('page'):
+        if 'page' in request.GET:
             p_name = request.GET['page']
-            if p_name != "":
-                if p_name == "stats":
-                    extra_scripts = "load_div(\'"+ reverse('assignment:stats', args=[a_name]) +"\', \'#assignment_content\'); \n"
-                elif p_name == "admin":
-                    action = request.GET.get('action', 'stats')
-                    if action == "stats":
-                        extra_scripts = "load_div(\'"+ reverse('assignment:admin_stats', args=[a_name]) +"\', \'#assignment_content\'); \n"
-                    elif action == "superman":
-                        extra_scripts = "load_div(\'"+ reverse('assignment:admin', args=[a_name]) +"\', \'#assignment_content\'); \n"
-                    else:
-                        order_by = request.GET.get('order_by', 'assigned')
-                        extra_scripts = "load_div(\'"+ reverse('assignment:admin_reviews', args=[a_name, action, order_by]) +"\', \'#assignment_content\'); \n"
-                else:
-                    extra_scripts = "load_div(\'"+ reverse('assignment:page', args=[a_name, p_name]) +"\', \'#assignment_content\'); \n"
+            extra_scripts = "load_div(\'"+ reverse('assignment:page', args=[a_name, p_name]) +"\', \'#assignment_content\'); \n"
 
-        if request.GET.has_key('review'):
-            review_pk = request.GET['review']
-            extra_scripts = "load_div(\'"+ reverse('assignment:review', args=[a_name, review_pk]) +"\', \'#assignment_content\'); \n"
-
-        if request.GET.has_key('code'):
+        if 'code' in request.GET:
             a_name = request.GET['code']
             extra_scripts = "load_div(\'"+ reverse('codework:work', args=[a_name]) +"\', \'#assignment_content\'); \n"
 
@@ -169,18 +77,12 @@ def home(request, a_name):
     a = a_all.filter(short_name=a_name)
     ap = AssignmentPage.objects.filter(assignment__short_name=a_name)
 
-    sub_info = submission_info()
-    submission = sub_info.get_by_student_and_assignment(s, a)
-    if submission:
-        submission.files = sub_info.get_files(submission)
-
     return render(request, 'assignment_pagebase.html', {
         'student': s,
         'a': a,
         'assignments': a_all,
         'ap': ap,
         'a_name': a_name,
-        'submission': submission,
         'extra_scripts': extra_scripts,
         'global': get_global(),
     })
@@ -616,8 +518,7 @@ def submission_add(request, a_name):
         fname = request.POST.get("filename", "")
         flink = request.POST.get("filelink", "")
         if len(fname) > 0 and len(flink) > 0:
-            print "Adding " + fname + ": " + flink
-            print submission
+            log.info("Adding %s: %s. Submssion is %s" % (fname, flink, submission))
             sub_info.add_file(submission, fname, flink)
             messages.success(request, "File was added successfully.")
 

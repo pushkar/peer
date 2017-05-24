@@ -11,14 +11,14 @@ class StudentDetails(models.Model):
     objectives = models.CharField(max_length=100, blank=True, null=True)
     details = models.CharField(max_length=1000, blank=True, null=True)
 
-    def __unicode__(self):
-        return unicode(self.student)
+    def __str__(self):
+        return str(self.student)
 
 class Objectives(models.Model):
     name = models.CharField(max_length=250)
 
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
 
 class Record(models.Model):
     student = models.ForeignKey(Student, related_name='student')
@@ -26,16 +26,16 @@ class Record(models.Model):
     locked = models.CharField(max_length=10, default="0")
     details = models.CharField(max_length=2000)
 
-    def __unicode__(self):
-        return unicode(self.student)
+    def __str__(self):
+        return str(self.student)
 
 class TopicGroup(models.Model):
     key = models.CharField(max_length=20)
     name = models.CharField(max_length=100)
     details = models.CharField(max_length=1000, blank=True, null=True)
 
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
 
 class Topic(models.Model):
     order = models.IntegerField()
@@ -43,8 +43,8 @@ class Topic(models.Model):
     name = models.CharField(max_length=100)
     details = models.CharField(max_length=1000, blank=True, null=True)
 
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
 
-    class Meta:
+    class Meta(object):
         ordering = ['order']

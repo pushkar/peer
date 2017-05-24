@@ -9,8 +9,6 @@ from assignment.models import *
 from api.models import *
 from codework.models import *
 from student.log import *
-from assignment.reviews_info  import *
-from assignment.review_convos_info import *
 from student.students_info import *
 from codework.iosolution_info import *
 
@@ -35,8 +33,8 @@ def check_permissions(perms):
                         if permission in perms:
                             return func(*args, **kwargs)
                         else:
-                           response['error'] = "Incorrect permissions"
-                           return JsonResponse(response)
+                            response['error'] = "Incorrect permissions"
+                            return JsonResponse(response)
 
                     except Exception as e:
                         response['error'] = '%s' % (e.message)
@@ -68,7 +66,7 @@ def get_submission(response, student, assignment):
     try:
         submission = Submission.objects.get(student=student, assignment=assignment)
     except Submission.DoesNotExist:
-        if student == None:
+        if student is None:
             response['message'] = "Student does not exist"
         else:
             response['message'] += "Submission does not exist for " + student.username
@@ -125,9 +123,9 @@ def add_student(request):
             if len(s.lastname) == 0 and len(lastname) > 0:
                 s.lastname = lastname
             if len(s.usertype) == 0 and len(usertype) > 0:
-                s.usertype=usertype
+                s.usertype = usertype
             s.save()
-            if created == True:
+            if created is True:
                 response['message'] = 'Created user ' + username
             else:
                 response['message'] = 'Updated user ' + username
@@ -185,7 +183,7 @@ def add_submission(request):
             sub, created = Submission.objects.get_or_create(student=student, assignment=assignment)
             sub.files = files
             sub.save()
-            if created == True:
+            if created is True:
                 response['message'] = 'Created submission for ' + username
             else:
                 response['message'] = 'Updated submission for ' + username
@@ -207,7 +205,7 @@ def add_review(request):
         submission = get_submission(response, student, assignment)
         if submission and assigned_to:
             r, created = Review.objects.get_or_create(submission=submission, assigned=assigned_to)
-            if created == True:
+            if created is True:
                 response['message'] = "Created review for " + student.username
             else:
                 response['message'] = "Review already assigned for " + submission_username
@@ -283,7 +281,6 @@ def get_review(request):
 
         response['error'] = ""
         # Use in the future
-        
     return JsonResponse(response)
 
 @check_permissions("r")

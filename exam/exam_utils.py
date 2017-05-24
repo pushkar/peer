@@ -141,7 +141,7 @@ class grading_info(object):
     '''
     Works with the Grading class
     '''
-    grade = Grading.object.none()
+    grade = None
     def __init__(self, student, mc):
         grade = Grading.objects.get_or_create(stduent=student, mc=mc)
         if grade[1] is True:

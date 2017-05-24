@@ -1,12 +1,8 @@
-from student.models import *
-import json
+from student.models import Student
 
-class students_info():
-    students = None
-    message = ""
-
+class students_info(object):
     def __init__(self):
-        pass
+        self.students = None
 
     def get_all_students(self):
         self.students = Student.objects.all()

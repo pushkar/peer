@@ -14,10 +14,7 @@
 <p>Welcome {{ student.firstname }} {{ student.lastname }}!</p>
 
 <h4>Tasks</h4>
-<div id="updates" class="content" data-refresh-url="{% url 'student:updates' %}"></div>
-<script type="text/javascript">
-  load_div("updates");
-</script>
+Notice!
 
 {% if student.usertype == "student" %}
 <h4>Consent for Peer Grading research</h4>
