@@ -19,8 +19,8 @@ log = logging.getLogger(__name__)
 
 # Create your views here.
 def send_email(email, gtid):
-    env_sendgrid_user = os.environ.get('ENV_SENDGRID_USER')
-    env_sendgrid_pass = os.environ.get('ENV_SENDGRID_PASS')
+    env_sendgrid_user = os.environ.get('SENDGRID_USERNAME')
+    env_sendgrid_pass = os.environ.get('SENDGRID_PASSWORD')
     if env_sendgrid_user is None:
         log.error('Sendgrid username not set. Set enviornment variable ENV_SENDGRID_USER')
         return False
