@@ -14,10 +14,14 @@ from django_ajax.decorators import ajax
 
 log = logging.getLogger(__name__)
 
-def get_assignments_data(username, a_name=None, p_name=None):
+def get_assignments_data(request, a_name=None, p_name=None):
     data = {}
+    username = request.session['user']
     student = Student.objects.get(username=username)
-    assignments = Assignment.objects.filter(released=True)
+    if request.session['usertype'] == 'student':
+        assignments = Assignment.objects.filter(released=True)
+    else:
+        assignments = Assignment.objects.all()
     data['student'] = student
     data['assignments'] = assignments
     if a_name:
@@ -35,7 +39,7 @@ def index(request):
         return HttpResponseRedirect(reverse('student:index'))
 
     return render(request, 'assignment_index.html', {
-        **get_assignments_data(request.session['user']),
+        **get_assignments_data(request),
         })
 
 # Default view for assignments
@@ -54,7 +58,7 @@ def home(request, a_name):
             extra_scripts = "load_div(\'"+ reverse('assignment:code', args=[a_name]) +"\', \'#assignment_content\'); \n"
 
     return render(request, 'assignment_pagebase.html', {
-        **get_assignments_data(request.session['user'], a_name),
+        **get_assignments_data(request, a_name),
         'extra_scripts': extra_scripts,
     })
 
@@ -65,7 +69,7 @@ def page(request, a_name, p_name):
         return HttpResponseRedirect(reverse('student:index'))
 
     return render(request, 'assignment_pageview.html', {
-        **get_assignments_data(request.session['user'], a_name, p_name),
+        **get_assignments_data(request, a_name, p_name),
         })
 
 @ajax
@@ -73,7 +77,7 @@ def code(request, a_name):
     if not utils.check_session(request):
         return HttpResponseRedirect(reverse('student:index'))
 
-    data = get_assignments_data(request.session['user'], a_name)
+    data = get_assignments_data(request, a_name)
     s = data['student']
     a = data['a'][0]
 
