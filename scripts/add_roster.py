@@ -2,7 +2,7 @@ import sys
 import json
 import requests
 
-url_base = 'http://127.0.0.1:8000/api/'
+url_base = 'http://rldm.herokuapp.com/api/'
 data_login = {}
 data_login['username'] = 'pkolhe3'
 data_login['gtid'] = '902285024'

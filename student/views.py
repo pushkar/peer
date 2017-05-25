@@ -14,27 +14,29 @@ from student.models import Student, LoginForm, ForgotPasswordForm
 from assignment.models import Assignment
 
 import sendgrid
+from sendgrid.helpers.mail import *
 
 log = logging.getLogger(__name__)
 
 # Create your views here.
 def send_email(email, gtid):
-    env_sendgrid_user = os.environ.get('SENDGRID_USERNAME')
-    env_sendgrid_pass = os.environ.get('SENDGRID_PASSWORD')
-    if env_sendgrid_user is None:
-        log.error('Sendgrid username not set. Set enviornment variable ENV_SENDGRID_USER')
-        return False
-    if env_sendgrid_pass is None:
-        log.error('Sendgrid password not set. Set enviornment variable ENV_SENDGRID_PASS')
-        return False
-    sg = sendgrid.SendGridClient(env_sendgrid_user, env_sendgrid_pass)
-    message = sendgrid.Mail()
-    message.add_to(email)
-    message.set_subject('Password Reset')
-    message.set_text('Your GTID is ' + gtid)
-    message.set_from('GTML TAs ')
-    status, msg = sg.send(message)
-    return status
+    log.info("Sending email to %s for GTID %s" % (email, gtid))
+    sendgrid_api_key = os.environ.get('SENDGRID_API_KEY')
+    if sendgrid_api_key is None:
+        log.info("Could not read api key. Set SENDGRID_API_KEY")
+        return 400
+    sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
+    from_email = Email("pushkar@cc.gatech.edu")
+    subject = "[CS 7642] GTID from RLDM TAs"
+    to_email = Email(email)
+    content = Content("text/plain", "Your GTID is %s." % gtid)
+    mail = Mail(from_email, subject, to_email, content)
+    response = sg.client.mail.send.post(request_body=mail.get())
+
+    log.info("Sendgrid status %s" % response.status_code)
+    log.info("Body %s" % response.body)
+    log.info("Headers %s" % response.headers)
+    return response.status_code
 
 def get_student_data(request):
     data = {}
@@ -92,7 +94,7 @@ def pass_request(request):
         if passform.is_valid():
             try:
                 s = Student.objects.get(username=passform.cleaned_data['username'])
-                if send_email(s.email, s.gtid) == 200:
+                if send_email(s.email, s.gtid) == 202:
                     messages.success(request, "Sent a message with GTID to your GT email. Check your SPAM folder if you can't find it.")
                     return HttpResponseRedirect(reverse('student:pass_request'))
                 else:
