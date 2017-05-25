@@ -19,7 +19,9 @@
         <label for="output-{{sol.pk}}">Output:</label>
         <textarea class="form-control" rows="3" id="output-{{sol.pk}}">{{sol.output_submitted}}</textarea>
         <small class="text-muted">
-          <b>{{ sol.comments }} ({{ sol.score }})</b>
+          <b>Comment:</b> {{ sol.comments }} | 
+          <b>Score:</b> {{ sol.score }} | 
+          <b>Submissions:</b> {{ sol.count }}/10 (max)
         </small>
       </div>
       {% if submit_late %}

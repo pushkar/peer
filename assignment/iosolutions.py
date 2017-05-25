@@ -79,6 +79,8 @@ def get_by_id(pk):
 def update(solution, output=None, submit_late="false"):
     try:
         solution = solution[0]
+        if solution.count >= 10:
+            return "Max submissions excedded."
         if check_deadline(solution.assignment) or submit_late == "true":
             if output:
                 if len(output) > 100000:
@@ -86,7 +88,7 @@ def update(solution, output=None, submit_late="false"):
                 solution.output_submitted = output
             solution.count = solution.count + 1
             solution.save()
-            return "Solution submitted."
+            return "Solution submitted. You have %s submissions available." % (10 - solution.count)
         else:
             return "Deadline has passed. Answer will not be recorded."
     except Exception as e:
