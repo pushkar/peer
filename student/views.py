@@ -18,12 +18,11 @@ import sendgrid
 log = logging.getLogger(__name__)
 
 # Create your views here.
-
 def send_email(email, gtid):
     env_sendgrid_user = os.environ.get('ENV_SENDGRID_USER')
     env_sendgrid_pass = os.environ.get('ENV_SENDGRID_PASS')
     if env_sendgrid_user is None:
-        log.error('Sendgrid username not set. Set enviornment variable ENV_SENDGRID_USER.!')
+        log.error('Sendgrid username not set. Set enviornment variable ENV_SENDGRID_USER')
         return False
     if env_sendgrid_pass is None:
         log.error('Sendgrid password not set. Set enviornment variable ENV_SENDGRID_PASS')
@@ -37,17 +36,24 @@ def send_email(email, gtid):
     status, msg = sg.send(message)
     return status
 
+def get_student_data(request):
+    data = {}
+    username = request.session['user']
+    usertype = request.session['usertype']
+    data['student'] = Student.objects.get(username=username)
+    data['assignments'] = Assignment.objects.all()
+    if usertype == 'student':
+        data['assignments'] = data['assignments'].filter(released=True)
+    return data
+
 @ajax
 def messages_all(request):
     return render(request, 'messages.html', {})
 
 def index(request):
     if utils.check_session(request):
-        s = Student.objects.get(username=request.session['user'])
-        assignments = Assignment.objects.all()
         return render(request, 'index.html', {
-            'student': s,
-            'assignments': assignments,
+            **get_student_data(request),
         })
     else:
         form = LoginForm()
@@ -129,16 +135,18 @@ def profile(request):
     if not utils.check_session(request):
         return HttpResponseRedirect(reverse('student:index'))
 
-    s = Student.objects.get(username=request.session['user'])
-    assignments = Assignment.objects.all()
-
     return render(request, 'profile.html', {
-        'student': s,
-        'assignments': assignments,
+        **get_student_data(request),
     })
 
 def about(request):
-    assignments = Assignment.objects.all()
+    assignments = Assignment.objects.none()
+    if 'usertype' in request.session:
+        if len(request.session['usertype']) > 0:
+            if request.session['usertype'] == 'student':
+                assignments = Assignment.objects.filter(released=True)
+            else:
+                assignments = Assignment.objects.all()
 
     return render(request, 'about.html', {
         'assignments': assignments,
@@ -149,13 +157,10 @@ def admin(request):
     if not utils.check_session(request):
         return HttpResponseRedirect(reverse('student:index'))
 
-    s = Student.objects.get(username=request.session['user'])
-    a = Assignment.objects.all()
-    s_all = Student.objects.all()
+    student_all = Student.objects.all()
     return render(request, 'admin.html', {
-        'student': s,
-        'assignments': a,
-        'student_all': s_all,
+        **get_student_data(request),
+        'student_all': student_all,
     })
 
 

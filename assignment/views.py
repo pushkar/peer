@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 def get_assignments_data(username, a_name=None, p_name=None):
     data = {}
     student = Student.objects.get(username=username)
-    assignments = Assignment.objects.all()
+    assignments = Assignment.objects.filter(released=True)
     data['student'] = student
     data['assignments'] = assignments
     if a_name:
