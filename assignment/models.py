@@ -74,6 +74,9 @@ class IOSolution(models.Model):
     score = models.FloatField(default=0.0)
     comments = models.CharField(max_length=2000, null=True, blank=True)
 
+    class Meta(object):
+        ordering = ['pk']
+
     def __str__(self):
         return str(self.pair_av() + " -> " + self.output_submitted_av())
 
