@@ -68,9 +68,10 @@ def get_by_assignment_all(a):
     ''' Filters IOSolution objects for assignment a
         :param a: Assignment
         :returns: List of IOSolutions generated with student ids
+        Specifically written for download_as_csv
     '''
     scores = {}
-    solutions = IOSolution.objects.filter(assignment=a)
+    solutions = IOSolution.objects.select_related().filter(assignment=a)
     for sol in solutions:
         if sol.student not in scores:
             scores[sol.student] = 0
