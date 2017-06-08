@@ -4,8 +4,8 @@ import requests
 
 url_base = 'http://rldm.herokuapp.com/api/'
 data_login = {}
-data_login['username'] = 'pkolhe3'
-data_login['gtid'] = '902285024'
+data_login['username'] = ''
+data_login['gtid'] = ''
 
 url_login = url_base + 'login'
 r = requests.post(url_login, data=data_login, headers=dict(Referer=url_login))

@@ -1,0 +1,29 @@
+<h4>Admin</h4>
+
+<h3>Scores</h3>
+<p><a href="{% url 'assignment:download_as_csv' a_name %}">Downloads scores as CSV</a></p>
+<table class="table table-condensed">
+    <tr>
+        <th>Student</th>
+        <th>Score</th>
+    </tr>
+    {% for student, score in scores.items %}
+    <tr>
+        <td>{{student}}</td>
+        <td>{{score}}</td>
+    </tr>
+    {% endfor %}
+  
+</table>
+
+
+<script type="text/javascript">
+    (function(window,undefined){
+        History.Adapter.bind(window,'statechange',function(){
+            var State = History.getState();
+        });
+        History.pushState({admin:"die_n"}, "Page for admins", "?admin=1");
+    })(window);
+
+    load_messages();
+</script>
