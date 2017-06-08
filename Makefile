@@ -15,3 +15,10 @@ restore_pg_backup:
 
 sync_with_stage:
 	heroku pg:backups:restore rldm::$(DB_ID) DATABASE_URL --app rldm-stage
+
+checkout-master:
+	git checkout master
+	git pull origin master
+	git branch -D staging
+	git branch staging
+	git checkout staging
