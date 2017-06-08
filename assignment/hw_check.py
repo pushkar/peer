@@ -13,6 +13,20 @@ def is_number(s):
     except ValueError:
         return False
 
+def is_json(s):
+    try:
+        s = json.loads(s)
+    except ValueError as e:
+        return False
+    return True
+
+def check_valid_json(s):
+    if is_json(s.output_submitted):
+        s.comments = "MDP submitted is a valid JSON. Submission Good!"
+    else:
+        s.comments = "MDP is not a valid JSON."
+    s.save()
+
 def check_floating_point_answer(s):
     max_score = 100./s.assignment.num_codeproblems
     output = s.pair.output
