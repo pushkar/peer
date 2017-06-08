@@ -56,13 +56,27 @@ def get_by_student(s, solutions=None):
 
 def get_by_assignment(a, solutions=None):
     ''' Filters IOSolution objects for assignment a
-        :param s: Student
+        :param a: Assignment
         :returns: List of IOSolutions generated
     '''
     if solutions:
         return solutions.filter(assignment=a)
 
     return IOSolution.objects.filter(assignment=a)
+
+def get_by_assignment_all(a):
+    ''' Filters IOSolution objects for assignment a
+        :param a: Assignment
+        :returns: List of IOSolutions generated with student ids
+        Specifically written for download_as_csv
+    '''
+    scores = {}
+    solutions = IOSolution.objects.select_related().filter(assignment=a)
+    for sol in solutions:
+        if sol.student not in scores:
+            scores[sol.student] = 0
+        scores[sol.student] += sol.score
+    return scores
 
 def get_none():
     return IOSolution.objects.none()

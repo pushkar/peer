@@ -51,7 +51,8 @@ def home(request, a_name):
     if request.method == "GET":
         if 'page' in request.GET:
             p_name = request.GET['page']
-            extra_scripts = "load_div(\'"+ reverse('assignment:page', args=[a_name, p_name]) +"\', \'#assignment_content\'); \n"
+            if p_name != "":
+                extra_scripts = "load_div(\'"+ reverse('assignment:page', args=[a_name, p_name]) +"\', \'#assignment_content\'); \n"
 
         if 'code' in request.GET:
             a_name = request.GET['code']
@@ -70,6 +71,46 @@ def page(request, a_name, p_name):
 
     return render(request, 'assignment_pageview.html', {
         **get_assignments_data(request, a_name, p_name),
+        })
+
+@ajax
+def admin(request, a_name):
+    if not utils.check_session(request):
+        return HttpResponseRedirect(reverse('student:index'))
+
+    # Extra security.
+    # The first is that the link is not show to students.
+    username = request.session['user']
+    student = Student.objects.get(username=username)
+    assignment = Assignment.objects.get(short_name=a_name)
+
+    if student.usertype != 'superta':
+        return HttpResponseRedirect(reverse('student:index'))
+
+    scores = iosolutions.get_by_assignment_all(assignment)
+
+    return render(request, 'assignment_admin.html', {
+        'scores': scores,
+        'a_name': a_name,
+        })
+
+def download_as_csv(request, a_name):
+    if not utils.check_session(request):
+        return HttpResponseRedirect(reverse('student:index'))
+
+    # Extra security.
+    # The first is that the link is not show to students.
+    username = request.session['user']
+    student = Student.objects.get(username=username)
+    assignment = Assignment.objects.get(short_name=a_name)
+
+    if student.usertype != 'superta':
+        return HttpResponseRedirect(reverse('student:index'))
+
+    scores = iosolutions.get_by_assignment_all(assignment)
+
+    return render(request, 'assignment_csv.html', {
+        'scores': scores,
         })
 
 @ajax
