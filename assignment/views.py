@@ -87,7 +87,7 @@ def admin(request, a_name):
     if student.usertype != 'superta':
         return HttpResponseRedirect(reverse('student:index'))
 
-    scores = iosolutions.get_by_assignment_all(assignment)
+    scores = iosolutions.get_by_assignment_scores(assignment)
 
     return render(request, 'assignment_admin.html', {
         'scores': scores,

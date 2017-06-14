@@ -175,11 +175,11 @@ def codework_by_assignment(request, a_name):
     try:
         if request.method == 'GET':
             a = Assignment.objects.get(short_name=a_name)
-            solutions = iosolutions.get_by_assignment(a)
+            solutions = iosolutions.get_by_assignment_all(a)
     except Exception as e:
         log.error(e)
 
-    data = serializers.serialize('json', solutions)
+    data = json.dumps(solutions)
     return HttpResponse(data, content_type='application/json')
 
 def codepair(request, id):

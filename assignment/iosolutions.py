@@ -64,7 +64,7 @@ def get_by_assignment(a, solutions=None):
 
     return IOSolution.objects.filter(assignment=a)
 
-def get_by_assignment_all(a):
+def get_by_assignment_scores(a):
     ''' Filters IOSolution objects for assignment a
         :param a: Assignment
         :returns: List of IOSolutions generated with student ids
@@ -77,6 +77,37 @@ def get_by_assignment_all(a):
             scores[sol.student] = 0
         scores[sol.student] += sol.score
     return scores
+
+def get_by_assignment_all(a):
+    """ Filters IOSolution objects for assignment a
+        :param a: Assignment
+        :returns: List of IOSolutions generated
+    """
+    scores = []
+    count = 0
+    solutions = IOSolution.objects.select_related().filter(assignment=a)
+    for sol in solutions:
+        d = {
+            'student': {
+                'username': sol.student.username,
+                'firstname': sol.student.firstname,
+                'lastname': sol.student.lastname,
+                'email_tsq': sol.student.email_tsq
+            },
+            'solution': {
+                'submission': sol.output_submitted,
+                'score': sol.score,
+                'comments': sol.comments,
+                'count': sol.count
+            },
+            'pair': {
+                'input': sol.pair.input,
+                'output': sol.pair.output
+            }
+        }
+        scores.append(d)
+    return scores
+
 
 def get_none():
     return IOSolution.objects.none()
