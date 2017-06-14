@@ -14,5 +14,6 @@ urlpatterns = [
     url(r'^codework/get/(?P<a_name>\w+)/(?P<username>\w+)$', views.codework, name='codework'),
     url(r'^codework/user/(?P<username>\w+)$', views.codework_by_username, name='codework_by_username'),
     url(r'^codework/assignment/(?P<a_name>\w+)$', views.codework_by_assignment, name='codework_by_assignment'),
+    url(r'^codework/solution/(?P<iosolution_id>[0-9]+)$', views.iosolution_update, name='iosolution_update'),
     url(r'^codepair/id/(?P<id>[0-9]+)$', views.codepair, name='codepair'),
 ]

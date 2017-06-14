@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.http import JsonResponse
 from django.core import serializers
 from student.models import Student
-from assignment.models import Assignment
+from assignment.models import Assignment, IOSolution
 import assignment.iosolutions as iosolutions
 import assignment.iopairs as iopairs
 from api.models import ApiKey
@@ -181,6 +181,31 @@ def codework_by_assignment(request, a_name):
 
     data = json.dumps(solutions)
     return HttpResponse(data, content_type='application/json')
+
+@csrf_exempt
+def iosolution_update(request, iosolution_id):
+    if not check_permissions(request):
+        return JsonResponse({'error': 'Permission Denied'})
+    if request.method == 'POST':
+        data = request.POST.dict()
+        if 'key' in data:
+            del data['key']
+
+        sol = IOSolution.objects.get(id=iosolution_id)
+
+        if sol is None:
+            return JsonResponse({'error': '(iosolution_update) No IOSolution found with id %s' % iosolution_id})
+
+        if 'submission' in data:
+            sol.output_submitted = data['submission']
+        if 'comments' in data:
+            sol.comments = data['comments']
+        if 'score' in data:
+            sol.score = data['score']
+        sol.save()
+
+        log.info("IOSolution %s saved" % iosolution_id)
+        return JsonResponse({'message': 'IOSolution %s updated' % iosolution_id})
 
 def codepair(request, id):
     if not check_permissions(request):

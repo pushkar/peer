@@ -88,6 +88,7 @@ def get_by_assignment_all(a):
     solutions = IOSolution.objects.select_related().filter(assignment=a)
     for sol in solutions:
         d = {
+            'id': sol.id,
             'student': {
                 'username': sol.student.username,
                 'firstname': sol.student.firstname,
