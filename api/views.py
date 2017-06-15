@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.http import JsonResponse
 from django.core import serializers
 from student.models import Student
-from assignment.models import Assignment, IOSolution
+from assignment.models import Assignment
 import assignment.iosolutions as iosolutions
 import assignment.iopairs as iopairs
 from api.models import ApiKey
@@ -191,7 +191,7 @@ def iosolution_update(request, iosolution_id):
         if 'key' in data:
             del data['key']
 
-        sol = IOSolution.objects.get(id=iosolution_id)
+        sol = iosolutions.get_by_id(iosolution_id)[0]
 
         if sol is None:
             return JsonResponse({'error': '(iosolution_update) No IOSolution found with id %s' % iosolution_id})
@@ -204,8 +204,11 @@ def iosolution_update(request, iosolution_id):
             sol.score = data['score']
         sol.save()
 
+        sol = iosolutions.get_by_id_all(iosolution_id)
+
         log.info("IOSolution %s saved" % iosolution_id)
-        return JsonResponse({'message': 'IOSolution %s updated' % iosolution_id})
+        data = json.dumps(sol)
+        return HttpResponse(data, content_type='application/json')
 
 def codepair(request, id):
     if not check_permissions(request):
