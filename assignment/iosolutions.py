@@ -91,7 +91,9 @@ def sol_to_dict(sol):
             'submission': sol.output_submitted,
             'score': sol.score,
             'comments': sol.comments,
-            'count': sol.count
+            'count': sol.count,
+            'created': str(sol.created),
+            'updated': str(sol.updated)
         },
         'pair': {
             'input': sol.pair.input,
