@@ -2,7 +2,7 @@ import sys
 import json
 import requests
 
-assignment_short_name = 'td' # get from peer website
+assignment_short_name = 'mdp' # get from peer website
 url_base = 'https://rldm.herokuapp.com/api/'
 data_login = {
     'username': '',
@@ -40,13 +40,11 @@ for response in responses:
     data = {
         'key': key,
         'score': 10,
-        'submission': 'this is their new submission',
-        'comments': 'these are some new comments',
+        #'submission': 'this is their new submission',
+        #'comments': 'these are some new comments',
     }
+    # some parameters in data can be optional
     r = requests.post(url_update_sol, data=data, headers=dict(Referer=url_login))
-    r = json.loads(r.text)
-    if 'error' in r:
-        print("Error: %s" % responses['error'])
-        sys.exit(1)
-    print(r['message'])
-
+    ret = json.loads(r.text)
+    updated_solution = ret['solution']
+    print(updated_solution['score'])

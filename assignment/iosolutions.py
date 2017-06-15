@@ -78,6 +78,28 @@ def get_by_assignment_scores(a):
         scores[sol.student] += sol.score
     return scores
 
+def sol_to_dict(sol):
+    d = {
+        'id': sol.id,
+        'student': {
+            'username': sol.student.username,
+            'firstname': sol.student.firstname,
+            'lastname': sol.student.lastname,
+            'email_tsq': sol.student.email_tsq
+        },
+        'solution': {
+            'submission': sol.output_submitted,
+            'score': sol.score,
+            'comments': sol.comments,
+            'count': sol.count
+        },
+        'pair': {
+            'input': sol.pair.input,
+            'output': sol.pair.output
+        }
+    }
+    return d
+
 def get_by_assignment_all(a):
     """ Filters IOSolution objects for assignment a
         :param a: Assignment
@@ -87,25 +109,7 @@ def get_by_assignment_all(a):
     count = 0
     solutions = IOSolution.objects.select_related().filter(assignment=a)
     for sol in solutions:
-        d = {
-            'id': sol.id,
-            'student': {
-                'username': sol.student.username,
-                'firstname': sol.student.firstname,
-                'lastname': sol.student.lastname,
-                'email_tsq': sol.student.email_tsq
-            },
-            'solution': {
-                'submission': sol.output_submitted,
-                'score': sol.score,
-                'comments': sol.comments,
-                'count': sol.count
-            },
-            'pair': {
-                'input': sol.pair.input,
-                'output': sol.pair.output
-            }
-        }
+        d = sol_to_dict(sol)
         scores.append(d)
     return scores
 
@@ -121,6 +125,10 @@ def get_by_id(pk):
     if len(solution) > 1:
         log.error("Found more than 1 solution")
     return solution
+
+def get_by_id_all(pk):
+    sol = IOSolution.objects.filter(pk=pk)
+    return sol_to_dict(sol[0])
 
 def update(solution, output=None, submit_late="false"):
     try:
