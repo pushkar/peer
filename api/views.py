@@ -36,7 +36,7 @@ def check_permissions(request):
     api.count = api.count + 1
     api.save()
     timedelta = api.updated - api.created
-    if timedelta.seconds > 300:
+    if timedelta.seconds > 1800:
         api.delete()
         log.info("Revoked access for %s (%s seconds)" % (api.student, timedelta.seconds))
         return False
