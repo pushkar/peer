@@ -1,1 +1,1 @@
-bin/newrelic-admin run-program bin/python peer/manage.py run_gunicorn -b "0.0.0.0:$PORT" -w 3
+web: newrelic-admin run-program gunicorn peer.wsgi --log-file -
