@@ -16,3 +16,4 @@ dependencies:
     - urllib3
     - django-secure
     - django-sslserver
+    - newrelic

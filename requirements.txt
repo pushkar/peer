@@ -11,3 +11,4 @@ djangoajax==2.3.3
 urllib3
 django-secure
 django-sslserver
+newrelic
