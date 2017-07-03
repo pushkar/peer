@@ -155,6 +155,8 @@ def check(solutions):
         a_name = s.assignment.short_name
         if a_name == "bandit":
             hw_check.check_two_armed_bandit(s)
+        if a_name == "k_arm":
+            hw_check.check_k_armed_bandit(s)
         elif a_name == "mdp":
             hw_check.check_valid_json(s)
         else:
