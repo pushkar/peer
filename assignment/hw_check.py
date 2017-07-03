@@ -46,6 +46,33 @@ def check_floating_point_answer(s):
         s.comments = "No solution yet."
     s.save()
 
+def check_k_armed_bandit(s):
+    max_score = 100./s.assignment.num_codeproblems
+    output = s.pair.output
+    if s.output_submitted:
+        if is_number(s.output_submitted):
+            score_diff = math.fabs(float(s.output_submitted) - float(output))
+            if score_diff <= 0.10:
+                if score_diff <= 0.01:
+                    s.comments = "Answer is correct."
+                    if s.updated < s.assignment.due_date:
+                        s.score = max_score
+                    else:
+                        s.score = max_score/2.0
+                else:
+                    s.comments = "Answer is correct, but you can improve your accuracy."
+                    if s.updated < s.assignment.due_date:
+                        s.score = max_score/2.0
+                    else:
+                        s.score = max_score/4.0
+                    
+            else:
+                s.comments = "Answer is wrong. ("+ s.output_submitted +")"
+        else:
+            s.comments = "Answer is not a number."
+    else:
+        s.comments = "No solution yet."
+    s.save()
 
 # Two Armed Bandit
 def check_two_armed_bandit(s):
