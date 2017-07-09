@@ -159,6 +159,8 @@ def check(solutions):
             hw_check.check_k_armed_bandit(s)
         elif a_name == "mdp":
             hw_check.check_valid_json(s)
+        elif a_name == "bar":
+            hw_check.check_bar_brawl(s)
         else:
             hw_check.check_floating_point_answer(s)
 

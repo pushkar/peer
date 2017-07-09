@@ -201,13 +201,14 @@ def check_messing_with_rewards(s):
     finally:
         s.save()
 
-def hw6_score(len_err):
-    len_correct = 100-len_err
-    percent_correct = len_correct/100.0
-    score = 10.0 + (100.0-10.0) * pow(percent_correct, 2.0)
+def bar_brawl_score(max_score, len_err):
+    len_correct = max_score-len_err
+    percent_correct = float(len_correct/max_score)
+    score = 0.1*max_score + (0.9*max_score) * pow(percent_correct, 2.0)
     return str(score)
 
-def check_hw6(s):
+def check_bar_brawl(s):
+    max_score = 100./s.assignment.num_codeproblems
     output = s.pair.output
     try:
         if s.output_submitted:
@@ -227,14 +228,14 @@ def check_hw6(s):
                 if len(err) == 0:
                     s.comments = "Solution is correct."
                     if s.updated < s.assignment.due_date:
-                        s.score = 100.0
+                        s.score = max_score
                     else:
-                        s.score = 100.0/2.0
+                        s.score = max_score/2.0
                 else:
                     if len(err) > 100:
                         s.score = 10.0
                     else:
-                        s.score = hw6_score(len(err))
+                        s.score = bar_brawl_score(max_score, len(err))
                     s.comments = str(len(err)) + " values are wrong."
                     # More detailed output
                     #if len(err) == 1:
