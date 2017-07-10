@@ -28,19 +28,28 @@ def get(s, a, n):
         :param m: int, number of pairs
         :returns: List of IOSolutions generated
     '''
-    solutions = IOSolution.objects.filter(student=s, assignment=a).count()
-    if solutions == n:
-        return IOSolution.objects.filter(student=s, assignment=a)
-
     iopairs_count = len(iopairs.get(a))
-    if iopairs_count < n:
+    if n > iopairs_count:
         n = iopairs_count
 
-    log.info("%s Generating %s iopairs" % (s, n))
-    pairs = iopairs.get_random(a, n)
-    for pair in pairs:
-        ios = IOSolution.objects.get_or_create(student=s, assignment=a, pair=pair)
-        log.info("Created IOSolution %s" % ios[0])
+    iosolutions_count = IOSolution.objects.filter(student=s, assignment=a).count()
+    if iosolutions_count > n:
+        solutions = IOSolution.objects.filter(student=s, assignment=a)
+        log.info("There are extra %s IOSolutions" % (iosolutions_count-n))
+        _n = 0
+        for sol in solutions:
+            _n = _n + 1
+            if _n > n:
+                log.info("Deleting %s" % sol)
+                sol.delete()
+
+    elif iosolutions_count < n:
+        _n = n - iosolutions_count
+        log.info("%s Generating %s IOPairs" % (s, _n))
+        pairs = iopairs.get_random(a, _n)
+        for pair in pairs:
+            ios = IOSolution.objects.get_or_create(student=s, assignment=a, pair=pair)
+            log.info("Created IOSolution %s" % ios[0])
 
     return IOSolution.objects.filter(student=s, assignment=a)
 
