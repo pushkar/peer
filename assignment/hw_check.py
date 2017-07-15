@@ -222,6 +222,8 @@ def check_bar_brawl(s):
                 i = 1
                 err = []
                 for (o, os) in zip(output, output_submitted):
+                    o = o.strip()
+                    os = os.strip()
                     if not o == os:
                         err.append(i)
                     i = i + 1
