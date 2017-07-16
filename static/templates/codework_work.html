@@ -32,7 +32,7 @@
       </div>
       {% endif %}
       <div class="form-group">
-        <button type="submit" name="submit-{{sol.pk}}" class="btn btn-default">Check</button>
+        <button type="submit" name="submit-{{sol.pk}}" class="btn btn-default" onClick="ga('send', 'event', 'click', 'homework check');">Check</button>
       </div>
     </div>
   </div>

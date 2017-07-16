@@ -23,7 +23,7 @@
                 {% endif %}
                 {% endfor %}
                 {% if a.0.enable_codework %}
-                <li><a href="{% url 'assignment:code' a.0.short_name %}" data-ajax="true" data-success="load_content">Solve with Code</a></li>
+                <li><a href="{% url 'assignment:code' a.0.short_name %}" data-ajax="true" data-success="load_content" onClick="ga('send', 'event', 'click', 'solve with code');">Solve with Code</a></li>
                 {% endif %}
                 {% if student.usertype == 'superta' %}
                 <li><a href="{% url 'assignment:admin' a.0.short_name %}" data-ajax="true" data-success="load_content">Admin</a></li>
