@@ -72,7 +72,7 @@ class Grading(models.Model):
     grade = models.CharField(max_length=100, blank=True, null=True)
 
 class TempExam(models.Model):
-    started = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     student = models.ForeignKey(Student)
     exam = models.ForeignKey(Exam)
