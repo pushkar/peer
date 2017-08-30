@@ -2,7 +2,7 @@ import sys
 import json
 import requests
 
-url_base = 'http://rldm.herokuapp.com/api/'
+url_base = 'https://rldm.herokuapp.com/api/'
 data_login = {}
 data_login['username'] = ''
 data_login['gtid'] = ''
