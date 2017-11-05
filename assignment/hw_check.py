@@ -52,8 +52,8 @@ def check_k_armed_bandit(s):
     if s.output_submitted:
         if is_number(s.output_submitted):
             score_diff = math.fabs(float(s.output_submitted) - float(output))
-            if score_diff <= 0.10:
-                if score_diff <= 0.01:
+            if score_diff <= 1.0:
+                if score_diff <= 0.5:
                     s.comments = "Answer is correct."
                     if s.updated < s.assignment.due_date:
                         s.score = max_score
