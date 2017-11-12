@@ -235,7 +235,7 @@ def check_bar_brawl(s):
                         s.score = max_score/2.0
                 else:
                     if len(err) > 100:
-                        s.score = 10.0
+                        s.score = 1.0
                     else:
                         s.score = bar_brawl_score(max_score, len(err))
                     s.comments = str(len(err)) + " values are wrong."
