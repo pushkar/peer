@@ -234,7 +234,7 @@ def check_bar_brawl(s):
                     else:
                         s.score = max_score/2.0
                 else:
-                    if len(err) > 100:
+                    if len(err) > int(max_score):
                         s.score = 1.0
                     else:
                         s.score = bar_brawl_score(max_score, len(err))
