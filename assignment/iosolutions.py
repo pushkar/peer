@@ -83,7 +83,7 @@ def get_by_assignment_scores(a):
     solutions = IOSolution.objects.select_related().filter(assignment=a)
     for sol in solutions:
         if sol.student not in scores:
-            scores[sol.student] = 0
+            scores[sol.student] = 0.0
         scores[sol.student] += sol.score
     return scores
 

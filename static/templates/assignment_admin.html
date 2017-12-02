@@ -10,7 +10,7 @@
     {% for student, score in scores.items %}
     <tr>
         <td>{{student}}</td>
-        <td>{{score}}</td>
+        <td>{{score|floatformat}}</td>
     </tr>
     {% endfor %}
   

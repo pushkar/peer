@@ -1,4 +1,4 @@
 {% for student, score in scores.items %}
-{{student.username}},{{student.lastname}},{{student.firstname}},{{score}}<br />
+{{student.username}},{{student.lastname}},{{student.firstname}},{{ score|floatformat }}<br />
 {% endfor %}
   
