@@ -16,9 +16,9 @@ def is_number(s):
 def is_json(s):
     try:
         s = json.loads(s)
+        return True
     except ValueError as e:
         return False
-    return True
 
 def check_valid_json(s):
     if is_json(s.output_submitted):
@@ -290,3 +290,30 @@ def check_hw7_old(s):
         s.comments = '%s (%s)' % (e.message, type(e))
     finally:
         s.save()
+
+def check_game_theory(s):
+    max_score = 100./s.assignment.num_codeproblems
+    output = s.pair.output
+    output = json.loads(output)
+    if s.output_submitted:
+        if is_json(s.output_submitted):
+            output_submitted = json.loads(s.output_submitted)
+            i = 1
+            err = []
+            for (o, os) in zip(output, output_submitted):
+                if math.fabs(float(o) - float(os)) > 0.01:
+                    err.append(i)
+                i = i + 1
+            if len(err) == 0:
+                s.comments = "Solution is correct."
+                if s.updated < s.assignment.due_date:
+                    s.score = max_score
+                else:
+                    s.score = max_score/2.0
+            else:
+                s.comments = "%s values are wrong." % len(err)
+        else:
+            s.comments = "Answer is not valid json. Expected [0.1, 0.2, 0.3] etc."
+    else:
+        s.comments = "No solution yet."
+    s.save()

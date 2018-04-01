@@ -170,6 +170,8 @@ def check(solutions):
             hw_check.check_valid_json(s)
         elif a_name == "bar":
             hw_check.check_bar_brawl(s)
+        elif a_name == "game":
+            hw_check.check_game_theory(s)
         else:
             hw_check.check_floating_point_answer(s)
 
