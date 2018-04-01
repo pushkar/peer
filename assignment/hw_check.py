@@ -16,9 +16,9 @@ def is_number(s):
 def is_json(s):
     try:
         s = json.loads(s)
+        return True
     except ValueError as e:
         return False
-    return True
 
 def check_valid_json(s):
     if is_json(s.output_submitted):
@@ -294,6 +294,7 @@ def check_hw7_old(s):
 def check_game_theory(s):
     max_score = 100./s.assignment.num_codeproblems
     output = s.pair.output
+    output = json.loads(output)
     if s.output_submitted:
         if is_json(s.output_submitted):
             output_submitted = json.loads(s.output_submitted)
