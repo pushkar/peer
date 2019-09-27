@@ -1,7 +1,7 @@
 Django==2.2.5
 dj-database-url>=0.5.0
 dj-static>=0.0.6
-gunicorn==19.3.0
+gunicorn==19.5.0
 psycopg2-binary
 static3
 requests>=2.13.0
