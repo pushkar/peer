@@ -10,6 +10,7 @@ from django.forms.models import model_to_dict
 
 log = logging.getLogger(__name__)
 
+
 def check_deadline(a):
     ''' Checks if the deadline has passed or not
         :returns: True if deadline is not passed
@@ -19,6 +20,7 @@ def check_deadline(a):
         return True
     else:
         return False
+
 
 def get(s, a, n):
     ''' Generates an IO pair for a student
@@ -53,6 +55,7 @@ def get(s, a, n):
 
     return IOSolution.objects.filter(student=s, assignment=a)
 
+
 def get_by_student(s, solutions=None):
     ''' Filters IOSolution objects for student s
         :param s: Student
@@ -63,6 +66,7 @@ def get_by_student(s, solutions=None):
 
     return IOSolution.objects.filter(student=s)
 
+
 def get_by_assignment(a, solutions=None):
     ''' Filters IOSolution objects for assignment a
         :param a: Assignment
@@ -72,6 +76,7 @@ def get_by_assignment(a, solutions=None):
         return solutions.filter(assignment=a)
 
     return IOSolution.objects.filter(assignment=a)
+
 
 def get_by_assignment_scores(a):
     ''' Filters IOSolution objects for assignment a
@@ -86,6 +91,7 @@ def get_by_assignment_scores(a):
             scores[sol.student] = 0.0
         scores[sol.student] += sol.score
     return scores
+
 
 def sol_to_dict(sol):
     d = {
@@ -111,6 +117,7 @@ def sol_to_dict(sol):
     }
     return d
 
+
 def get_by_assignment_all(a):
     """ Filters IOSolution objects for assignment a
         :param a: Assignment
@@ -128,8 +135,10 @@ def get_by_assignment_all(a):
 def get_none():
     return IOSolution.objects.none()
 
+
 def get_by(s, a):
     return IOSolution.objects.filter(student=s, assignment=a)
+
 
 def get_by_id(pk):
     solution = IOSolution.objects.filter(pk=pk)
@@ -137,9 +146,11 @@ def get_by_id(pk):
         log.error("Found more than 1 solution")
     return solution
 
+
 def get_by_id_all(pk):
     sol = IOSolution.objects.filter(pk=pk)
     return sol_to_dict(sol[0])
+
 
 def update(solution, output=None, submit_late="false"):
     try:
@@ -159,6 +170,7 @@ def update(solution, output=None, submit_late="false"):
     except Exception as e:
         return "Exception: %s" % (e)
 
+
 def check(solutions):
     for s in solutions:
         a_name = s.assignment.short_name
@@ -172,8 +184,11 @@ def check(solutions):
             hw_check.check_bar_brawl(s)
         elif a_name == "game":
             hw_check.check_game_theory(s)
+        elif a_name == "sarsa":
+            hw_check.check_bar_brawl(s)
         else:
             hw_check.check_floating_point_answer(s)
+
 
 def get_stats(solutions):
     stats = {}
