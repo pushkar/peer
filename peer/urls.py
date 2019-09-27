@@ -1,4 +1,4 @@
-from django.conf.urls import url, include
+from django.urls import include, path
 from django.contrib import admin
 from student import views
 import django.contrib.staticfiles.views as static_views
@@ -6,11 +6,20 @@ import django.contrib.staticfiles.views as static_views
 admin.autodiscover()
 
 urlpatterns = [
-    url(r'^$', views.index, name='index'),
-    url(r'^student/', include('student.urls', namespace="student")),
-    url(r'^assignment/', include('assignment.urls', namespace="assignment")),
-    url(r'^api/', include('api.urls', namespace="api")),
-    #url(r'^exam/', include('exam.urls', namespace="exam")),
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^static/(?P<path>.*)$', static_views.serve),
+    # url(r'^student/', 'student', name='student'),
+
+    # url(r'^student/', include('student.urls', namespace="student")),
+    # url(r'^assignment/', include('assignment.urls', namespace="assignment")),
+
+
+
+    path('', views.index, name='index'),
+    path('student/', include('student.urls')),
+    path('assignment/', include('assignment.urls')),
+    path('api/', include('api.urls')),
+    path('admin/', admin.site.urls),
+    path('static/<slug:path>', static_views.serve),
+
+    # path('exam/', include('exam.urls')),
+
 ]

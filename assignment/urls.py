@@ -2,6 +2,8 @@ from django.conf.urls import url
 
 from assignment import views
 
+app_name = "assignment"
+
 urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^(?P<a_name>\w+)/$', views.home, name='home'),

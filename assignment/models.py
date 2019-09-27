@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.contrib import messages
 from student.models import Student
 
+
 class Assignment(models.Model):
     short_name = models.CharField(max_length=50)
     name = models.CharField(max_length=200)
@@ -20,8 +21,9 @@ class Assignment(models.Model):
     class Meta(object):
         ordering = ['due_date']
 
+
 class AssignmentPage(models.Model):
-    assignment = models.ForeignKey(Assignment)
+    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
     title = models.CharField(max_length=200)
     link = models.CharField(max_length=200, null=True, blank=True)
@@ -33,9 +35,10 @@ class AssignmentPage(models.Model):
     def __str__(self):
         return "%s's page: %s" % (self.assignment, self.name)
 
+
 class IOPair(models.Model):
     ''' Contains Input/Output pairs for each Assignment '''
-    assignment = models.ForeignKey(Assignment)
+    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
     input = models.CharField(max_length=550000)
     output = models.CharField(max_length=100000)
 
@@ -62,14 +65,15 @@ class IOPair(models.Model):
             ret += "..."
         return ret
 
+
 class IOSolution(models.Model):
     ''' Contains Input/Output pairs submited by students '''
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     count = models.PositiveIntegerField(default=0)
-    student = models.ForeignKey(Student)
-    assignment = models.ForeignKey(Assignment)
-    pair = models.ForeignKey(IOPair)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
+    pair = models.ForeignKey(IOPair, on_delete=models.CASCADE)
     output_submitted = models.CharField(max_length=100000, null=True, blank=True)
     score = models.FloatField(default=0.0)
     comments = models.CharField(max_length=2000, null=True, blank=True)
