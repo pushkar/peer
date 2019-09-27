@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib import messages
 from django import template
 from django_ajax.decorators import ajax
@@ -11,13 +11,15 @@ from student.models import *
 from exam.exam_info import *
 import json
 
+
 def index(request):
     s = Student.objects.get(username=request.session['user'])
     exams = Exam.objects.all()
     return render(request, 'exam_index.html', {
         'student': s,
         'exams': exams,
-        })
+    })
+
 
 def get_or_create_exam(request, exam_name):
     s = Student.objects.get(username=request.session['user'])
@@ -36,7 +38,8 @@ def get_or_create_exam(request, exam_name):
         'student': s,
         'exam': e.get_exam(),
         'tempexam': tempexam.get_exam(),
-        })
+    })
+
 
 def save_exam(request, exam_name):
     s = Student.objects.get(username=request.session['user'])
@@ -62,7 +65,9 @@ def save_exam(request, exam_name):
                     return HttpResponseRedirect(reverse('exam:index'))
     return HttpResponseRedirect(reverse('exam:get_or_create_exam', args=[exam_name]))
 
-## Redundant, the functionality is in save_exam()
+# Redundant, the functionality is in save_exam()
+
+
 def submit_exam(request, exam_name):
     s = Student.objects.get(username=request.session['user'])
     e = exam_info(exam_name)
@@ -71,6 +76,7 @@ def submit_exam(request, exam_name):
         messages.success(request, "Your exam was submitted successfully.")
         tempexam.delete_exam()
     return HttpResponseRedirect(reverse('exam:index'))
+
 
 def admin_exam(request, exam_name):
     e = exam_info(exam_name)
@@ -88,7 +94,8 @@ def admin_exam(request, exam_name):
     return render(request, 'exam_admin.html', {
         'exam': e.get_exam(),
         'data': data,
-        })
+    })
+
 
 @ajax
 def graders(request, id):

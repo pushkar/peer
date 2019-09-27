@@ -2,7 +2,7 @@ import os
 import logging
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django_ajax.decorators import ajax
@@ -19,6 +19,8 @@ from sendgrid.helpers.mail import *
 log = logging.getLogger(__name__)
 
 # Create your views here.
+
+
 def send_email(email, gtid):
     log.info("Sending email to %s for GTID %s" % (email, gtid))
     sendgrid_api_key = os.environ.get('SENDGRID_API_KEY')
@@ -38,6 +40,7 @@ def send_email(email, gtid):
     log.info("Headers %s" % response.headers)
     return response.status_code
 
+
 def get_student_data(request):
     data = {}
     username = request.session['user']
@@ -48,9 +51,11 @@ def get_student_data(request):
         data['assignments'] = data['assignments'].filter(released=True)
     return data
 
+
 @ajax
 def messages_all(request):
     return render(request, 'messages.html', {})
+
 
 def index(request):
     if utils.check_session(request):
@@ -62,6 +67,7 @@ def index(request):
         return render(request, 'index.html', {
             'form': form,
         })
+
 
 def login(request):
     if request.method == 'POST':
@@ -88,6 +94,7 @@ def login(request):
     messages.warning(request, "Form entries are wrong. Please try again.")
     return HttpResponseRedirect(reverse('student:index'))
 
+
 def pass_request(request):
     if request.method == 'POST':
         passform = ForgotPasswordForm(request.POST)
@@ -95,7 +102,9 @@ def pass_request(request):
             try:
                 s = Student.objects.get(username=passform.cleaned_data['username'])
                 if send_email(s.email, s.gtid) == 202:
-                    messages.success(request, "Sent a message with GTID to your GT email. Check your SPAM folder if you can't find it.")
+                    messages.success(
+                        request,
+                        "Sent a message with GTID to your GT email. Check your SPAM folder if you can't find it.")
                     return HttpResponseRedirect(reverse('student:pass_request'))
                 else:
                     messages.warning(request, "Could not send an email. Contact your TA.")
@@ -123,6 +132,7 @@ def logout(request):
     messages.success(request, "You were successfully logged out")
     return HttpResponseRedirect(reverse('student:index'))
 
+
 def optin(request):
     if not utils.check_session(request):
         return HttpResponseRedirect(reverse('student:index'))
@@ -133,6 +143,7 @@ def optin(request):
     log.info("%s changed to opt-in" % s)
     return HttpResponseRedirect(reverse('student:index'))
 
+
 def profile(request):
     if not utils.check_session(request):
         return HttpResponseRedirect(reverse('student:index'))
@@ -140,6 +151,7 @@ def profile(request):
     return render(request, 'profile.html', {
         **get_student_data(request),
     })
+
 
 def about(request):
     assignments = Assignment.objects.none()
@@ -153,6 +165,7 @@ def about(request):
     return render(request, 'about.html', {
         'assignments': assignments,
     })
+
 
 @login_required
 def admin(request):

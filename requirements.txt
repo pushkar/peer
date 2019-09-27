@@ -1,9 +1,9 @@
-Django==1.11
-dj-database-url==0.3.0
-dj-static==0.0.6
+Django==2.2.5
+dj-database-url>=0.5.0
+dj-static>=0.0.6
 gunicorn==19.3.0
 psycopg2-binary
-static3==0.6.1
+static3
 requests>=2.13.0
 sendgrid>=0.5.0
 pytz==2013.7

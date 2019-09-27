@@ -4,7 +4,7 @@ import hashlib
 from django.utils import timezone
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
@@ -19,6 +19,8 @@ from api.models import ApiKey
 log = logging.getLogger(__name__)
 
 # Decorators
+
+
 def check_permissions(request):
     if request.method == 'GET':
         key = request.GET.get('key', '')
@@ -43,10 +45,13 @@ def check_permissions(request):
     return True
 
 # Views
+
+
 def index(request):
     response = {}
     response['message'] = "Call valid endpoints!"
     return JsonResponse(response)
+
 
 @csrf_exempt
 def login(request):
@@ -88,12 +93,14 @@ def login(request):
         data['key'] = api_[0].key
     return JsonResponse(data)
 
+
 def student_all(request):
     if not check_permissions(request):
         return JsonResponse({'error': 'Permission Denied'})
     students = Student.objects.all()
     data = serializers.serialize('json', students)
     return HttpResponse(data, content_type='application/json')
+
 
 def student_by_id(request, id):
     if not check_permissions(request):
@@ -102,12 +109,14 @@ def student_by_id(request, id):
     data = serializers.serialize('json', students)
     return HttpResponse(data, content_type='application/json')
 
+
 def student_by_user(request, username):
     if not check_permissions(request):
         return JsonResponse({'error': 'Permission Denied'})
     students = Student.objects.filter(username=username)
     data = serializers.serialize('json', students)
     return HttpResponse(data, content_type='application/json')
+
 
 @csrf_exempt
 def student_add(request):
@@ -125,6 +134,7 @@ def student_add(request):
             log.info("Could not create a user for %s" % data)
             return JsonResponse({'error': 'Could not create an entry for student with %s' % data})
 
+
 def assignment_all(request):
     if not check_permissions(request):
         return JsonResponse({'error': 'Permission Denied'})
@@ -134,6 +144,7 @@ def assignment_all(request):
 
     data = serializers.serialize('json', a)
     return HttpResponse(data, content_type='application/json')
+
 
 def assignment(request, a_name):
     if not check_permissions(request):
@@ -145,6 +156,7 @@ def assignment(request, a_name):
     data = serializers.serialize('json', a)
     return HttpResponse(data, content_type='application/json')
 
+
 def codework(request, a_name, username):
     if not check_permissions(request):
         return JsonResponse({'error': 'Permission Denied'})
@@ -153,6 +165,7 @@ def codework(request, a_name, username):
     solutions = iosolutions.get_by(s, a)
     data = serializers.serialize('json', solutions)
     return HttpResponse(data, content_type='application/json')
+
 
 def codework_by_username(request, username):
     if not check_permissions(request):
@@ -168,6 +181,7 @@ def codework_by_username(request, username):
     data = serializers.serialize('json', solutions)
     return HttpResponse(data, content_type='application/json')
 
+
 def codework_by_assignment(request, a_name):
     if not check_permissions(request):
         return JsonResponse({'error': 'Permission Denied'})
@@ -181,6 +195,7 @@ def codework_by_assignment(request, a_name):
 
     data = json.dumps(solutions)
     return HttpResponse(data, content_type='application/json')
+
 
 @csrf_exempt
 def iosolution_update(request, iosolution_id):
@@ -209,6 +224,7 @@ def iosolution_update(request, iosolution_id):
         log.info("IOSolution %s saved" % iosolution_id)
         data = json.dumps(sol)
         return HttpResponse(data, content_type='application/json')
+
 
 def codepair(request, id):
     if not check_permissions(request):

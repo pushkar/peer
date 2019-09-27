@@ -1,7 +1,7 @@
 import logging
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib import messages
 from django.utils import timezone
 from assignment.models import Assignment, AssignmentPage
@@ -13,6 +13,7 @@ import student.utils as utils
 from django_ajax.decorators import ajax
 
 log = logging.getLogger(__name__)
+
 
 def get_assignments_data(request, a_name=None, p_name=None):
     data = {}
@@ -34,15 +35,19 @@ def get_assignments_data(request, a_name=None, p_name=None):
     return data
 
 # Displays all Assignments
+
+
 def index(request):
     if not utils.check_session(request):
         return HttpResponseRedirect(reverse('student:index'))
 
     return render(request, 'assignment_index.html', {
         **get_assignments_data(request),
-        })
+    })
 
 # Default view for assignments
+
+
 def home(request, a_name):
     if not utils.check_session(request):
         return HttpResponseRedirect(reverse('student:index'))
@@ -52,11 +57,13 @@ def home(request, a_name):
         if 'page' in request.GET:
             p_name = request.GET['page']
             if p_name != "":
-                extra_scripts = "load_div(\'"+ reverse('assignment:page', args=[a_name, p_name]) +"\', \'#assignment_content\'); \n"
+                extra_scripts = "load_div(\'" + reverse('assignment:page',
+                                                        args=[a_name, p_name]) + "\', \'#assignment_content\'); \n"
 
         if 'code' in request.GET:
             a_name = request.GET['code']
-            extra_scripts = "load_div(\'"+ reverse('assignment:code', args=[a_name]) +"\', \'#assignment_content\'); \n"
+            extra_scripts = "load_div(\'" + reverse('assignment:code',
+                                                    args=[a_name]) + "\', \'#assignment_content\'); \n"
 
     return render(request, 'assignment_pagebase.html', {
         **get_assignments_data(request, a_name),
@@ -71,7 +78,8 @@ def page(request, a_name, p_name):
 
     return render(request, 'assignment_pageview.html', {
         **get_assignments_data(request, a_name, p_name),
-        })
+    })
+
 
 @ajax
 def admin(request, a_name):
@@ -92,7 +100,8 @@ def admin(request, a_name):
     return render(request, 'assignment_admin.html', {
         'scores': scores,
         'a_name': a_name,
-        })
+    })
+
 
 def download_as_csv(request, a_name):
     if not utils.check_session(request):
@@ -111,7 +120,8 @@ def download_as_csv(request, a_name):
 
     return render(request, 'assignment_csv.html', {
         'scores': scores,
-        })
+    })
+
 
 @ajax
 def code(request, a_name):
@@ -148,7 +158,8 @@ def code(request, a_name):
         'time_left': time_left,
         'submit_late': submit_late,
         'stats': stats,
-        })
+    })
+
 
 @ajax
 def update(request, id):
